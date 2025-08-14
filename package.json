@@ -16,6 +16,7 @@
     "studio:deploy": "sanity deploy"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@next/third-parties": "^14.2.5",
     "@portabletext/react": "^3.1.0",
     "@sanity/client": "^6.21.3",
