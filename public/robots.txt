@@ -1,174 +1,19 @@
-# =============================================
-# ROBOTS.TXT - BLOG DE RESEÑAS LOCALES
-# =============================================
-# Configuración optimizada para SEO y crawling
-
-# Configuración para todos los bots
 User-agent: *
 Allow: /
 
-# =============================================
-# ÁREAS BLOQUEADAS - Seguridad y Performance
-# =============================================
+# Sitemap
+Sitemap: https://example.com/sitemap.xml
 
-# Bloquear áreas administrativas
+# Block admin areas
 Disallow: /studio/
-Disallow: /admin/
-Disallow: /dashboard/
-
-# Bloquear APIs y endpoints internos
 Disallow: /api/
-Disallow: /api/auth/
-Disallow: /api/revalidate/
-Disallow: /_next/webpack-hmr
+Disallow: /_next/
+Disallow: /admin/
 
-# Bloquear archivos del sistema Next.js
-Disallow: /_next/static/chunks/
-Disallow: /_vercel/
-
-# Bloquear archivos temporales y de desarrollo
-Disallow: /tmp/
-Disallow: /.well-known/
-Disallow: /health/
-Disallow: /status/
-
-# =============================================
-# ÁREAS PERMITIDAS EXPLÍCITAMENTE
-# =============================================
-
-# Permitir imágenes y assets estáticos
+# Allow crawling of images
 Allow: /images/
-Allow: /icons/
-Allow: /og/
 Allow: /_next/image
 Allow: /_next/static/
-Allow: /favicon.ico
 
-# Permitir páginas públicas importantes
-Allow: /blog/
-Allow: /categorias/
-Allow: /tags/
-Allow: /sitemap.xml
-Allow: /feed.xml
-Allow: /rss.xml
-
-# =============================================
-# CONFIGURACIÓN ESPECÍFICA POR BOT
-# =============================================
-
-# Google Bot - Sin restricciones adicionales
-User-agent: Googlebot
-Allow: /
+# Crawl delay (optional)
 Crawl-delay: 1
-
-# Bing Bot
-User-agent: bingbot
-Allow: /
-Crawl-delay: 1
-
-# Facebook Bot (para Open Graph)
-User-agent: facebookexternalhit/1.1
-Allow: /
-Allow: /og/
-
-# Twitter Bot (para Twitter Cards)
-User-agent: Twitterbot
-Allow: /
-Allow: /og/
-
-# WhatsApp Bot (para previews)
-User-agent: WhatsApp
-Allow: /
-Allow: /og/
-
-# LinkedIn Bot
-User-agent: LinkedInBot
-Allow: /
-Allow: /og/
-
-# Pinterest Bot
-User-agent: Pinterestbot
-Allow: /
-Allow: /images/
-
-# Telegram Bot
-User-agent: TelegramBot
-Allow: /
-Allow: /og/
-
-# =============================================
-# BOTS BLOQUEADOS - Spam y scraping
-# =============================================
-
-# Bloquear bots maliciosos conocidos
-User-agent: AhrefsBot
-Disallow: /
-
-User-agent: MJ12bot
-Disallow: /
-
-User-agent: SemrushBot
-Disallow: /
-
-User-agent: DotBot
-Disallow: /
-
-User-agent: BLEXBot
-Disallow: /
-
-User-agent: YandexBot
-Disallow: /
-
-# Bloquear scrapers agresivos
-User-agent: ia_archiver
-Disallow: /
-
-User-agent: ScoutJet
-Disallow: /
-
-User-agent: CCBot
-Disallow: /
-
-# =============================================
-# CONFIGURACIÓN DE CRAWLING
-# =============================================
-
-# Crawl delay general (1 segundo entre requests)
-Crawl-delay: 1
-
-# Request rate (requests por segundo) - Solo para bots que lo soporten
-Request-rate: 1/1s
-
-# Tiempo de visita (tiempo máximo en el sitio)
-Visit-time: 0400-2000
-
-# =============================================
-# SITEMAPS
-# =============================================
-
-# Sitemap principal (será generado automáticamente)
-Sitemap: https://your-domain.com/sitemap.xml
-
-# Sitemaps específicos (opcional)
-Sitemap: https://your-domain.com/sitemap-posts.xml
-Sitemap: https://your-domain.com/sitemap-categories.xml
-Sitemap: https://your-domain.com/sitemap-images.xml
-
-# RSS Feed (para bots que lo soporten)
-Sitemap: https://your-domain.com/rss.xml
-Sitemap: https://your-domain.com/feed.xml
-
-# =============================================
-# NOTAS IMPORTANTES
-# =============================================
-# 1. Actualizar las URLs con tu dominio real antes de ir a producción
-# 2. Verificar que los sitemaps existan y estén actualizados
-# 3. Monitorear Google Search Console para errores de crawling
-# 4. Revisar logs del servidor para detectar bots problemáticos
-# 5. Actualizar esta configuración según las necesidades del sitio
-
-# =============================================
-# INFORMACIÓN DE CONTACTO
-# =============================================
-# Para consultas sobre crawling: webmaster@your-domain.com
-# Última actualización: 2024

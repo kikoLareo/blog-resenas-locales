@@ -1,17 +1,7 @@
-// Export all schema types
-import { city } from './city';
-import { category } from './category';
-import { venue } from './venue';
-import { review } from './review';
-import { post } from './post';
+import venue from './venue';
+import review from './review';
+import post from './post';
+import city from './city';
+import category from './category';
 
-export const schemaTypes = [
-  // Settings and configuration
-  city,
-  category,
-  
-  // Main content types
-  venue,
-  review,
-  post,
-];
+export const schemaTypes = [venue, review, post, city, category];

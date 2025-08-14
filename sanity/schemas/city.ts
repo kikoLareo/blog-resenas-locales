@@ -1,16 +1,15 @@
 import { defineField, defineType } from 'sanity';
 
-export const city = defineType({
+export default defineType({
   name: 'city',
   title: 'Ciudad',
   type: 'document',
-  icon: () => '🏙️',
   fields: [
     defineField({
       name: 'title',
-      title: 'Nombre de la ciudad',
+      title: 'Nombre de la Ciudad',
       type: 'string',
-      validation: (rule) => rule.required().min(2).max(100),
+      validation: (Rule) => Rule.required().min(2).max(50),
     }),
     defineField({
       name: 'slug',
@@ -20,39 +19,25 @@ export const city = defineType({
         source: 'title',
         maxLength: 96,
       },
-      validation: (rule) => rule.required(),
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'region',
       title: 'Región/Provincia',
       type: 'string',
-      description: 'Ej: Galicia, Madrid, Cataluña',
+      initialValue: 'Galicia',
+      validation: (Rule) => Rule.required(),
+      description: 'Provincia o comunidad autónoma',
     }),
     defineField({
       name: 'geo',
-      title: 'Ubicación geográfica',
-      type: 'object',
-      fields: [
-        {
-          name: 'lat',
-          title: 'Latitud',
-          type: 'number',
-          validation: (rule) => rule.required().min(-90).max(90),
-        },
-        {
-          name: 'lng',
-          title: 'Longitud',
-          type: 'number',
-          validation: (rule) => rule.required().min(-180).max(180),
-        },
-      ],
-      options: {
-        collapsible: true,
-      },
+      title: 'Ubicación GPS',
+      type: 'geopoint',
+      description: 'Coordenadas del centro de la ciudad',
     }),
     defineField({
       name: 'heroImage',
-      title: 'Imagen principal',
+      title: 'Imagen Principal',
       type: 'image',
       options: {
         hotspot: true,
@@ -60,14 +45,14 @@ export const city = defineType({
       fields: [
         {
           name: 'alt',
-          title: 'Texto alternativo',
           type: 'string',
-          validation: (rule) => rule.required(),
+          title: 'Texto alternativo',
+          validation: (Rule) => Rule.required(),
         },
         {
           name: 'caption',
-          title: 'Pie de foto',
           type: 'string',
+          title: 'Descripción',
         },
       ],
     }),
@@ -75,22 +60,54 @@ export const city = defineType({
       name: 'description',
       title: 'Descripción',
       type: 'text',
-      rows: 3,
-      description: 'Breve descripción de la ciudad para SEO',
+      rows: 4,
+      description: 'Descripción de la ciudad para SEO y presentación',
+    }),
+    defineField({
+      name: 'featured',
+      title: 'Ciudad Destacada',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Mostrar en homepage y secciones principales',
+    }),
+    defineField({
+      name: 'population',
+      title: 'Población',
+      type: 'number',
+      description: 'Número de habitantes (opcional)',
+    }),
+    defineField({
+      name: 'website',
+      title: 'Web Oficial',
+      type: 'url',
+      description: 'Página web del ayuntamiento o turismo',
     }),
   ],
   preview: {
     select: {
       title: 'title',
-      region: 'region',
+      subtitle: 'region',
       media: 'heroImage',
     },
-    prepare({ title, region, media }) {
+    prepare(selection) {
+      const { title, subtitle, media } = selection;
       return {
         title,
-        subtitle: region || 'Sin región',
+        subtitle: subtitle || 'Galicia',
         media,
       };
     },
   },
+  orderings: [
+    {
+      title: 'Nombre A-Z',
+      name: 'titleAsc',
+      by: [{ field: 'title', direction: 'asc' }],
+    },
+    {
+      title: 'Población (mayor)',
+      name: 'populationDesc',
+      by: [{ field: 'population', direction: 'desc' }],
+    },
+  ],
 });

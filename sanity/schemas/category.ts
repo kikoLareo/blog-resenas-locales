@@ -1,16 +1,15 @@
 import { defineField, defineType } from 'sanity';
 
-export const category = defineType({
+export default defineType({
   name: 'category',
   title: 'Categoría',
   type: 'document',
-  icon: () => '🏷️',
   fields: [
     defineField({
       name: 'title',
-      title: 'Nombre de la categoría',
+      title: 'Nombre de la Categoría',
       type: 'string',
-      validation: (rule) => rule.required().min(2).max(50),
+      validation: (Rule) => Rule.required().min(2).max(50),
     }),
     defineField({
       name: 'slug',
@@ -20,56 +19,92 @@ export const category = defineType({
         source: 'title',
         maxLength: 96,
       },
-      validation: (rule) => rule.required(),
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'description',
       title: 'Descripción',
       type: 'text',
       rows: 3,
-      description: 'Breve descripción de la categoría',
+      description: 'Descripción de la categoría para SEO',
+    }),
+    defineField({
+      name: 'icon',
+      title: 'Icono/Emoji',
+      type: 'string',
+      validation: (Rule) => Rule.max(10),
+      description: 'Emoji o icono representativo (ej: 🍕, 🍣, ☕)',
     }),
     defineField({
       name: 'color',
-      title: 'Color',
+      title: 'Color Representativo',
       type: 'string',
       options: {
         list: [
           { title: 'Rojo', value: 'red' },
           { title: 'Azul', value: 'blue' },
           { title: 'Verde', value: 'green' },
-          { title: 'Amarillo', value: 'yellow' },
+          { title: 'Naranja', value: 'orange' },
           { title: 'Púrpura', value: 'purple' },
           { title: 'Rosa', value: 'pink' },
-          { title: 'Índigo', value: 'indigo' },
+          { title: 'Amarillo', value: 'yellow' },
           { title: 'Gris', value: 'gray' },
         ],
         layout: 'radio',
       },
-      initialValue: 'blue',
+      initialValue: 'red',
+    }),
+    defineField({
+      name: 'featured',
+      title: 'Categoría Destacada',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Mostrar en homepage y navegación principal',
+    }),
+    defineField({
+      name: 'seoTitle',
+      title: 'Título SEO',
+      type: 'string',
+      validation: (Rule) => Rule.max(60),
+      description: 'Título optimizado para buscadores',
+    }),
+    defineField({
+      name: 'seoDescription',
+      title: 'Meta Description',
+      type: 'text',
+      rows: 2,
+      validation: (Rule) => Rule.max(160),
+      description: 'Descripción para buscadores (máx. 160 caracteres)',
     }),
   ],
   preview: {
     select: {
       title: 'title',
-      description: 'description',
-      color: 'color',
+      subtitle: 'description',
+      icon: 'icon',
+      featured: 'featured',
     },
-    prepare({ title, description, color }) {
+    prepare(selection) {
+      const { title, subtitle, icon, featured } = selection;
       return {
-        title,
-        subtitle: description || 'Sin descripción',
-        media: () => (
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              backgroundColor: `var(--${color}-500, #3b82f6)`,
-              borderRadius: '4px',
-            }}
-          />
-        ),
+        title: `${icon || '🏷️'} ${title}`,
+        subtitle: `${featured ? '⭐ DESTACADA • ' : ''}${subtitle || 'Sin descripción'}`,
       };
     },
   },
+  orderings: [
+    {
+      title: 'Nombre A-Z',
+      name: 'titleAsc',
+      by: [{ field: 'title', direction: 'asc' }],
+    },
+    {
+      title: 'Destacadas primero',
+      name: 'featuredFirst',
+      by: [
+        { field: 'featured', direction: 'desc' },
+        { field: 'title', direction: 'asc' },
+      ],
+    },
+  ],
 });
