@@ -141,7 +141,6 @@ public/sitemap-*.xml
 public/robots-generated.txt
 
 # Package manager files
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
