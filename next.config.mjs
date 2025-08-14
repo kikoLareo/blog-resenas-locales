@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    ppr: false,
+    typedRoutes: true,
   },
   images: {
     remotePatterns: [
@@ -16,41 +16,45 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
+  async generateBuildId() {
+    return 'build-' + new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+  },
   async rewrites() {
     return [
       {
-        source: '/studio/:path*',
-        destination: '/studio/index.html',
+        source: '/sitemap.xml',
+        destination: '/api/sitemap',
+      },
+      {
+        source: '/sitemap-:type.xml',
+        destination: '/api/sitemap/:type',
       },
     ];
   },
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: '/:path*',
         headers: [
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
+            key: 'X-Robots-Tag',
+            value: 'index, follow',
           },
           {
             key: 'X-Content-Type-Options',
             value: 'nosniff',
           },
           {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
+            key: 'X-Frame-Options',
+            value: 'DENY',
           },
         ],
       },
     ];
   },
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
+  swcMinify: true,
   poweredByHeader: false,
   compress: true,
-  generateEtags: true,
 };
 
 export default nextConfig;
