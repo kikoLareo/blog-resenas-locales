@@ -22,6 +22,7 @@
     "next-sanity": "^8.5.0",
     "@sanity/image-url": "^1.0.2",
     "@sanity/vision": "^3.45.0",
+    "@sanity/icons": "^2.8.0",
     "next-seo": "^6.5.0",
     "groq": "^3.45.0",
     "@portabletext/react": "^3.0.0",
