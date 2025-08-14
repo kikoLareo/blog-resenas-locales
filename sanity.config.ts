@@ -4,6 +4,8 @@
 import { visionTool } from '@sanity/vision';
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
+import { colorInput } from '@sanity/color-input';
+import { orderableDocumentListPlugin } from '@sanity/orderable-document-list';
 
 // Import schemas
 import { schemaTypes } from './sanity/schemas';
@@ -21,18 +23,80 @@ export default defineConfig({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '',
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   basePath: '/studio',
+  
   plugins: [
     structureTool({
       structure,
+      defaultDocumentNode: (S, { schemaType }) => {
+        // Personalizar vista por defecto según el tipo de documento
+        switch (schemaType) {
+          case 'review':
+            return S.document().views([
+              S.view.form(),
+              S.view
+                .component(() => 
+                  <div style={{ padding: '20px' }}>
+                    <h3>Vista previa de la reseña</h3>
+                    <p>Aquí se mostraría una vista previa de cómo se ve la reseña en el sitio web.</p>
+                  </div>
+                )
+                .title('Vista previa')
+                .icon(() => '👁️'),
+            ]);
+          case 'venue':
+            return S.document().views([
+              S.view.form(),
+              S.view
+                .component(() => 
+                  <div style={{ padding: '20px' }}>
+                    <h3>Vista previa del local</h3>
+                    <p>Aquí se mostraría una vista previa de la página del local.</p>
+                  </div>
+                )
+                .title('Vista previa')
+                .icon(() => '👁️'),
+            ]);
+          case 'post':
+            return S.document().views([
+              S.view.form(),
+              S.view
+                .component(() => 
+                  <div style={{ padding: '20px' }}>
+                    <h3>Vista previa del post</h3>
+                    <p>Aquí se mostraría una vista previa del artículo/crónica.</p>
+                  </div>
+                )
+                .title('Vista previa')
+                .icon(() => '👁️'),
+            ]);
+          default:
+            return S.document().views([S.view.form()]);
+        }
+      },
     }),
-    visionTool(),
+    
+    // Plugin para manejar colores
+    colorInput(),
+    
+    // Plugin para ordenar documentos
+    orderableDocumentListPlugin({
+      type: 'category',
+      title: 'Ordenar Categorías',
+    }),
+    
+    // Plugin Vision para desarrollo
+    visionTool({
+      defaultApiVersion: '2024-01-01',
+    }),
   ],
+  
   schema: {
     types: schemaTypes,
     // Filter out singleton types from the global "New document" menu
     templates: (templates) =>
       templates.filter(({ schemaType }) => !singletonTypes.has(schemaType)),
   },
+  
   document: {
     // For singleton types, filter out actions that are not explicitly included
     // in the `singletonActions` list defined above
@@ -40,12 +104,80 @@ export default defineConfig({
       singletonTypes.has(context.schemaType)
         ? input.filter(({ action }) => action && singletonActions.has(action))
         : input,
+        
+    // Configurar campos computados y validaciones
+    productionUrl: async (prev, { document }) => {
+      // URL base del sitio (reemplazar con tu dominio real)
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      
+      if (!document.slug?.current) return prev;
+      
+      switch (document._type) {
+        case 'review':
+          return `${baseUrl}/resenas/${document.slug.current}`;
+        case 'venue':
+          return `${baseUrl}/locales/${document.slug.current}`;
+        case 'post':
+          return `${baseUrl}/blog/${document.slug.current}`;
+        case 'city':
+          return `${baseUrl}/ciudades/${document.slug.current}`;
+        case 'category':
+          return `${baseUrl}/categorias/${document.slug.current}`;
+        default:
+          return prev;
+      }
+    },
   },
+  
   tools: (prev) => {
     // Show the vision tool only in development
     if (process.env.NODE_ENV === 'development') {
       return prev;
     }
     return prev.filter((tool) => tool.name !== 'vision');
+  },
+  
+  // Configuraciones adicionales del Studio
+  studio: {
+    components: {
+      // Personalizar el logo del Studio
+      logo: () => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '24px' }}>🍽️</span>
+          <span style={{ fontWeight: 'bold', color: '#1f2937' }}>
+            Reseñas Locales
+          </span>
+        </div>
+      ),
+    },
+  },
+  
+  // Configurar la búsqueda
+  search: {
+    // Configurar qué campos se incluyen en la búsqueda global
+    filters: [
+      {
+        name: 'type',
+        title: 'Tipo',
+        options: [
+          { title: 'Reseñas', value: 'review' },
+          { title: 'Locales', value: 'venue' },
+          { title: 'Posts', value: 'post' },
+          { title: 'Ciudades', value: 'city' },
+          { title: 'Categorías', value: 'category' },
+        ],
+      },
+    ],
+  },
+  
+  // Configurar la API
+  api: {
+    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '',
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+    apiVersion: '2024-01-01',
+    useCdn: process.env.NODE_ENV === 'production',
+    stega: {
+      enabled: process.env.NODE_ENV === 'development',
+    },
   },
 });
