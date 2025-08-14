@@ -99,8 +99,8 @@ export default function AdSlot({
     }
 
   // Intersection Observer for lazy loading
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(
+  if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+          const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
