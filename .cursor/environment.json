@@ -1,18 +1,32 @@
 {
-  "install": "npm install && npm run build",
+  "name": "Blog Reseñas Development Environment",
+  "install": "npm install",
   "start": "",
-  "terminals": [
+  "ports": [
     {
       "name": "Next.js Dev Server",
-      "command": "npm run dev"
+      "port": 3000
     },
     {
       "name": "Sanity Studio",
-      "command": "npm run studio"
+      "port": 3333
+    }
+  ],
+  "terminals": [
+    {
+      "name": "Next.js Dev Server",
+      "command": "npm run dev",
+      "description": "Runs the Next.js development server on port 3000"
     },
     {
-      "name": "Tests",
-      "command": "npm run test:watch"
+      "name": "Sanity Studio", 
+      "command": "npm run studio",
+      "description": "Runs Sanity Studio on port 3333 for content management"
+    },
+    {
+      "name": "Tests Watcher",
+      "command": "npm run test",
+      "description": "Runs Vitest in watch mode for unit tests"
     }
   ]
 }
