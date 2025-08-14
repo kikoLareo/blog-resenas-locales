@@ -232,9 +232,7 @@ export const getCategoryBySlug = groq`
     }
   }
 `;
-    }
-  }
-`;
+   
 
 // Query para sitemap - venues
 export const sitemapVenuesQuery = groq`
