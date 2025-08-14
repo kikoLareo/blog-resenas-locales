@@ -159,13 +159,12 @@ export default defineConfig({
       'react-dom',
       '@testing-library/react',
       '@testing-library/jest-dom',
-      'vitest',
     ],
   },
 
   // ESBuild configuration
   esbuild: {
-    target: 'node14',
-    format: 'cjs',
+    target: 'node18',
+    format: 'esm',
   },
 });
