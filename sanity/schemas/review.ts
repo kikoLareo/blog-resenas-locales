@@ -1,169 +1,129 @@
 import { defineField, defineType } from 'sanity';
 
-export const review = defineType({
+export default defineType({
   name: 'review',
   title: 'Reseña',
   type: 'document',
-  icon: () => '⭐',
-  groups: [
-    {
-      name: 'basic',
-      title: 'Información básica',
-    },
-    {
-      name: 'ratings',
-      title: 'Puntuaciones',
-    },
-    {
-      name: 'content',
-      title: 'Contenido',
-    },
-    {
-      name: 'media',
-      title: 'Galería',
-    },
-    {
-      name: 'seo',
-      title: 'SEO/AEO',
-    },
-  ],
   fields: [
     defineField({
       name: 'title',
-      title: 'Título de la reseña',
+      title: 'Título de la Reseña',
       type: 'string',
-      group: 'basic',
-      validation: (rule) => rule.required().min(10).max(100),
+      validation: (Rule) => Rule.required().min(10).max(120),
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
-      group: 'basic',
       options: {
         source: 'title',
         maxLength: 96,
       },
-      validation: (rule) => rule.required(),
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'venue',
       title: 'Local',
       type: 'reference',
       to: [{ type: 'venue' }],
-      group: 'basic',
-      validation: (rule) => rule.required(),
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'visitDate',
-      title: 'Fecha de visita',
+      title: 'Fecha de Visita',
       type: 'date',
-      group: 'basic',
-      validation: (rule) => rule.required(),
+      validation: (Rule) => Rule.required().max(new Date().toISOString().split('T')[0]),
     }),
     defineField({
       name: 'ratings',
       title: 'Puntuaciones',
       type: 'object',
-      group: 'ratings',
       fields: [
         {
           name: 'food',
           title: 'Comida',
           type: 'number',
-          validation: (rule) => rule.required().min(0).max(10).integer(),
-          options: {
-            layout: 'slider',
-            range: { min: 0, max: 10, step: 1 },
-          },
+          validation: (Rule) => Rule.required().min(0).max(10).precision(1),
+          description: 'Puntuación de 0 a 10',
         },
         {
           name: 'service',
           title: 'Servicio',
           type: 'number',
-          validation: (rule) => rule.required().min(0).max(10).integer(),
-          options: {
-            layout: 'slider',
-            range: { min: 0, max: 10, step: 1 },
-          },
+          validation: (Rule) => Rule.required().min(0).max(10).precision(1),
+          description: 'Puntuación de 0 a 10',
         },
         {
           name: 'ambience',
           title: 'Ambiente',
           type: 'number',
-          validation: (rule) => rule.required().min(0).max(10).integer(),
-          options: {
-            layout: 'slider',
-            range: { min: 0, max: 10, step: 1 },
-          },
+          validation: (Rule) => Rule.required().min(0).max(10).precision(1),
+          description: 'Puntuación de 0 a 10',
         },
         {
           name: 'value',
-          title: 'Relación calidad-precio',
+          title: 'Relación Calidad-Precio',
           type: 'number',
-          validation: (rule) => rule.required().min(0).max(10).integer(),
-          options: {
-            layout: 'slider',
-            range: { min: 0, max: 10, step: 1 },
-          },
+          validation: (Rule) => Rule.required().min(0).max(10).precision(1),
+          description: 'Puntuación de 0 a 10',
         },
       ],
-      validation: (rule) => rule.required(),
-      options: {
-        collapsible: false,
-      },
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'avgTicket',
-      title: 'Ticket medio (€)',
+      title: 'Ticket Medio (€)',
       type: 'number',
-      group: 'ratings',
-      description: 'Precio promedio por persona',
-      validation: (rule) => rule.min(0).max(500),
+      validation: (Rule) => Rule.required().min(0).max(500),
+      description: 'Coste medio por persona en euros',
     }),
     defineField({
       name: 'highlights',
-      title: 'Platos destacados',
+      title: 'Platos Estrella',
       type: 'array',
       of: [{ type: 'string' }],
-      group: 'content',
-      validation: (rule) => rule.max(5),
-      description: 'Máximo 5 platos o elementos destacados',
+      validation: (Rule) => Rule.max(8),
+      description: 'Mejores platos probados',
     }),
     defineField({
       name: 'pros',
-      title: 'Puntos positivos',
+      title: 'Aspectos Positivos',
       type: 'array',
       of: [{ type: 'string' }],
-      group: 'content',
-      validation: (rule) => rule.required().min(2).max(5),
-      description: 'Entre 2 y 5 puntos positivos',
+      validation: (Rule) => Rule.required().min(2).max(6),
+      description: 'Puntos fuertes del local',
     }),
     defineField({
       name: 'cons',
-      title: 'Puntos negativos',
+      title: 'Aspectos Negativos',
       type: 'array',
       of: [{ type: 'string' }],
-      group: 'content',
-      validation: (rule) => rule.max(3),
-      description: 'Máximo 3 puntos negativos (opcional)',
+      validation: (Rule) => Rule.max(4),
+      description: 'Puntos de mejora (opcional)',
     }),
     defineField({
       name: 'tldr',
-      title: 'TL;DR (Resumen AEO)',
+      title: 'TL;DR (Resumen Ejecutivo)',
       type: 'text',
       rows: 3,
-      group: 'seo',
-      validation: (rule) => 
-        rule
-          .required()
-          .min(200) // ~50 palabras
-          .max(300), // ~75 palabras
-      description: 'Resumen de 50-75 palabras optimizado para asistentes de voz',
+      validation: (Rule) => 
+        Rule.required()
+          .min(50)
+          .max(75)
+          .custom((value) => {
+            if (value) {
+              const wordCount = value.split(/\s+/).length;
+              if (wordCount < 8 || wordCount > 18) {
+                return 'El TL;DR debe tener entre 8 y 18 palabras (50-75 caracteres)';
+              }
+            }
+            return true;
+          }),
+      description: 'Resumen de 50-75 caracteres optimizado para AEO/respuestas de voz',
     }),
     defineField({
       name: 'faq',
-      title: 'Preguntas frecuentes',
+      title: 'FAQ (Preguntas Frecuentes)',
       type: 'array',
       of: [
         {
@@ -173,18 +133,27 @@ export const review = defineType({
               name: 'question',
               title: 'Pregunta',
               type: 'string',
-              validation: (rule) => rule.required().min(10).max(150),
+              validation: (Rule) => Rule.required().min(10).max(120),
             },
             {
               name: 'answer',
               title: 'Respuesta',
               type: 'text',
               rows: 2,
-              validation: (rule) => 
-                rule
-                  .required()
-                  .min(160) // ~40 palabras
-                  .max(220), // ~55 palabras
+              validation: (Rule) => 
+                Rule.required()
+                  .min(40)
+                  .max(55)
+                  .custom((value) => {
+                    if (value) {
+                      const wordCount = value.split(/\s+/).length;
+                      if (wordCount < 8 || wordCount > 12) {
+                        return 'La respuesta debe tener entre 8-12 palabras (40-55 caracteres)';
+                      }
+                    }
+                    return true;
+                  }),
+              description: 'Respuesta concisa de 40-55 caracteres para featured snippets',
             },
           ],
           preview: {
@@ -195,13 +164,12 @@ export const review = defineType({
           },
         },
       ],
-      group: 'seo',
-      validation: (rule) => rule.required().min(3).max(5),
-      description: 'Entre 3 y 5 preguntas con respuestas de 40-55 palabras',
+      validation: (Rule) => Rule.required().min(3).max(5),
+      description: '3-5 preguntas con respuestas optimizadas para SEO/AEO',
     }),
     defineField({
       name: 'body',
-      title: 'Contenido de la reseña',
+      title: 'Contenido de la Reseña',
       type: 'array',
       of: [
         {
@@ -214,7 +182,7 @@ export const review = defineType({
           ],
           lists: [
             { title: 'Bullet', value: 'bullet' },
-            { title: 'Numbered', value: 'number' },
+            { title: 'Number', value: 'number' },
           ],
           marks: {
             decorators: [
@@ -231,36 +199,25 @@ export const review = defineType({
                     title: 'URL',
                     name: 'href',
                     type: 'url',
+                    validation: (Rule) => Rule.required(),
+                  },
+                  {
+                    title: 'Open in new tab',
+                    name: 'blank',
+                    type: 'boolean',
+                    initialValue: true,
                   },
                 ],
               },
             ],
           },
         },
-        {
-          type: 'image',
-          options: { hotspot: true },
-          fields: [
-            {
-              name: 'alt',
-              title: 'Texto alternativo',
-              type: 'string',
-              validation: (rule) => rule.required(),
-            },
-            {
-              name: 'caption',
-              title: 'Pie de foto',
-              type: 'string',
-            },
-          ],
-        },
       ],
-      group: 'content',
-      validation: (rule) => rule.required(),
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'gallery',
-      title: 'Galería de fotos',
+      title: 'Galería de Imágenes',
       type: 'array',
       of: [
         {
@@ -271,35 +228,31 @@ export const review = defineType({
           fields: [
             {
               name: 'alt',
-              title: 'Texto alternativo',
               type: 'string',
-              validation: (rule) => rule.required(),
+              title: 'Texto alternativo',
+              validation: (Rule) => Rule.required(),
             },
             {
               name: 'caption',
-              title: 'Pie de foto',
               type: 'string',
+              title: 'Descripción',
             },
           ],
         },
       ],
-      group: 'media',
-      validation: (rule) => rule.min(3).max(15),
-      description: 'Entre 3 y 15 fotos de la experiencia',
+      validation: (Rule) => Rule.min(3).max(15),
     }),
     defineField({
       name: 'author',
       title: 'Autor',
       type: 'string',
-      group: 'basic',
-      validation: (rule) => rule.required(),
-      initialValue: 'Blog de Reseñas Team',
+      initialValue: 'Foodie Galicia',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'authorAvatar',
-      title: 'Avatar del autor',
+      title: 'Avatar del Autor',
       type: 'image',
-      group: 'basic',
       options: {
         hotspot: true,
       },
@@ -309,19 +262,25 @@ export const review = defineType({
       title: 'Etiquetas',
       type: 'array',
       of: [{ type: 'string' }],
-      group: 'seo',
-      validation: (rule) => rule.max(10),
       options: {
         layout: 'tags',
       },
+      validation: (Rule) => Rule.max(8),
+      description: 'Etiquetas para categorización y SEO',
+    }),
+    defineField({
+      name: 'featured',
+      title: 'Reseña Destacada',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Mostrar en homepage y secciones destacadas',
     }),
     defineField({
       name: 'publishedAt',
-      title: 'Fecha de publicación',
+      title: 'Fecha de Publicación',
       type: 'datetime',
-      group: 'basic',
-      validation: (rule) => rule.required(),
       initialValue: () => new Date().toISOString(),
+      validation: (Rule) => Rule.required(),
     }),
   ],
   preview: {
@@ -330,33 +289,36 @@ export const review = defineType({
       venue: 'venue.title',
       visitDate: 'visitDate',
       media: 'gallery.0',
-      food: 'ratings.food',
-      service: 'ratings.service',
+      ratings: 'ratings',
     },
-    prepare({ title, venue, visitDate, media, food, service }) {
-      const avgRating = food && service ? Math.round((food + service) / 2 * 10) / 10 : 'Sin puntuación';
+    prepare(selection) {
+      const { title, venue, visitDate, media, ratings } = selection;
+      const avgRating = ratings 
+        ? ((ratings.food + ratings.service + ratings.ambience + ratings.value) / 4).toFixed(1)
+        : 'N/A';
+      
       return {
         title,
-        subtitle: `${venue || 'Sin local'} • ${visitDate || 'Sin fecha'} • ⭐ ${avgRating}`,
+        subtitle: `${venue} • ${visitDate} • ⭐ ${avgRating}`,
         media,
       };
     },
   },
   orderings: [
     {
+      title: 'Fecha de publicación (más reciente)',
+      name: 'publishedAtDesc',
+      by: [{ field: 'publishedAt', direction: 'desc' }],
+    },
+    {
       title: 'Fecha de visita (más reciente)',
       name: 'visitDateDesc',
       by: [{ field: 'visitDate', direction: 'desc' }],
     },
     {
-      title: 'Fecha de publicación',
-      name: 'publishedAtDesc',
-      by: [{ field: 'publishedAt', direction: 'desc' }],
-    },
-    {
-      title: 'Título A-Z',
-      name: 'titleAsc',
-      by: [{ field: 'title', direction: 'asc' }],
+      title: 'Puntuación (mejor)',
+      name: 'ratingDesc',
+      by: [{ field: 'ratings.food', direction: 'desc' }],
     },
   ],
 });
