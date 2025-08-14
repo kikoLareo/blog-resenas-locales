@@ -98,27 +98,32 @@ export default function AdSlot({
       return;
     }
 
-    // Intersection Observer for lazy loading
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            loadAd();
-            observer.disconnect();
-          }
-        });
-      },
-      {
-        rootMargin: '100px', // Start loading 100px before entering viewport
-        threshold: 0.1,
-      }
-    );
+  // Intersection Observer for lazy loading
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              loadAd();
+              observer.disconnect();
+            }
+          });
+        },
+        {
+          rootMargin: '100px',
+          threshold: 0.1,
+        }
+      );
 
-    observer.observe(container);
+      observer.observe(container);
 
-    return () => {
-      observer.disconnect();
-    };
+      return () => {
+        observer.disconnect();
+      };
+    } else {
+      // Fallback: load ad immediately if IntersectionObserver is unavailable
+      loadAd();
+    }
   }, [hasConsent, isLoaded, lazy, slotId, width, height]);
 
   if (!hasConsent) {
