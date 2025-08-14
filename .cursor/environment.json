@@ -1,0 +1,18 @@
+{
+  "install": "npm install && npm run build",
+  "start": "",
+  "terminals": [
+    {
+      "name": "Next.js Dev Server",
+      "command": "npm run dev"
+    },
+    {
+      "name": "Sanity Studio",
+      "command": "npm run studio"
+    },
+    {
+      "name": "Tests",
+      "command": "npm run test:watch"
+    }
+  ]
+}
