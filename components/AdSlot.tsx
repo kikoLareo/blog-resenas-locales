@@ -72,6 +72,7 @@ export default function AdSlot({
       // AdSense implementation
       if (ADS_CONFIG.provider === 'adsense' && typeof window !== 'undefined') {
         // AdSense implementation would go here
+        // eslint-disable-next-line no-console
         console.log('AdSense implementation needed');
       }
 
@@ -170,6 +171,13 @@ export default function AdSlot({
 // Extend Window type for TypeScript
 declare global {
   interface Window {
-    googletag: any;
+    // Minimal shape to satisfy typing without usar any
+    googletag: {
+      cmd: Array<() => void>;
+      pubads: () => { enableSingleRequest: () => void };
+      enableServices: () => void;
+      defineSlot: (adUnitPath: string, size: [number, number], div: Element) => { addService: (service: unknown) => unknown } | null;
+      display: (div: Element) => void;
+    };
   }
 }
