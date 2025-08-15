@@ -20,8 +20,10 @@ export default function AdSlot({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasConsent, setHasConsent] = useState(false);
 
-  // Get slot configuration
-  const slotConfig = ADS_CONFIG.sizes[slotId];
+  // Get slot configuration (map logical slotId -> size key)
+  // Map logical id -> size key; provide safe fallback if misconfigurado
+  const sizeKey = ADS_CONFIG.slots[slotId] as keyof typeof ADS_CONFIG.sizes;
+  const slotConfig = sizeKey ? ADS_CONFIG.sizes[sizeKey] : { width: 1, height: 1 } as const;
   const { width, height } = slotConfig;
 
   // Check for consent (implement your consent management logic here)
@@ -71,6 +73,7 @@ export default function AdSlot({
       // AdSense implementation
       if (ADS_CONFIG.provider === 'adsense' && typeof window !== 'undefined') {
         // AdSense implementation would go here
+        // eslint-disable-next-line no-console
         console.log('AdSense implementation needed');
       }
 
@@ -98,42 +101,52 @@ export default function AdSlot({
       return;
     }
 
-    // Intersection Observer for lazy loading
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            loadAd();
-            observer.disconnect();
-          }
-        });
-      },
-      {
-        rootMargin: '100px', // Start loading 100px before entering viewport
-        threshold: 0.1,
-      }
-    );
+  // Intersection Observer for lazy loading
+  if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+          const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              loadAd();
+              observer.disconnect();
+            }
+          });
+        },
+        {
+          rootMargin: '100px',
+          threshold: 0.1,
+        }
+      );
 
-    observer.observe(container);
+      observer.observe(container);
 
-    return () => {
-      observer.disconnect();
-    };
+      return () => {
+        observer.disconnect();
+      };
+    } else {
+      // Fallback: load ad immediately if IntersectionObserver is unavailable
+      loadAd();
+    }
   }, [hasConsent, isLoaded, lazy, slotId, width, height]);
 
-  if (!hasConsent) {
+  // Ads desactivados temporalmente: renderiza solo el contenedor reservado sin contenido de anuncio
+  // Respeta bandera de entorno para activar/desactivar anuncios en UI
+  if (!ADS_CONFIG.enabled) {
     return (
       <div
         ref={containerRef}
-        className={`ad-slot flex items-center justify-center ${className}`}
-        style={{ width, height }}
+        className={`ad-slot ${className}`}
+        style={{ 
+          width, 
+          height,
+          minHeight: height,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
         data-testid={testId}
-        aria-label="Advertisement space (consent required)"
-      >
-        <span className="text-xs text-gray-400">
-          Publicidad (requiere consentimiento)
-        </span>
-      </div>
+        aria-label="Advertisement (disabled)"
+      />
     );
   }
 
@@ -152,21 +165,7 @@ export default function AdSlot({
       data-testid={testId}
       aria-label="Advertisement"
     >
-      {!isLoaded && ADS_CONFIG.provider !== 'none' && (
-        <div className="flex items-center justify-center h-full">
-          <div className="animate-pulse bg-gray-200 rounded w-full h-full flex items-center justify-center">
-            <span className="text-xs text-gray-400">Cargando anuncio...</span>
-          </div>
-        </div>
-      )}
       
-      {ADS_CONFIG.provider === 'none' && (
-        <div className="bg-gray-100 border-2 border-dashed border-gray-300 w-full h-full flex items-center justify-center">
-          <span className="text-xs text-gray-400">
-            Ad Slot {slotId} ({width}x{height})
-          </span>
-        </div>
-      )}
     </div>
   );
 }
@@ -174,6 +173,13 @@ export default function AdSlot({
 // Extend Window type for TypeScript
 declare global {
   interface Window {
-    googletag: any;
+    // Minimal shape to satisfy typing without usar any
+    googletag: {
+      cmd: Array<() => void>;
+      pubads: () => { enableSingleRequest: () => void };
+      enableServices: () => void;
+      defineSlot: (adUnitPath: string, size: [number, number], div: Element) => { addService: (service: unknown) => unknown } | null;
+      display: (div: Element) => void;
+    };
   }
 }

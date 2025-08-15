@@ -19,7 +19,7 @@ test.describe('SEO and JSON-LD Validation', () => {
 
     // Validate JSON-LD presence
     const jsonLdScript = page.locator('script[type="application/ld+json"]').first();
-    await expect(jsonLdScript).toBeVisible();
+    await expect(jsonLdScript).toHaveCount(1);
 
     // Parse and validate JSON-LD structure
     const jsonLdContent = await jsonLdScript.textContent();

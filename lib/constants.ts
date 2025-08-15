@@ -67,6 +67,7 @@ export const SOCIAL_PLATFORMS = {
 
 // Ad configuration
 export const ADS_CONFIG = {
+  enabled: process.env.NEXT_PUBLIC_ADS_ENABLED === 'true',
   provider: process.env.ADS_PROVIDER || 'none',
   scriptUrl: process.env.ADS_SCRIPT_URL || '',
   slots: {

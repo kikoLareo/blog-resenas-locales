@@ -14,11 +14,9 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [
-    ['html'],
-    ['json', { outputFile: 'test-results/results.json' }],
-    ...(process.env.CI ? [['github']] : []),
-  ],
+  reporter: process.env.CI
+    ? [ ['html'], ['json', { outputFile: 'test-results/results.json' }], ['github'] ]
+    : [ ['html'], ['json', { outputFile: 'test-results/results.json' }] ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -146,8 +144,8 @@ export default defineConfig({
   ],
 
   /* Configure global setup and teardown */
-  globalSetup: require.resolve('./tests/global-setup.ts'),
-  globalTeardown: require.resolve('./tests/global-teardown.ts'),
+  globalSetup: './tests/global-setup.ts',
+  globalTeardown: './tests/global-teardown.ts',
 
   /* Run your local dev server before starting the tests */
   webServer: {
@@ -156,7 +154,6 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
     // Wait for specific content to ensure app is ready
-    reuseExistingServer: !process.env.CI,
   },
 
   /* Configure test timeouts */

@@ -1,10 +1,9 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
-import { generateDefaultSEO } from '@/lib/seo';
+import AdSlot from '@/components/AdSlot';
 import { websiteJsonLd, organizationJsonLd } from '@/lib/schema';
 import { SITE_CONFIG } from '@/lib/constants';
-import AdSlot from '@/components/AdSlot';
+// Ads desactivados temporalmente
 
 // This would be replaced with actual Sanity queries
 const mockReviews = [
@@ -51,7 +50,6 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const seoConfig = generateDefaultSEO();
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -95,9 +93,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Ad Slot - Header */}
+      {/* Ad Slot - Header (placeholder sin anuncios) */}
       <div className="container-wide py-4">
-        <AdSlot slotId="header-banner" className="mx-auto" lazy={false} />
+        <AdSlot slotId="header" className="mx-auto" lazy={false} />
       </div>
 
       {/* Latest Reviews Section */}
@@ -179,7 +177,8 @@ export default function HomePage() {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              <AdSlot slotId="sidebar-300x250" />
+              {/* Ad Slot - Sidebar (placeholder sin anuncios) */}
+              <AdSlot slotId="sidebar" />
               
               {/* Cities Section */}
               <div className="card">
@@ -261,9 +260,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer Ad */}
+      {/* Footer Ad (placeholder sin anuncios) */}
       <div className="container-wide py-4">
-        <AdSlot slotId="footer-728x90" className="mx-auto" />
+        <AdSlot slotId="footer" className="mx-auto" />
       </div>
     </>
   );
