@@ -257,6 +257,8 @@ ADS_SCRIPT_URL=https://securepubads.g.doubleclick.net/tag/js/gpt.js
 ADS_PROVIDER=adsense
 ```
 
+> Nota: La integración de anuncios en la UI está temporalmente desactivada. Consulta `TODO.md` para el plan de reintroducción.
+
 ## 🧪 Testing
 
 ### Tests E2E (Playwright)

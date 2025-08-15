@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { generateDefaultSEO } from '@/lib/seo';
 import { websiteJsonLd, organizationJsonLd } from '@/lib/schema';
 import { SITE_CONFIG } from '@/lib/constants';
-import AdSlot from '@/components/AdSlot';
+// Ads desactivados temporalmente
 
 // This would be replaced with actual Sanity queries
 const mockReviews = [
@@ -95,10 +95,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Ad Slot - Header */}
-      <div className="container-wide py-4">
-        <AdSlot slotId="header-banner" className="mx-auto" lazy={false} />
-      </div>
+      {/* Ad Slot - Header (desactivado) */}
 
       {/* Latest Reviews Section */}
       <section className="py-16">
@@ -179,7 +176,7 @@ export default function HomePage() {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              <AdSlot slotId="sidebar-300x250" />
+              {/* Ad Slot - Sidebar (desactivado) */}
               
               {/* Cities Section */}
               <div className="card">
@@ -261,10 +258,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer Ad */}
-      <div className="container-wide py-4">
-        <AdSlot slotId="footer-728x90" className="mx-auto" />
-      </div>
+      {/* Footer Ad (desactivado) */}
     </>
   );
 }

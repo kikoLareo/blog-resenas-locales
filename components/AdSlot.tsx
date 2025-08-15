@@ -20,8 +20,9 @@ export default function AdSlot({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasConsent, setHasConsent] = useState(false);
 
-  // Get slot configuration
-  const slotConfig = ADS_CONFIG.sizes[slotId];
+  // Get slot configuration (map logical slotId -> size key)
+  const sizeKey = ADS_CONFIG.slots[slotId] as keyof typeof ADS_CONFIG.sizes;
+  const slotConfig = ADS_CONFIG.sizes[sizeKey];
   const { width, height } = slotConfig;
 
   // Check for consent (implement your consent management logic here)
@@ -126,19 +127,23 @@ export default function AdSlot({
     }
   }, [hasConsent, isLoaded, lazy, slotId, width, height]);
 
-  if (!hasConsent) {
+  // Ads desactivados temporalmente: renderiza solo el contenedor reservado sin contenido de anuncio
+  if (true) {
     return (
       <div
         ref={containerRef}
-        className={`ad-slot flex items-center justify-center ${className}`}
-        style={{ width, height }}
+        className={`ad-slot ${className}`}
+        style={{ 
+          width, 
+          height,
+          minHeight: height,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
         data-testid={testId}
-        aria-label="Advertisement space (consent required)"
-      >
-        <span className="text-xs text-gray-400">
-          Publicidad (requiere consentimiento)
-        </span>
-      </div>
+        aria-label="Advertisement (disabled)"
+      />
     );
   }
 
@@ -157,21 +162,7 @@ export default function AdSlot({
       data-testid={testId}
       aria-label="Advertisement"
     >
-      {!isLoaded && ADS_CONFIG.provider !== 'none' && (
-        <div className="flex items-center justify-center h-full">
-          <div className="animate-pulse bg-gray-200 rounded w-full h-full flex items-center justify-center">
-            <span className="text-xs text-gray-400">Cargando anuncio...</span>
-          </div>
-        </div>
-      )}
       
-      {ADS_CONFIG.provider === 'none' && (
-        <div className="bg-gray-100 border-2 border-dashed border-gray-300 w-full h-full flex items-center justify-center">
-          <span className="text-xs text-gray-400">
-            Ad Slot {slotId} ({width}x{height})
-          </span>
-        </div>
-      )}
     </div>
   );
 }
