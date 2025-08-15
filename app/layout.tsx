@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { DefaultSeo } from 'next-seo';
 import '@/styles/globals.css';
 import { SITE_CONFIG, SEO_DEFAULTS } from '@/lib/constants';
 import { websiteJsonLd, organizationJsonLd } from '@/lib/schema';

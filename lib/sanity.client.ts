@@ -18,13 +18,13 @@ export function urlFor(source: SanityImageSource) {
 }
 
 // Cached client for ISR
-export async function sanityFetch<T = any>({
+export async function sanityFetch<T = unknown>({
   query,
   params = {},
   tags = [],
 }: {
   query: string;
-  params?: any;
+  params?: Record<string, unknown>;
   tags?: string[];
 }): Promise<T> {
   return client.fetch(query, params, {
@@ -45,12 +45,12 @@ export const previewClient = createClient({
   perspective: 'previewDrafts',
 });
 
-export async function sanityPreviewFetch<T = any>({
+export async function sanityPreviewFetch<T = unknown>({
   query,
   params = {},
 }: {
   query: string;
-  params?: any;
+  params?: Record<string, unknown>;
 }): Promise<T> {
   return previewClient.fetch(query, params);
 }

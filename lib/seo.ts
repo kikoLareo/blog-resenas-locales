@@ -1,6 +1,6 @@
 import { NextSeoProps } from 'next-seo';
 import { Venue, Review, Post, City } from './types';
-import { SITE_CONFIG, SEO_DEFAULTS } from './constants';
+import { SITE_CONFIG } from './constants';
 
 /**
  * Generate SEO configuration for venue pages

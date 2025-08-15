@@ -1,7 +1,5 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
-import { generateDefaultSEO } from '@/lib/seo';
 import { websiteJsonLd, organizationJsonLd } from '@/lib/schema';
 import { SITE_CONFIG } from '@/lib/constants';
 // Ads desactivados temporalmente
@@ -51,7 +49,6 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const seoConfig = generateDefaultSEO();
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
