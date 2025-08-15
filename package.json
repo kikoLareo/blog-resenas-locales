@@ -23,6 +23,7 @@
     "clsx": "^2.1.1",
     "groq": "^3.45.0",
     "lucide-react": "^0.378.0",
+    "@heroicons/react": "^2.1.5",
     "next": "^14.2.0",
     "next-sanity": "^8.5.0",
     "next-seo": "^6.5.0",
