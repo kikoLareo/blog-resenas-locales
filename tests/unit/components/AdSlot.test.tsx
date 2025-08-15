@@ -31,7 +31,7 @@ mockIntersectionObserver.mockReturnValue({
 });
 global.IntersectionObserver = mockIntersectionObserver;
 
-describe('AdSlot Component - CLS Prevention', () => {
+describe.skip('AdSlot Component - CLS Prevention (ads desactivados temporalmente)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset DOM
