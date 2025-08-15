@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import AdSlot from '@/components/AdSlot';
 import { websiteJsonLd, organizationJsonLd } from '@/lib/schema';
 import { SITE_CONFIG } from '@/lib/constants';
 // Ads desactivados temporalmente
@@ -92,7 +93,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Ad Slot - Header (desactivado) */}
+      {/* Ad Slot - Header (placeholder sin anuncios) */}
+      <div className="container-wide py-4">
+        <AdSlot slotId="header-banner" className="mx-auto" lazy={false} />
+      </div>
 
       {/* Latest Reviews Section */}
       <section className="py-16">
@@ -173,7 +177,8 @@ export default function HomePage() {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Ad Slot - Sidebar (desactivado) */}
+              {/* Ad Slot - Sidebar (placeholder sin anuncios) */}
+              <AdSlot slotId="sidebar-300x250" />
               
               {/* Cities Section */}
               <div className="card">
@@ -255,7 +260,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer Ad (desactivado) */}
+      {/* Footer Ad (placeholder sin anuncios) */}
+      <div className="container-wide py-4">
+        <AdSlot slotId="footer-728x90" className="mx-auto" />
+      </div>
     </>
   );
 }
