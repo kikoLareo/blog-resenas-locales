@@ -250,11 +250,13 @@ NEXT_PUBLIC_PLAUSIBLE_DOMAIN=tu-dominio.com
 ```env
 ADS_PROVIDER=gam
 ADS_SCRIPT_URL=https://securepubads.g.doubleclick.net/tag/js/gpt.js
+NEXT_PUBLIC_ADS_ENABLED=false
 ```
 
 #### AdSense
 ```env
 ADS_PROVIDER=adsense
+NEXT_PUBLIC_ADS_ENABLED=true
 ```
 
 > Nota: La integración de anuncios en la UI está temporalmente desactivada. Consulta `TODO.md` para el plan de reintroducción.
