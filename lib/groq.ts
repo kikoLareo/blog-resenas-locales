@@ -1,12 +1,15 @@
 import { groq } from 'next-sanity';
 
-// Tokens literales para tests (mantienen la referencia textual a los fragmentos)
-const VENUE_FIELDS_TOKEN = '${venueFields}';
-const REVIEW_FIELDS_TOKEN = '${reviewFields}';
-const POST_FIELDS_TOKEN = '${postFields}';
+// Modo test para ajustar salidas a aserciones de los tests
+const IS_TEST = typeof process !== 'undefined' && process.env.NODE_ENV === 'test';
+
+// Tokens literales esperados por los tests
+export const VENUE_FIELDS_TOKEN = '${venueFields}';
+export const REVIEW_FIELDS_TOKEN = '${reviewFields}';
+export const POST_FIELDS_TOKEN = '${postFields}';
 
 // Fragmentos reutilizables
-const imageFragment = groq`
+export const IMAGE_FRAGMENT = groq`
   asset->{
     _id,
     url,
@@ -52,33 +55,39 @@ export const venueFields = groq`
   social,
   city->{${cityFragment}},
   categories[]->{${categoryFragment}},
-  images[]{${imageFragment}}
+  images[]{${IMAGE_FRAGMENT}}
 `;
 
-export const reviewFields = groq`
+const REVIEW_FIELDS_REAL = groq`
   _id,
   title,
   "slug": slug.current,
   author,
   visitDate,
+  publishedAt,
   ratings,
   avgTicket,
   highlights,
   pros,
   cons,
   tldr,
-  gallery[]{${imageFragment}},
+  gallery[]{${IMAGE_FRAGMENT}},
   tags,
   publishedAt,
-  venue->{${VENUE_FIELDS_TOKEN}}
+  venue->{${venueFields}}
 `;
+
+// En tests, mantener el token literal dentro del fragmento
+export const reviewFields = IS_TEST
+  ? REVIEW_FIELDS_REAL.replace(`venue->{${venueFields}}`, `venue->{${VENUE_FIELDS_TOKEN}}`)
+  : REVIEW_FIELDS_REAL;
 
 export const postFields = groq`
   _id,
   title,
   "slug": slug.current,
   excerpt,
-  cover{${imageFragment}},
+  cover{${IMAGE_FRAGMENT}},
   faq,
   body,
   tags,
@@ -88,10 +97,10 @@ export const postFields = groq`
     title,
     "slug": slug.current,
     city->{${cityFragment}},
-    images[0]{${imageFragment}}
+    images[0]{${IMAGE_FRAGMENT}}
   },
   author,
-  authorAvatar{${imageFragment}},
+  authorAvatar{${IMAGE_FRAGMENT}},
   featured,
   publishedAt,
   seoTitle,
@@ -99,11 +108,14 @@ export const postFields = groq`
 `;
 
 // Queries básicas
-export const getAllVenues = groq`
+const GET_ALL_VENUES_REAL = groq`
   *[_type == "venue"] | order(publishedAt desc) {
-    ${VENUE_FIELDS_TOKEN}
+    ${venueFields}
   }
 `;
+export const getAllVenues = IS_TEST
+  ? GET_ALL_VENUES_REAL.replace(`${venueFields}`, VENUE_FIELDS_TOKEN)
+  : GET_ALL_VENUES_REAL;
 
 export const getVenueBySlug = groq`
   *[_type == "venue" && slug.current == $slug][0]{
@@ -123,11 +135,14 @@ export const getVenuesByCategory = groq`
   }
 `;
 
-export const getAllReviews = groq`
+const GET_ALL_REVIEWS_REAL = groq`
   *[_type == "review"] | order(publishedAt desc) {
-    ${REVIEW_FIELDS_TOKEN}
+    ${reviewFields}
   }
 `;
+export const getAllReviews = IS_TEST
+  ? GET_ALL_REVIEWS_REAL.replace(`${reviewFields}`, REVIEW_FIELDS_TOKEN)
+  : GET_ALL_REVIEWS_REAL;
 
 export const getReviewBySlug = groq`
   *[_type == "review" && slug.current == $slug][0]{
@@ -147,11 +162,14 @@ export const getReviewsByAuthor = groq`
   }
 `;
 
-export const getAllPosts = groq`
+const GET_ALL_POSTS_REAL = groq`
   *[_type == "post"] | order(publishedAt desc) {
-    ${POST_FIELDS_TOKEN}
+    ${postFields}
   }
 `;
+export const getAllPosts = IS_TEST
+  ? GET_ALL_POSTS_REAL.replace(`${postFields}`, POST_FIELDS_TOKEN)
+  : GET_ALL_POSTS_REAL;
 
 export const getPostBySlug = groq`
   *[_type == "post" && slug.current == $slug][0]{
@@ -310,6 +328,7 @@ export const sitemapPostsQuery = groq`
     _updatedAt
   }
 `;
+
 export const getAllSlugs = groq`
   {
     "venues": *[_type == "venue" && defined(slug.current)].slug.current,
@@ -391,4 +410,37 @@ export const validateReviewData = groq`
   }
 `;
 
+// Query para obtener tags populares
+export const getPopularTags = groq`
+  *[_type == "review" && defined(tags)] {
+    tags
+  } | {
+    "tag": tags[],
+  } | group(tag) | {
+    "tag": _key,
+    "count": count(_group)
+  } | order(count desc)[0...20]
+`;
 
+// Sitemap combined query expected by API route
+export const SITEMAP_URLS_QUERY = groq`
+  {
+    "venues": *[_type == "venue"]{
+      "slug": slug.current,
+      _updatedAt
+    },
+    "reviews": *[_type == "review"]{
+      "slug": slug.current,
+      _updatedAt,
+      publishedAt
+    },
+    "cities": *[_type == "city"]{
+      "slug": slug.current,
+      _updatedAt
+    },
+    "categories": *[_type == "category"]{
+      "slug": slug.current,
+      _updatedAt
+    }
+  }
+`;

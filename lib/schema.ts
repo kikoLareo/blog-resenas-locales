@@ -1,111 +1,164 @@
-import { Venue, Review, Post, BreadcrumbItem } from './types';
+import { 
+  Venue, 
+  Review, 
+  Post,
+  FAQ,
+  LocalBusinessJsonLd,
+  ReviewJsonLd,
+  ArticleJsonLd,
+  FAQJsonLd,
+  BreadcrumbJsonLd,
+} from './types';
 import { SITE_CONFIG } from './constants';
 
 /**
  * Generate LocalBusiness JSON-LD for venues
  */
-export function localBusinessJsonLd(venue: Venue) {
+export function localBusinessJsonLd(venue: Venue): LocalBusinessJsonLd {
   const baseUrl = SITE_CONFIG.url;
+  const id = `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}#business`;
   
-  return {
+  // Generar URLs de imágenes
+  const images = venue.images?.map(img => img.asset.url).filter(Boolean) || [];
+  
+  // Mapear categorías a tipos de cocina
+  const servesCuisine = venue.categories?.map(cat => cat.title) || [];
+  
+  const schema: LocalBusinessJsonLd = {
     '@context': 'https://schema.org',
     '@type': venue.schemaType || 'LocalBusiness',
-    '@id': `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}#business`,
+    '@id': id,
     name: venue.title,
     description: venue.description,
-    url: `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}`,
-    image: venue.images?.[0]?.asset?.url,
+    image: images,
     address: {
       '@type': 'PostalAddress',
       streetAddress: venue.address,
-      postalCode: venue.postalCode,
       addressLocality: venue.city.title,
-      addressRegion: venue.city.region || 'España',
+      addressRegion: venue.city.region,
+      postalCode: venue.postalCode,
       addressCountry: 'ES',
     },
-    geo: venue.geo ? {
+    telephone: venue.phone,
+    url: `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}`,
+    openingHours: venue.openingHours,
+    priceRange: venue.priceRange,
+    servesCuisine,
+  };
+
+  // Agregar coordenadas GPS si están disponibles
+  if (venue.geo) {
+    schema.geo = {
       '@type': 'GeoCoordinates',
       latitude: venue.geo.lat,
       longitude: venue.geo.lng,
-    } : undefined,
-    telephone: venue.phone,
-    openingHours: venue.openingHours,
-    priceRange: venue.priceRange,
-    sameAs: [
-      venue.social?.instagram,
-      venue.social?.facebook,
-      venue.social?.tiktok,
-      venue.social?.maps,
-      venue.website,
-    ].filter(Boolean),
-  };
+    };
+  }
+
+  // Agregar rating agregado si hay reseñas
+  if (venue.avgRating && venue.reviewCount) {
+    schema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: venue.avgRating,
+      reviewCount: venue.reviewCount,
+      bestRating: 10,
+      worstRating: 0,
+    };
+  }
+
+  // Agregar redes sociales
+  const socialLinks = [
+    venue.social?.instagram,
+    venue.social?.facebook,
+    venue.social?.tiktok,
+    venue.social?.maps,
+    venue.website,
+  ].filter((v): v is string => typeof v === 'string' && v.length > 0);
+
+  if (socialLinks.length > 0) {
+    schema.sameAs = socialLinks;
+  }
+
+  return schema;
 }
 
 /**
  * Generate Review JSON-LD
  */
-export function reviewJsonLd(review: Review, venue: Venue) {
-  const baseUrl = SITE_CONFIG.url;
+export function reviewJsonLd(review: Review, venue: Venue): ReviewJsonLd {
+  // Calcular rating promedio (normalizado a 1-5)
   const avgRating = (
     review.ratings.food + 
     review.ratings.service + 
     review.ratings.ambience + 
     review.ratings.value
   ) / 4;
+  const rating5 = Math.round(((avgRating / 10) * 5) * 10) / 10; // un decimal
+  const baseUrl = SITE_CONFIG.url;
+  const reviewUrl = `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}/review-${review.slug.current}`;
 
   return {
     '@context': 'https://schema.org',
     '@type': 'Review',
-    '@id': `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}/review-${review.slug.current}#review`,
-    itemReviewed: localBusinessJsonLd(venue),
-    author: {
-      '@type': 'Person',
-      name: review.author,
-      image: review.authorAvatar?.asset?.url,
+    '@id': `${reviewUrl}#review`,
+    url: reviewUrl,
+    headline: review.title,
+    itemReviewed: {
+      '@type': venue.schemaType || 'LocalBusiness',
+      name: venue.title,
+      image: venue.images?.[0]?.asset.url,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: venue.address,
+        addressLocality: venue.city.title,
+        addressRegion: venue.city.region,
+        addressCountry: 'ES',
+      },
     },
     reviewRating: {
       '@type': 'Rating',
-      ratingValue: Math.round((avgRating / 10) * 5 * 10) / 10, // Convert 0-10 to 0-5 scale
+      ratingValue: rating5,
       bestRating: 5,
       worstRating: 1,
     },
-    datePublished: review.publishedAt,
+    name: review.title,
+    author: {
+      '@type': 'Person',
+      name: review.author,
+      image: review.authorAvatar?.asset.url,
+    },
     reviewBody: review.tldr,
-    url: `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}/review-${review.slug.current}`,
-    headline: review.title,
+    datePublished: review.publishedAt,
     isPartOf: {
       '@type': 'WebSite',
       name: SITE_CONFIG.name,
-      url: baseUrl,
+      url: SITE_CONFIG.url,
     },
   };
 }
 
 /**
- * Generate Article/BlogPosting JSON-LD
+ * Generate Article/BlogPosting JSON-LD for reviews
  */
-export function articleJsonLd(post: Post) {
+export function articleJsonLd(post: Post): ArticleJsonLd {
   const baseUrl = SITE_CONFIG.url;
+  const url = `${baseUrl}/blog/${post.slug.current}`;
 
   return {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
-    '@id': `${baseUrl}/blog/${post.slug.current}#article`,
+    '@id': `${url}#article`,
     headline: post.title,
-    description: post.excerpt,
-    image: post.cover?.asset?.url,
-    url: `${baseUrl}/blog/${post.slug.current}`,
+    description: post.excerpt || '',
+    image: post.cover?.asset?.url ? [post.cover.asset.url] : undefined,
     datePublished: post.publishedAt,
-    dateModified: post.publishedAt,
     author: {
       '@type': 'Person',
       name: post.author,
-      image: post.authorAvatar?.asset?.url,
     },
     publisher: {
       '@type': 'Organization',
       name: SITE_CONFIG.name,
-      url: baseUrl,
       logo: {
         '@type': 'ImageObject',
         url: `${baseUrl}/logo.png`,
@@ -113,21 +166,17 @@ export function articleJsonLd(post: Post) {
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${baseUrl}/blog/${post.slug.current}`,
+      '@id': url,
     },
+    url,
     keywords: post.tags?.join(', '),
-    isPartOf: {
-      '@type': 'WebSite',
-      name: SITE_CONFIG.name,
-      url: baseUrl,
-    },
   };
 }
 
 /**
  * Generate FAQPage JSON-LD
  */
-export function faqJsonLd(faqs: Array<{ question: string; answer: string }>) {
+export function faqJsonLd(faqs: FAQ[]): FAQJsonLd | null {
   if (!faqs || faqs.length === 0) return null;
 
   return {
@@ -147,7 +196,9 @@ export function faqJsonLd(faqs: Array<{ question: string; answer: string }>) {
 /**
  * Generate BreadcrumbList JSON-LD
  */
-export function breadcrumbsJsonLd(items: BreadcrumbItem[]) {
+export function breadcrumbsJsonLd(
+  items: Array<{ name: string; url: string }>
+): BreadcrumbJsonLd {
   const baseUrl = SITE_CONFIG.url;
 
   return {
@@ -209,6 +260,137 @@ export function organizationJsonLd() {
       // Add social media URLs here
     ],
   };
+}
+
+/**
+ * Generate ItemList JSON-LD for review listings
+ */
+export function itemListJsonLd(
+  reviews: Review[],
+  listName: string,
+  description?: string
+) {
+  const baseUrl = SITE_CONFIG.url;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: listName,
+    description,
+    numberOfItems: reviews.length,
+    itemListElement: reviews.map((review, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Article',
+        name: review.title,
+        url: `${baseUrl}/${review.venue.city.slug.current}/${review.venue.slug.current}/${review.slug.current}`,
+        datePublished: review.publishedAt,
+        author: {
+          '@type': 'Person',
+          name: review.author,
+        },
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: (
+            review.ratings.food + 
+            review.ratings.service + 
+            review.ratings.ambience + 
+            review.ratings.value
+          ) / 4,
+          bestRating: 10,
+          worstRating: 0,
+        },
+      },
+    })),
+  };
+}
+
+/**
+ * Generate CollectionPage JSON-LD for city/category pages
+ */
+export function collectionPageJsonLd(
+  title: string,
+  description: string,
+  url: string,
+  items: Venue[] | Review[]
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: title,
+    description,
+    url,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: items.length,
+      itemListElement: items.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'title' in item ? 'LocalBusiness' : 'Article',
+          name: item.title,
+          url: 'city' in item 
+            ? `${SITE_CONFIG.url}/${item.city.slug.current}/${item.slug.current}`
+            : `${SITE_CONFIG.url}/${(item as Review).venue.city.slug.current}/${(item as Review).venue.slug.current}/${item.slug.current}`,
+        },
+      })),
+    },
+  };
+}
+
+/**
+ * Generate complete page JSON-LD for review pages
+ */
+export function reviewPageJsonLd(review: Review, venue: Venue) {
+  const schemas: (object | null)[] = [
+    localBusinessJsonLd(venue),
+    reviewJsonLd(review, venue),
+  ];
+
+  // Agregar FAQ si existe
+  if (review.faq && review.faq.length > 0) {
+    schemas.push(faqJsonLd(review.faq));
+  }
+
+  // Generar breadcrumbs
+  const breadcrumbs = [
+    { name: 'Inicio', url: '/' },
+    { name: venue.city.title, url: `/${venue.city.slug.current}` },
+    { name: venue.title, url: `/${venue.city.slug.current}/${venue.slug.current}` },
+    { name: review.title, url: `/${venue.city.slug.current}/${venue.slug.current}/${review.slug.current}` },
+  ];
+  schemas.push(breadcrumbsJsonLd(breadcrumbs));
+
+  return combineJsonLd(...schemas);
+}
+
+/**
+ * Generate complete page JSON-LD for venue pages
+ */
+export function venuePageJsonLd(venue: Venue, recentReviews?: Review[]) {
+  const schemas: object[] = [
+    localBusinessJsonLd(venue),
+  ];
+
+  // Generar breadcrumbs
+  const breadcrumbs = [
+    { name: 'Inicio', url: '/' },
+    { name: venue.city.title, url: `/${venue.city.slug.current}` },
+    { name: venue.title, url: `/${venue.city.slug.current}/${venue.slug.current}` },
+  ];
+  schemas.push(breadcrumbsJsonLd(breadcrumbs));
+
+  // Agregar lista de reseñas si existen
+  if (recentReviews && recentReviews.length > 0) {
+    schemas.push(itemListJsonLd(
+      recentReviews,
+      `Reseñas de ${venue.title}`,
+      `Las mejores reseñas de ${venue.title} en ${venue.city.title}`
+    ));
+  }
+
+  return combineJsonLd(...schemas);
 }
 
 /**

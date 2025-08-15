@@ -1,117 +1,128 @@
-// Base types for the blog
-export interface Image {
+
+// Tipos base
+export interface SanityImage {
+  _type: 'image';
   asset: {
     _id: string;
     url: string;
+    metadata: {
+      dimensions: {
+        width: number;
+        height: number;
+        aspectRatio: number;
+      };
+      lqip?: string;
+    };
   };
-  hotspot?: {
-    x: number;
-    y: number;
-    height: number;
-    width: number;
-  };
-  crop?: {
-    top: number;
-    bottom: number;
-    left: number;
-    right: number;
-  };
-  alt?: string;
+  alt: string;
   caption?: string;
 }
 
-export interface Slug {
-  current: string;
-  _type: 'slug';
+export interface GeoPoint {
+  lat: number;
+  lng: number;
 }
 
-export interface Reference {
-  _ref: string;
-  _type: 'reference';
+export interface SocialLinks {
+  instagram?: string;
+  facebook?: string;
+  tiktok?: string;
+  maps?: string;
 }
 
-// City type
+// Interfaces principales
 export interface City {
   _id: string;
-  _type: 'city';
   title: string;
-  slug: Slug;
-  region?: string;
-  geo?: {
-    lat: number;
-    lng: number;
+  slug: {
+    current: string;
   };
-  heroImage?: Image;
+  region?: string;
+  geo?: GeoPoint;
+  heroImage?: SanityImage;
   description?: string;
+  // Campos calculados
+  venueCount?: number;
+  reviewCount?: number;
 }
 
-// Category type
 export interface Category {
   _id: string;
-  _type: 'category';
   title: string;
-  slug: Slug;
+  slug: {
+    current: string;
+  };
   description?: string;
+  // Campos calculados
+  venueCount?: number;
+  reviewCount?: number;
 }
 
-// Venue type
 export interface Venue {
   _id: string;
-  _type: 'venue';
   title: string;
-  slug: Slug;
+  slug: {
+    current: string;
+  };
   city: City;
   address: string;
   postalCode?: string;
+  geo?: GeoPoint;
   phone?: string;
   website?: string;
-  geo?: {
-    lat: number;
-    lng: number;
-  };
   openingHours?: string[];
   priceRange: '€' | '€€' | '€€€' | '€€€€';
   categories: Category[];
-  images: Image[];
-  description?: string;
-  social?: {
-    instagram?: string;
-    facebook?: string;
-    tiktok?: string;
-    maps?: string;
-  };
   schemaType: 'Restaurant' | 'CafeOrCoffeeShop' | 'BarOrPub' | 'LocalBusiness';
+  description?: string;
+  social?: SocialLinks;
+  images: SanityImage[];
+  // Campos calculados
+  reviews?: Review[];
+  reviewCount?: number;
+  avgRating?: number;
+  latestReview?: {
+    publishedAt: string;
+    ratings: Ratings;
+  };
 }
 
-// Review type
+export interface Ratings {
+  food: number;
+  service: number;
+  ambience: number;
+  value: number;
+}
+
+export interface FAQ {
+  question: string;
+  answer: string;
+}
+
 export interface Review {
   _id: string;
-  _type: 'review';
   title: string;
-  slug: Slug;
+  slug: {
+    current: string;
+  };
   venue: Venue;
   visitDate: string;
-  ratings: {
-    food: number;
-    service: number;
-    ambience: number;
-    value: number;
-  };
+  publishedAt: string;
+  ratings: Ratings;
   avgTicket?: number;
   highlights?: string[];
   pros: string[];
-  cons: string[];
+  cons?: string[];
   tldr: string;
   faq: Array<{
     question: string;
     answer: string;
   }>;
   body: unknown[]; // Portable Text blocks
-  gallery: Image[];
+  gallery: SanityImage[];
   author: string;
-  authorAvatar?: Image;
+  authorAvatar?: SanityImage;
   tags?: string[];
-  publishedAt: string;
 }
 
 // Post type
@@ -119,9 +130,11 @@ export interface Post {
   _id: string;
   _type: 'post';
   title: string;
-  slug: Slug;
+  slug: {
+    current: string;
+  };
   excerpt?: string;
-  cover?: Image;
+  cover?: SanityImage;
   faq?: Array<{
     question: string;
     answer: string;
@@ -129,117 +142,252 @@ export interface Post {
   body: unknown[]; // Portable Text blocks
   tags?: string[];
   author: string;
-  authorAvatar?: Image;
+  authorAvatar?: SanityImage;
   publishedAt: string;
 }
 
-// Navigation and UI types
-export interface BreadcrumbItem {
-  name: string;
-  url: string;
+export interface SitemapUrl {
+  slug: string;
+  _updatedAt: string;
+  publishedAt?: string;
 }
 
-export interface MenuItem {
-  title: string;
-  href: string;
-  children?: MenuItem[];
+export interface SitemapData {
+  venues: SitemapUrl[];
+  reviews: SitemapUrl[];
+  cities: SitemapUrl[];
+  categories: SitemapUrl[];
 }
 
-// SEO types
-export interface SEOData {
-  title: string;
-  description: string;
-  canonical?: string;
-  noindex?: boolean;
-  openGraph?: {
-    title?: string;
-    description?: string;
-    image?: string;
-    type?: string;
+// Tipos para estadísticas
+export interface SiteStats {
+  totalReviews: number;
+  totalVenues: number;
+  totalCities: number;
+  avgRating: number;
+  latestReview: {
+    title: string;
+    slug: {
+      current: string;
+    };
+    publishedAt: string;
+    venue: {
+      title: string;
+      slug: {
+        current: string;
+      };
+    };
   };
-  twitter?: {
-    card?: string;
-    title?: string;
-    description?: string;
-    image?: string;
-  };
 }
 
-// JSON-LD types
+// Tipos para búsqueda
+export interface SearchResults {
+  venues: Venue[];
+  reviews: Review[];
+}
+
+// Tipos para tags populares
+export interface PopularTag {
+  tag: string;
+  count: number;
+}
+
+// Tipos para JSON-LD
 export interface LocalBusinessJsonLd {
-  '@context': string;
+  '@context': 'https://schema.org';
   '@type': string;
+  '@id'?: string;
   name: string;
+  description?: string;
+  image?: string[];
   address: {
-    '@type': string;
+    '@type': 'PostalAddress';
     streetAddress: string;
-    postalCode?: string;
     addressLocality: string;
-    addressRegion: string;
-    addressCountry: string;
+    addressRegion?: string;
+    postalCode?: string;
+    addressCountry: 'ES';
   };
-  telephone?: string;
-  url: string;
   geo?: {
-    '@type': string;
+    '@type': 'GeoCoordinates';
     latitude: number;
     longitude: number;
   };
+  telephone?: string;
+  url?: string;
   openingHours?: string[];
   priceRange?: string;
-  sameAs?: string[];
+  servesCuisine?: string[];
   aggregateRating?: {
-    '@type': string;
+    '@type': 'AggregateRating';
     ratingValue: number;
     reviewCount: number;
+    bestRating: 10;
+    worstRating: 0;
   };
+  sameAs?: string[];
 }
 
 export interface ReviewJsonLd {
-  '@context': string;
-  '@type': string;
-  itemReviewed: LocalBusinessJsonLd;
-  author: {
+  '@context': 'https://schema.org';
+  '@type': 'Review';
+  '@id'?: string;
+  url?: string;
+  headline?: string;
+  itemReviewed: {
     '@type': string;
     name: string;
+    image?: string;
+    address: {
+      '@type': 'PostalAddress';
+      streetAddress: string;
+      addressLocality: string;
+      addressRegion?: string;
+      addressCountry: 'ES';
+    };
   };
   reviewRating: {
-    '@type': string;
+    '@type': 'Rating';
     ratingValue: number;
     bestRating: number;
     worstRating: number;
   };
-  datePublished: string;
+  name: string;
+  author: {
+    '@type': 'Person';
+    name: string;
+    image?: string;
+  };
   reviewBody: string;
+  datePublished: string;
+  isPartOf?: {
+    '@type': 'WebSite';
+    name: string;
+    url: string;
+  };
 }
 
-// API response types
-export interface ApiResponse<T> {
-  data: T;
-  error?: string;
+export interface ArticleJsonLd {
+  '@context': 'https://schema.org';
+  '@type': 'Article' | 'BlogPosting';
+  '@id'?: string;
+  headline: string;
+  description: string;
+  image?: string[];
+  datePublished: string;
+  dateModified?: string;
+  author: {
+    '@type': 'Person';
+    name: string;
+  };
+  publisher: {
+    '@type': 'Organization';
+    name: string;
+    logo: {
+      '@type': 'ImageObject';
+      url: string;
+    };
+  };
+  mainEntityOfPage: {
+    '@type': 'WebPage';
+    '@id': string;
+  };
+  url?: string;
+  keywords?: string;
 }
 
-export interface PaginatedResponse<T> {
+export interface FAQJsonLd {
+  '@context': 'https://schema.org';
+  '@type': 'FAQPage';
+  mainEntity: Array<{
+    '@type': 'Question';
+    name: string;
+    acceptedAnswer: {
+      '@type': 'Answer';
+      text: string;
+    };
+  }>;
+}
+
+export interface BreadcrumbJsonLd {
+  '@context': 'https://schema.org';
+  '@type': 'BreadcrumbList';
+  itemListElement: Array<{
+    '@type': 'ListItem';
+    position: number;
+    name: string;
+    item: string;
+  }>;
+}
+
+// Tipos para utilidades SEO
+export interface SEOData {
+  title: string;
+  description: string;
+  canonical: string;
+  openGraph: {
+    title: string;
+    description: string;
+    url: string;
+    type: 'website' | 'article';
+    images: Array<{
+      url: string;
+      width: number;
+      height: number;
+      alt: string;
+    }>;
+    siteName: string;
+    locale: 'es_ES';
+  };
+
+  additionalMetaTags?: Array<{
+    name?: string;
+    property?: string;
+    content: string;
+  }>;
+}
+
+// Tipos para configuración de imágenes
+export interface ImageConfig {
+  width?: number;
+  height?: number;
+  quality?: number;
+  format?: 'webp' | 'jpg' | 'png';
+  fit?: 'crop' | 'fill' | 'max' | 'min' | 'scale';
+  crop?: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'entropy' | 'focalpoint';
+  auto?: 'format' | 'compress';
+  blur?: number;
+  sharpen?: number;
+}
+
+// Tipos para paginación
+export interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface PaginatedResults<T> {
   items: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-  hasMore: boolean;
+  pagination: PaginationInfo;
 }
 
-// Search types
-export interface SearchParams {
-  query?: string;
-  city?: string;
-  category?: string;
-  priceRange?: string;
-  page?: number;
-  limit?: number;
-}
+// Constantes de tipos
+export const VENUE_SCHEMA_TYPES = [
+  'Restaurant',
+  'CafeOrCoffeeShop', 
+  'BarOrPub',
+  'LocalBusiness'
+] as const;
 
-export interface SearchResult {
-  venues: Venue[];
-  reviews: Review[];
-  posts: Post[];
-  total: number;
-}
+export const PRICE_RANGES = ['€', '€€', '€€€', '€€€€'] as const;
+
+export const RATING_CATEGORIES = [
+  'food',
+  'service', 
+  'ambience',
+  'value'
+] as const;
