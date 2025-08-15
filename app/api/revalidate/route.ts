@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
     // Revalidar sitemaps principales
     revalidatePath('/sitemap.xml');
 
+    // eslint-disable-next-line no-console
     console.log(`✅ Revalidated: ${body._type} - ${body._id}`);
 
     return NextResponse.json({
@@ -70,10 +71,11 @@ export async function POST(req: NextRequest) {
       id: body._id,
       now: Date.now(),
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    // eslint-disable-next-line no-console
     console.error('❌ Revalidation error:', err);
     return NextResponse.json(
-      { message: err.message },
+      { message: err instanceof Error ? err.message : 'Unknown error' },
       { status: 500 }
     );
   }

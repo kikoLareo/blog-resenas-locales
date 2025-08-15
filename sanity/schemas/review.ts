@@ -112,7 +112,8 @@ export default defineType({
           .max(75)
           .custom((value) => {
             if (value) {
-              const wordCount = value.split(/\s+/).length;
+              const text = String(value);
+              const wordCount = text.split(/\s+/).length;
               if (wordCount < 8 || wordCount > 18) {
                 return 'El TL;DR debe tener entre 8 y 18 palabras (50-75 caracteres)';
               }
@@ -146,7 +147,8 @@ export default defineType({
                   .max(55)
                   .custom((value) => {
                     if (value) {
-                      const wordCount = value.split(/\s+/).length;
+                      const text = String(value);
+                      const wordCount = text.split(/\s+/).length;
                       if (wordCount < 8 || wordCount > 12) {
                         return 'La respuesta debe tener entre 8-12 palabras (40-55 caracteres)';
                       }

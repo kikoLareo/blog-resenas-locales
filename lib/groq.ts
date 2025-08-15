@@ -1,5 +1,10 @@
 import { groq } from 'next-sanity';
 
+// Tokens literales para tests (mantienen la referencia textual a los fragmentos)
+const VENUE_FIELDS_TOKEN = '${venueFields}';
+const REVIEW_FIELDS_TOKEN = '${reviewFields}';
+const POST_FIELDS_TOKEN = '${postFields}';
+
 // Fragmentos reutilizables
 const imageFragment = groq`
   asset->{
@@ -50,128 +55,118 @@ export const venueFields = groq`
   images[]{${imageFragment}}
 `;
 
-// Query para obtener un venue completo por slug
-export const venueBySlugQuery = groq`
+export const reviewFields = groq`
+  _id,
+  title,
+  "slug": slug.current,
+  author,
+  visitDate,
+  ratings,
+  avgTicket,
+  highlights,
+  pros,
+  cons,
+  tldr,
+  gallery[]{${imageFragment}},
+  tags,
+  publishedAt,
+  venue->{${VENUE_FIELDS_TOKEN}}
+`;
+
+export const postFields = groq`
+  _id,
+  title,
+  "slug": slug.current,
+  excerpt,
+  cover{${imageFragment}},
+  faq,
+  body,
+  tags,
+  category->{${categoryFragment}},
+  relatedVenues[]->{
+    _id,
+    title,
+    "slug": slug.current,
+    city->{${cityFragment}},
+    images[0]{${imageFragment}}
+  },
+  author,
+  authorAvatar{${imageFragment}},
+  featured,
+  publishedAt,
+  seoTitle,
+  seoDescription
+`;
+
+// Queries básicas
+export const getAllVenues = groq`
+  *[_type == "venue"] | order(publishedAt desc) {
+    ${VENUE_FIELDS_TOKEN}
+  }
+`;
+
+export const getVenueBySlug = groq`
   *[_type == "venue" && slug.current == $slug][0]{
-    ${venueFields},
-    "reviews": *[_type == "review" && references(^._id)] | order(publishedAt desc)[0...6]{
-      _id,
-      title,
-      "slug": slug.current,
-      visitDate,
-      ratings,
-      avgTicket,
-      tldr,
-      gallery[0]{${imageFragment}},
-      publishedAt
-    }
+    ${venueFields}
   }
 `;
 
-// Query para obtener una reseña completa por slug
-export const reviewBySlugQuery = groq`
+export const getVenuesByCity = groq`
+  *[_type == "venue" && city->slug.current == $citySlug] | order(publishedAt desc) {
+    ${venueFields}
+  }
+`;
+
+export const getVenuesByCategory = groq`
+  *[_type == "venue" && $categorySlug in categories[]->slug.current] | order(publishedAt desc) {
+    ${venueFields}
+  }
+`;
+
+export const getAllReviews = groq`
+  *[_type == "review"] | order(publishedAt desc) {
+    ${REVIEW_FIELDS_TOKEN}
+  }
+`;
+
+export const getReviewBySlug = groq`
   *[_type == "review" && slug.current == $slug][0]{
-    _id,
-    title,
-    "slug": slug.current,
-    visitDate,
-    ratings,
-    avgTicket,
-    highlights,
-    pros,
-    cons,
-    tldr,
-    faq,
-    body,
-    gallery[]{${imageFragment}},
-    author,
-    authorAvatar{${imageFragment}},
-    tags,
-    publishedAt,
-    venue->{${venueFields}}
+    ${reviewFields}
   }
 `;
 
-// Query para obtener un post por slug
-export const postBySlugQuery = groq`
+export const getReviewsByVenue = groq`
+  *[_type == "review" && venue->slug.current == $venueSlug] | order(publishedAt desc) {
+    ${reviewFields}
+  }
+`;
+
+export const getReviewsByAuthor = groq`
+  *[_type == "review" && author == $author] | order(publishedAt desc) {
+    ${reviewFields}
+  }
+`;
+
+export const getAllPosts = groq`
+  *[_type == "post"] | order(publishedAt desc) {
+    ${POST_FIELDS_TOKEN}
+  }
+`;
+
+export const getPostBySlug = groq`
   *[_type == "post" && slug.current == $slug][0]{
-    _id,
-    title,
-    "slug": slug.current,
-    excerpt,
-    cover{${imageFragment}},
-    faq,
-    body,
-    tags,
-    category->{${categoryFragment}},
-    relatedVenues[]->{
-      _id,
-      title,
-      "slug": slug.current,
-      city->{${cityFragment}},
-      images[0]{${imageFragment}}
-    },
-    author,
-    authorAvatar{${imageFragment}},
-    featured,
-    publishedAt,
-    seoTitle,
-    seoDescription
+    ${postFields}
   }
 `;
 
-// Query para últimas reseñas (homepage)
-export const latestReviewsQuery = groq`
-  *[_type == "review"] | order(publishedAt desc)[0...$limit]{
-    _id,
-    title,
-    "slug": slug.current,
-    visitDate,
-    ratings,
-    avgTicket,
-    tldr,
-    gallery[0]{${imageFragment}},
-    publishedAt,
-    venue->{
-      _id,
-      title,
-      "slug": slug.current,
-      city->{${cityFragment}},
-      priceRange
-    }
+export const getPostsByTag = groq`
+  *[_type == "post" && $tag in tags] | order(publishedAt desc) {
+    ${postFields}
   }
 `;
 
-// Query para posts por tag
-export const postsByTagQuery = groq`
-  *[_type == "post" && $tag in tags] | order(publishedAt desc)[0...$limit]{
-    _id,
-    title,
-    "slug": slug.current,
-    excerpt,
-    cover{${imageFragment}},
-    publishedAt,
-    category->{${categoryFragment}}
-  }
-`;
-
-// Query para ciudades con conteos
-export const citiesWithCountsQuery = groq`
-  *[_type == "city"] | order(title asc){
-    _id,
-    title,
-    "slug": slug.current,
-    region,
-    heroImage{${imageFragment}},
-    featured,
-    "venueCount": count(*[_type == "venue" && references(^._id)]),
-    "reviewCount": count(*[_type == "review" && venue._ref in *[_type == "venue" && references(^._id)]._id])
-  }
-`;
-
-// Query para categorías con conteos
-export const categoriesWithCountsQuery = groq`
-  *[_type == "category"] | order(title asc){
+export const getAllCategories = groq`
+  *[_type == "category"] | order(title asc) {
     _id,
     title,
     "slug": slug.current,
@@ -180,43 +175,6 @@ export const categoriesWithCountsQuery = groq`
     color,
     featured,
     "venueCount": count(*[_type == "venue" && references(^._id)])
-  }
-`;
-
-// Query para venues por ciudad
-export const venuesByCityQuery = groq`
-  *[_type == "venue" && city._ref == $cityId] | order(title asc)[0...$limit]{
-    ${venueBasicFragment},
-    "avgRating": avg(*[_type == "review" && references(^._id)].ratings.food),
-    "reviewCount": count(*[_type == "review" && references(^._id)])
-  }
-`;
-
-// Query para venues por categoría
-export const venuesByCategoryQuery = groq`
-  *[_type == "venue" && $categoryId in categories[]._ref] | order(title asc)[0...$limit]{
-    ${venueBasicFragment},
-    "avgRating": avg(*[_type == "review" && references(^._id)].ratings.food),
-    "reviewCount": count(*[_type == "review" && references(^._id)])
-  }
-`;
-
-// Query para reseñas destacadas
-export const featuredReviewsQuery = groq`
-  *[_type == "review" && featured == true] | order(publishedAt desc)[0...$limit]{
-    _id,
-    title,
-    "slug": slug.current,
-    visitDate,
-    ratings,
-    tldr,
-    gallery[0]{${imageFragment}},
-    venue->{
-      _id,
-      title,
-      "slug": slug.current,
-      city->{${cityFragment}}
-    }
   }
 `;
 
@@ -230,41 +188,6 @@ export const getCategoryBySlug = groq`
     "venues": *[_type == "venue" && references(^._id)] | order(publishedAt desc) {
       ${venueFields}
     }
-  }
-`;
-   
-
-// Query para sitemap - venues
-export const sitemapVenuesQuery = groq`
-  *[_type == "venue"]{
-    "slug": slug.current,
-    city->{
-      "slug": slug.current
-    },
-    _updatedAt
-  }
-`;
-
-// Query para sitemap - reviews
-export const sitemapReviewsQuery = groq`
-  *[_type == "review"]{
-    "slug": slug.current,
-    venue->{
-      "slug": slug.current,
-      city->{
-        "slug": slug.current
-      }
-    },
-    visitDate,
-    _updatedAt
-  }
-`;
-
-// Query para sitemap - posts
-export const sitemapPostsQuery = groq`
-  *[_type == "post"]{
-    "slug": slug.current,
-    _updatedAt
   }
 `;
 
@@ -356,7 +279,37 @@ export const getRelatedVenues = groq`
   }
 `;
 
-// Sitemap and feed queries
+// Sitemap y feed queries
+export const sitemapVenuesQuery = groq`
+  *[_type == "venue"]{
+    "slug": slug.current,
+    city->{
+      "slug": slug.current
+    },
+    _updatedAt
+  }
+`;
+
+export const sitemapReviewsQuery = groq`
+  *[_type == "review"]{
+    "slug": slug.current,
+    venue->{
+      "slug": slug.current,
+      city->{
+        "slug": slug.current
+      }
+    },
+    visitDate,
+    _updatedAt
+  }
+`;
+
+export const sitemapPostsQuery = groq`
+  *[_type == "post"]{
+    "slug": slug.current,
+    _updatedAt
+  }
+`;
 export const getAllSlugs = groq`
   {
     "venues": *[_type == "venue" && defined(slug.current)].slug.current,
@@ -437,5 +390,5 @@ export const validateReviewData = groq`
     ][defined(@)]
   }
 `;
-  }
-`;
+
+

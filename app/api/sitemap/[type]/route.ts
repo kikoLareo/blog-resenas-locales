@@ -27,12 +27,12 @@ export async function GET(
         break;
 
       case 'venues':
-        const venues = await sanityFetch({
+        const venues = await sanityFetch<Array<{ slug: string; _updatedAt: string; city: { slug: string } }>>({
           query: sitemapVenuesQuery,
           tags: ['sitemap-venues', 'venues'],
         });
 
-        urls = venues.map((venue: any) => {
+        urls = venues.map((venue: { slug: string; _updatedAt: string; city: { slug: string } }) => {
           const url = `${baseUrl}/${venue.city.slug}/${venue.slug}`;
           const lastmod = new Date(venue._updatedAt).toISOString();
           return `<url><loc>${url}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`;
@@ -40,12 +40,12 @@ export async function GET(
         break;
 
       case 'reviews':
-        const reviews = await sanityFetch({
+        const reviews = await sanityFetch<Array<{ visitDate: string; _updatedAt: string; venue: { slug: string; city: { slug: string } } }>>({
           query: sitemapReviewsQuery,
           tags: ['sitemap-reviews', 'reviews'],
         });
 
-        urls = reviews.map((review: any) => {
+        urls = reviews.map((review: { visitDate: string; _updatedAt: string; venue: { slug: string; city: { slug: string } } }) => {
           const dateStr = new Date(review.visitDate).toISOString().slice(0, 7); // YYYY-MM
           const url = `${baseUrl}/${review.venue.city.slug}/${review.venue.slug}/review-${dateStr}`;
           const lastmod = new Date(review._updatedAt).toISOString();
@@ -54,12 +54,12 @@ export async function GET(
         break;
 
       case 'posts':
-        const posts = await sanityFetch({
+        const posts = await sanityFetch<Array<{ slug: string; _updatedAt: string }>>({
           query: sitemapPostsQuery,
           tags: ['sitemap-posts', 'posts'],
         });
 
-        urls = posts.map((post: any) => {
+        urls = posts.map((post: { slug: string; _updatedAt: string }) => {
           const url = `${baseUrl}/blog/${post.slug}`;
           const lastmod = new Date(post._updatedAt).toISOString();
           return `<url><loc>${url}</loc><lastmod>${lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>`;
@@ -81,7 +81,8 @@ export async function GET(
         'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    // eslint-disable-next-line no-console
     console.error(`Error generating ${type} sitemap:`, error);
     return NextResponse.json({ error: 'Failed to generate sitemap' }, { status: 500 });
   }

@@ -106,7 +106,7 @@ export interface Review {
     question: string;
     answer: string;
   }>;
-  body: any[]; // Portable Text blocks
+  body: unknown[]; // Portable Text blocks
   gallery: Image[];
   author: string;
   authorAvatar?: Image;
@@ -126,7 +126,7 @@ export interface Post {
     question: string;
     answer: string;
   }>;
-  body: any[]; // Portable Text blocks
+  body: unknown[]; // Portable Text blocks
   tags?: string[];
   author: string;
   authorAvatar?: Image;

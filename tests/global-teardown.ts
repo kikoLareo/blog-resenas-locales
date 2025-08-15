@@ -1,6 +1,8 @@
 import { FullConfig } from '@playwright/test';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { exec } from 'child_process';
+import { platform } from 'os';
 
 async function globalTeardown(config: FullConfig) {
   console.log('🧹 Iniciando limpieza global de Playwright...');
@@ -91,9 +93,8 @@ async function globalTeardown(config: FullConfig) {
     // Clean up browser processes (safety measure)
     console.log('🔄 Verificando procesos de navegador...');
     
-    if (process.platform !== 'win32') {
+    if (platform() !== 'win32') {
       try {
-        const { exec } = require('child_process');
         exec('pkill -f "chromium|firefox|webkit"', (error) => {
           // Ignore errors - processes might not exist
         });
