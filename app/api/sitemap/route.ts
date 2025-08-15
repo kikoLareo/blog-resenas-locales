@@ -1,33 +1,56 @@
 import { NextResponse } from 'next/server';
 import { SITE_CONFIG } from '@/lib/constants';
 
-export async function GET() {
-  const baseUrl = SITE_CONFIG.url;
+// Generar XML del sitemap principal
+function generateSitemapXML(baseUrl: string): string {
+  const lastmod = new Date().toISOString();
   
-  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+  return `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
-    <loc>${baseUrl}/sitemap-static.xml</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <loc>${baseUrl}/api/sitemap/static</loc>
+    <lastmod>${lastmod}</lastmod>
   </sitemap>
   <sitemap>
-    <loc>${baseUrl}/sitemap-venues.xml</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <loc>${baseUrl}/api/sitemap/venues</loc>
+    <lastmod>${lastmod}</lastmod>
   </sitemap>
   <sitemap>
-    <loc>${baseUrl}/sitemap-reviews.xml</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <loc>${baseUrl}/api/sitemap/reviews</loc>
+    <lastmod>${lastmod}</lastmod>
   </sitemap>
   <sitemap>
-    <loc>${baseUrl}/sitemap-posts.xml</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
+    <loc>${baseUrl}/api/sitemap/cities</loc>
+    <lastmod>${lastmod}</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>${baseUrl}/api/sitemap/categories</loc>
+    <lastmod>${lastmod}</lastmod>
   </sitemap>
 </sitemapindex>`;
-
-  return new NextResponse(sitemap, {
-    headers: {
-      'Content-Type': 'application/xml',
-      'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
-    },
-  });
 }
+
+export async function GET() {
+  try {
+    const baseUrl = SITE_CONFIG.url;
+    const sitemapXML = generateSitemapXML(baseUrl);
+
+    return new Response(sitemapXML, {
+      headers: {
+        'Content-Type': 'application/xml',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error generando sitemap principal:', error);
+    
+    return NextResponse.json(
+      { error: 'Error generando sitemap' },
+      { status: 500 }
+    );
+  }
+}
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';

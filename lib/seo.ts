@@ -1,5 +1,5 @@
 import { NextSeoProps } from 'next-seo';
-import { Venue, Review, Post, City } from './types';
+import { Venue, Review, City, Category, SEOData, SanityImage } from './types';
 import { SITE_CONFIG } from './constants';
 
 /**
@@ -31,9 +31,7 @@ export function generateVenueSEO(venue: Venue): NextSeoProps {
       site_name: SITE_CONFIG.name,
       locale: SITE_CONFIG.locale,
     },
-    twitter: {
-      cardType: 'summary_large_image',
-    },
+
     additionalMetaTags: [
       {
         name: 'geo.region',
@@ -109,9 +107,7 @@ export function generateReviewSEO(review: Review, venue: Venue): NextSeoProps {
         tags: review.tags,
       },
     },
-    twitter: {
-      cardType: 'summary_large_image',
-    },
+
     additionalMetaTags: [
       {
         name: 'article:author',
@@ -142,60 +138,95 @@ export function generateReviewSEO(review: Review, venue: Venue): NextSeoProps {
 }
 
 /**
- * Generate SEO configuration for blog posts
+ * Generar datos SEO optimizados para cualquier página
  */
-export function generatePostSEO(post: Post): NextSeoProps {
-  const title = post.title;
-  const description = post.excerpt || 'Artículo del blog sobre gastronomía y locales.';
-  const url = `${SITE_CONFIG.url}/blog/${post.slug.current}`;
-  
-  const images = post.cover ? [{
-    url: post.cover.asset.url,
-    alt: post.cover.alt || post.title,
+export function generateSEOData(config: {
+  title: string;
+  description: string;
+  canonical: string;
+  type?: 'website' | 'article';
+  images?: Array<{
+    url: string;
+    width: number;
+    height: number;
+    alt: string;
+  }>;
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  tags?: string[];
+  additionalMeta?: Array<{
+    name?: string;
+    property?: string;
+    content: string;
+  }>;
+}): SEOData {
+  const {
+    title,
+    description,
+    canonical,
+    type = 'website',
+    images = [],
+    publishedTime,
+    modifiedTime,
+    author,
+    tags,
+    additionalMeta = [],
+  } = config;
+
+  // Imagen por defecto si no hay imágenes
+  const defaultImage = {
+    url: `${SITE_CONFIG.url}/og-default.jpg`,
     width: 1200,
-    height: 800,
-  }] : [];
+    height: 630,
+    alt: title,
+  };
+
+  const ogImages = images.length > 0 ? images : [defaultImage];
 
   return {
     title,
-    description: description.slice(0, 160),
-    canonical: url,
+    description,
+    canonical,
     openGraph: {
       title,
-      description: description.slice(0, 160),
-      url,
-      type: 'article',
-      images,
-      site_name: SITE_CONFIG.name,
-      locale: SITE_CONFIG.locale,
-      article: {
-        publishedTime: post.publishedAt,
-        authors: [post.author],
-        tags: post.tags,
-      },
-    },
-    twitter: {
-      cardType: 'summary_large_image',
+      description,  
+      url: canonical,
+      type,
+      images: ogImages,
+      siteName: SITE_CONFIG.name,
+      locale: 'es_ES',
     },
     additionalMetaTags: [
       {
-        name: 'article:author',
-        content: post.author,
+        name: 'robots',
+        content: 'index, follow, max-image-preview:large',
       },
       {
-        name: 'article:published_time',
-        content: post.publishedAt,
+        name: 'googlebot',
+        content: 'index, follow, max-video-preview:-1, max-image-preview:large, max-snippet:-1',
       },
       {
+        property: 'og:locale',
+        content: 'es_ES',
+      },
+      ...(publishedTime ? [{
+        property: 'article:published_time',
+        content: publishedTime,
+      }] : []),
+      ...(modifiedTime ? [{
+        property: 'article:modified_time',
+        content: modifiedTime,
+      }] : []),
+      ...(author ? [{
+        name: 'author',
+        content: author,
+      }] : []),
+      ...(tags && tags.length > 0 ? [{
         name: 'keywords',
-        content: [
-          'blog',
-          'gastronomía',
-          'restaurantes',
-          'locales',
-          ...(post.tags || []),
-        ].join(', '),
-      },
+        content: tags.join(', '),
+      }] : []),
+      ...additionalMeta,
     ],
   };
 }
@@ -227,9 +258,6 @@ export function generateCitySEO(city: City, venueCount: number): NextSeoProps {
       images,
       site_name: SITE_CONFIG.name,
       locale: SITE_CONFIG.locale,
-    },
-    twitter: {
-      cardType: 'summary_large_image',
     },
     additionalMetaTags: [
       {
@@ -289,9 +317,7 @@ export function generateCategorySEO(category: string, city?: string): NextSeoPro
       site_name: SITE_CONFIG.name,
       locale: SITE_CONFIG.locale,
     },
-    twitter: {
-      cardType: 'summary_large_image',
-    },
+
     additionalMetaTags: [
       {
         name: 'keywords',
@@ -310,33 +336,223 @@ export function generateCategorySEO(category: string, city?: string): NextSeoPro
 }
 
 /**
- * Generate default SEO configuration
+ * Generar URL canónica
  */
-export function generateDefaultSEO(): NextSeoProps {
+export function generateCanonicalUrl(path: string): string {
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${SITE_CONFIG.url}${cleanPath}`;
+}
+
+/**
+ * Optimizar descripción para SEO
+ */
+export function optimizeDescription(text: string, maxLength: number = 160): string {
+  if (!text) return '';
+  
+  const cleaned = text
+    .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  
+  if (cleaned.length <= maxLength) return cleaned;
+  
+  // Cortar en la última palabra completa antes del límite
+  const truncated = cleaned.substring(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(' ');
+  
+  return lastSpace > 0 
+    ? `${truncated.substring(0, lastSpace)}...`
+    : `${truncated.substring(0, maxLength - 3)}...`;
+}
+
+/**
+ * Generar keywords SEO basadas en contexto
+ */
+export function generateKeywords(context: {
+  venue?: Venue;
+  city?: City;
+  category?: Category;
+  review?: Review;
+  customKeywords?: string[];
+}): string[] {
+  const keywords: Set<string> = new Set();
+  
+  // Keywords base
+  const baseKeywords = [
+    'restaurante', 'local', 'reseña', 'opinión', 'gastronomía', 'comida'
+  ];
+  baseKeywords.forEach(k => keywords.add(k));
+  
+  // Keywords del venue
+  if (context.venue) {
+    keywords.add(context.venue.title.toLowerCase());
+    keywords.add(context.venue.priceRange);
+    context.venue.categories.forEach(cat => keywords.add(cat.title.toLowerCase()));
+  }
+  
+  // Keywords de la ciudad
+  if (context.city) {
+    keywords.add(context.city.title.toLowerCase());
+    if (context.city.region) {
+      keywords.add(context.city.region.toLowerCase());
+    }
+  }
+  
+  // Keywords de la categoría
+  if (context.category) {
+    keywords.add(context.category.title.toLowerCase());
+  }
+  
+  // Keywords de la reseña
+  if (context.review) {
+    context.review.tags?.forEach(tag => keywords.add(tag.toLowerCase()));
+    if (context.review.highlights) {
+      context.review.highlights.forEach(highlight => keywords.add(highlight.toLowerCase()));
+    }
+  }
+  
+  // Keywords personalizadas
+  if (context.customKeywords) {
+    context.customKeywords.forEach(k => keywords.add(k.toLowerCase()));
+  }
+  
+  return Array.from(keywords);
+}
+
+/**
+ * Generar datos estructurados para breadcrumbs
+ */
+export function generateBreadcrumbData(items: Array<{ name: string; url: string }>) {
   return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url.startsWith('http') ? item.url : generateCanonicalUrl(item.url),
+    })),
+  };
+}
+
+/**
+ * Generar meta tags para geo-localización
+ */
+export function generateGeoMetaTags(geo?: { lat: number; lng: number }, location?: string) {
+  if (!geo && !location) return [];
+  
+  const tags = [
+    {
+      name: 'geo.region',
+      content: 'ES',
+    },
+  ];
+  
+  if (location) {
+    tags.push({
+      name: 'geo.placename',
+      content: location,
+    });
+  }
+  
+  if (geo) {
+    tags.push(
+      {
+        name: 'geo.position',
+        content: `${geo.lat};${geo.lng}`,
+      },
+      {
+        name: 'ICBM',
+        content: `${geo.lat}, ${geo.lng}`,
+      }
+    );
+  }
+  
+  return tags;
+}
+
+/**
+ * Convertir imágenes Sanity a formato SEO
+ */
+export function sanityImageToSEO(
+  image: SanityImage, 
+  alt?: string, 
+  width: number = 1200, 
+  height: number = 630
+) {
+  return {
+    url: image.asset.url,
+    width,
+    height,
+    alt: alt || image.alt || 'Imagen',
+  };
+}
+
+/**
+ * Generar múltiples tamaños de imagen para SEO
+ */
+export function generateImageSizes(image: SanityImage, alt?: string) {
+  const baseUrl = image.asset.url;
+  const altText = alt || image.alt || 'Imagen';
+  
+  return [
+    {
+      url: `${baseUrl}?w=1200&h=630&fit=crop&auto=format`,
+      width: 1200,
+      height: 630,
+      alt: altText,
+    },
+    {
+      url: `${baseUrl}?w=800&h=600&fit=crop&auto=format`,
+      width: 800,
+      height: 600,
+      alt: altText,
+    },
+    {
+      url: `${baseUrl}?w=400&h=300&fit=crop&auto=format`,
+      width: 400,
+      height: 300,
+      alt: altText,
+    },
+  ];
+}
+
+/**
+ * Validar y limpiar título SEO
+ */
+export function optimizeTitle(title: string, maxLength: number = 60): string {
+  if (!title) return '';
+  
+  const cleaned = title.trim();
+  
+  if (cleaned.length <= maxLength) return cleaned;
+  
+  // Cortar en la última palabra completa antes del límite
+  const truncated = cleaned.substring(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(' ');
+  
+  return lastSpace > 0 
+    ? truncated.substring(0, lastSpace)
+    : truncated.substring(0, maxLength - 3);
+}
+
+/**
+ * Generar configuración SEO por defecto
+ */
+export function generateDefaultSEO(): SEOData {
+  return generateSEOData({
     title: SITE_CONFIG.name,
     description: SITE_CONFIG.description,
     canonical: SITE_CONFIG.url,
-    openGraph: {
-      title: SITE_CONFIG.name,
-      description: SITE_CONFIG.description,
-      url: SITE_CONFIG.url,
-      type: 'website',
-      site_name: SITE_CONFIG.name,
-      locale: SITE_CONFIG.locale,
-      images: [
-        {
-          url: `${SITE_CONFIG.url}${SITE_CONFIG.defaultImage}`,
-          alt: SITE_CONFIG.name,
-          width: 1200,
-          height: 630,
-        },
-      ],
-    },
-    twitter: {
-      cardType: 'summary_large_image',
-    },
-    additionalMetaTags: [
+    images: [
+      {
+        url: `${SITE_CONFIG.url}${SITE_CONFIG.defaultImage}`,
+        width: 1200,
+        height: 630,
+        alt: SITE_CONFIG.name,
+      },
+    ],
+    additionalMeta: [
       {
         name: 'keywords',
         content: [
@@ -355,5 +571,9 @@ export function generateDefaultSEO(): NextSeoProps {
         content: SITE_CONFIG.author,
       },
     ],
-  };
+    tags: [
+      'restaurantes', 'reseñas', 'gastronomía', 'locales', 
+      'opiniones', 'blog', 'comida', 'España'
+    ],
+  });
 }
