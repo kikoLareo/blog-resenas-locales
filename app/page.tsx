@@ -95,7 +95,7 @@ export default function HomePage() {
 
       {/* Ad Slot - Header (placeholder sin anuncios) */}
       <div className="container-wide py-4">
-        <AdSlot slotId="header-banner" className="mx-auto" lazy={false} />
+        <AdSlot slotId="header" className="mx-auto" lazy={false} />
       </div>
 
       {/* Latest Reviews Section */}
@@ -178,7 +178,7 @@ export default function HomePage() {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Ad Slot - Sidebar (placeholder sin anuncios) */}
-              <AdSlot slotId="sidebar-300x250" />
+              <AdSlot slotId="sidebar" />
               
               {/* Cities Section */}
               <div className="card">
@@ -262,7 +262,7 @@ export default function HomePage() {
 
       {/* Footer Ad (placeholder sin anuncios) */}
       <div className="container-wide py-4">
-        <AdSlot slotId="footer-728x90" className="mx-auto" />
+        <AdSlot slotId="footer" className="mx-auto" />
       </div>
     </>
   );

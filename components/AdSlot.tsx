@@ -21,8 +21,9 @@ export default function AdSlot({
   const [hasConsent, setHasConsent] = useState(false);
 
   // Get slot configuration (map logical slotId -> size key)
+  // Map logical id -> size key; provide safe fallback if misconfigurado
   const sizeKey = ADS_CONFIG.slots[slotId] as keyof typeof ADS_CONFIG.sizes;
-  const slotConfig = ADS_CONFIG.sizes[sizeKey];
+  const slotConfig = sizeKey ? ADS_CONFIG.sizes[sizeKey] : { width: 1, height: 1 } as const;
   const { width, height } = slotConfig;
 
   // Check for consent (implement your consent management logic here)
@@ -129,7 +130,8 @@ export default function AdSlot({
   }, [hasConsent, isLoaded, lazy, slotId, width, height]);
 
   // Ads desactivados temporalmente: renderiza solo el contenedor reservado sin contenido de anuncio
-  if (true) {
+  // Respeta bandera de entorno para activar/desactivar anuncios en UI
+  if (!ADS_CONFIG.enabled) {
     return (
       <div
         ref={containerRef}
