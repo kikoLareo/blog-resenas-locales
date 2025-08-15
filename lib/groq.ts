@@ -280,6 +280,36 @@ export const getRelatedVenues = groq`
 `;
 
 // Sitemap y feed queries
+export const sitemapVenuesQuery = groq`
+  *[_type == "venue"]{
+    "slug": slug.current,
+    city->{
+      "slug": slug.current
+    },
+    _updatedAt
+  }
+`;
+
+export const sitemapReviewsQuery = groq`
+  *[_type == "review"]{
+    "slug": slug.current,
+    venue->{
+      "slug": slug.current,
+      city->{
+        "slug": slug.current
+      }
+    },
+    visitDate,
+    _updatedAt
+  }
+`;
+
+export const sitemapPostsQuery = groq`
+  *[_type == "post"]{
+    "slug": slug.current,
+    _updatedAt
+  }
+`;
 export const getAllSlugs = groq`
   {
     "venues": *[_type == "venue" && defined(slug.current)].slug.current,
