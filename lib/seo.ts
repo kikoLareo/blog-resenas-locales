@@ -32,10 +32,7 @@ export function generateVenueSEO(venue: Venue): NextSeoProps {
       locale: SITE_CONFIG.locale,
     },
     twitter: {
-      card: 'summary_large_image',
-      title,
-      description: description.slice(0, 160),
-      images: images.map(img => img.url),
+      cardType: 'summary_large_image',
     },
     additionalMetaTags: [
       {
@@ -113,10 +110,7 @@ export function generateReviewSEO(review: Review, venue: Venue): NextSeoProps {
       },
     },
     twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: images.map(img => img.url),
+      cardType: 'summary_large_image',
     },
     additionalMetaTags: [
       {
@@ -181,10 +175,7 @@ export function generatePostSEO(post: Post): NextSeoProps {
       },
     },
     twitter: {
-      card: 'summary_large_image',
-      title,
-      description: description.slice(0, 160),
-      images: images.map(img => img.url),
+      cardType: 'summary_large_image',
     },
     additionalMetaTags: [
       {
@@ -238,10 +229,7 @@ export function generateCitySEO(city: City, venueCount: number): NextSeoProps {
       locale: SITE_CONFIG.locale,
     },
     twitter: {
-      card: 'summary_large_image',
-      title,
-      description: description.slice(0, 160),
-      images: images.map(img => img.url),
+      cardType: 'summary_large_image',
     },
     additionalMetaTags: [
       {
@@ -302,9 +290,7 @@ export function generateCategorySEO(category: string, city?: string): NextSeoPro
       locale: SITE_CONFIG.locale,
     },
     twitter: {
-      card: 'summary_large_image',
-      title,
-      description: description.slice(0, 160),
+      cardType: 'summary_large_image',
     },
     additionalMetaTags: [
       {
@@ -348,10 +334,7 @@ export function generateDefaultSEO(): NextSeoProps {
       ],
     },
     twitter: {
-      card: 'summary_large_image',
-      title: SITE_CONFIG.name,
-      description: SITE_CONFIG.description,
-      images: [`${SITE_CONFIG.url}${SITE_CONFIG.defaultImage}`],
+      cardType: 'summary_large_image',
     },
     additionalMetaTags: [
       {

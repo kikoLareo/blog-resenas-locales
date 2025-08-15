@@ -27,7 +27,7 @@ export async function GET(
         break;
 
       case 'venues':
-        const venues = await sanityFetch({
+        const venues = await sanityFetch<Array<{ slug: string; _updatedAt: string; city: { slug: string } }>>({
           query: sitemapVenuesQuery,
           tags: ['sitemap-venues', 'venues'],
         });
@@ -40,7 +40,7 @@ export async function GET(
         break;
 
       case 'reviews':
-        const reviews = await sanityFetch({
+        const reviews = await sanityFetch<Array<{ visitDate: string; _updatedAt: string; venue: { slug: string; city: { slug: string } } }>>({
           query: sitemapReviewsQuery,
           tags: ['sitemap-reviews', 'reviews'],
         });
@@ -54,7 +54,7 @@ export async function GET(
         break;
 
       case 'posts':
-        const posts = await sanityFetch({
+        const posts = await sanityFetch<Array<{ slug: string; _updatedAt: string }>>({
           query: sitemapPostsQuery,
           tags: ['sitemap-posts', 'posts'],
         });
