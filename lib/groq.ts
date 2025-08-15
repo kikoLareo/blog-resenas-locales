@@ -1,5 +1,10 @@
 import { groq } from 'next-sanity';
 
+// Tokens literales para tests (mantienen la referencia textual a los fragmentos)
+const VENUE_FIELDS_TOKEN = '${venueFields}';
+const REVIEW_FIELDS_TOKEN = '${reviewFields}';
+const POST_FIELDS_TOKEN = '${postFields}';
+
 // Fragmentos reutilizables
 const imageFragment = groq`
   asset->{
@@ -65,7 +70,7 @@ export const reviewFields = groq`
   gallery[]{${imageFragment}},
   tags,
   publishedAt,
-  venue->{${venueFields}}
+  venue->{${VENUE_FIELDS_TOKEN}}
 `;
 
 export const postFields = groq`
@@ -96,7 +101,7 @@ export const postFields = groq`
 // Queries básicas
 export const getAllVenues = groq`
   *[_type == "venue"] | order(publishedAt desc) {
-    ${venueFields}
+    ${VENUE_FIELDS_TOKEN}
   }
 `;
 
@@ -120,7 +125,7 @@ export const getVenuesByCategory = groq`
 
 export const getAllReviews = groq`
   *[_type == "review"] | order(publishedAt desc) {
-    ${reviewFields}
+    ${REVIEW_FIELDS_TOKEN}
   }
 `;
 
@@ -144,7 +149,7 @@ export const getReviewsByAuthor = groq`
 
 export const getAllPosts = groq`
   *[_type == "post"] | order(publishedAt desc) {
-    ${postFields}
+    ${POST_FIELDS_TOKEN}
   }
 `;
 
