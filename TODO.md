@@ -39,3 +39,72 @@
 
 - Actualizar `README.md` con la bandera `NEXT_PUBLIC_ADS_ENABLED` y pasos de configuración.
 
+
+## Backlog ampliado (estado actual y tareas pendientes)
+
+### Rutas y páginas
+
+- Alinear el esquema de rutas del sitio. Decidir entre `/{city}/{venue}` o `/ciudades/...` y unificar:
+  - `components/Breadcrumbs.tsx` (especialmente `VenueBreadcrumbs`).
+  - URLs de `productionUrl` en `sanity.config.tsx` para `review`, `venue`, `post`, `city`, `category`.
+- Crear páginas faltantes según plan inicial:
+  - `app/(public)/[city]/[venue]/review-[date]/page.tsx` (reseña completa).
+  - `app/blog/page.tsx` y `app/blog/[slug]/page.tsx`.
+  - `app/categorias/page.tsx` y `app/categorias/[slug]/page.tsx`.
+  - Si se opta por prefijo `/ciudades`: `app/ciudades/page.tsx` y `app/ciudades/[slug]/page.tsx`.
+  - Páginas estáticas enlazadas desde el layout: `/sobre`, `/contacto`, `/politica-privacidad`, `/terminos`, `/cookies`, `/buscar`, `/tags` (o eliminar enlaces/sitemap si no se implementan).
+- Corregir los enlaces en `app/page.tsx` y `app/(public)/[city]/[venue]/page.tsx` para apuntar a rutas reales existentes.
+
+### Datos (Sanity)
+
+- Sustituir datos mock por `sanityFetch` + GROQ en:
+  - Homepage (`app/page.tsx`): reseñas recientes, categorías/ciudades destacadas, posts destacados.
+  - Ficha de local (`app/(public)/[city]/[venue]/page.tsx`): datos del local y sus reseñas.
+- Endurecer `sanity.client.ts` cuando falten variables de entorno:
+  - Evitar devolver `[]` silencioso en endpoints que esperan objeto; devolver 500 o early-return controlado donde aplique.
+
+### Sitemaps y SEO
+
+- Corregir URLs generadas en `app/api/sitemap/[type]/route.ts`:
+  - Venues: incluir `city.slug` en la URL final (p. ej., `/{citySlug}/{venueSlug}`).
+  - Reviews: usar la ruta real (por-venue o `/resenas/...`) de forma consistente con la web.
+  - Revisar listado de páginas estáticas del sitemap y asegurar que existen para evitar 404.
+- Unificar AEO de TL;DR:
+  - Decidir unidad de validación: “caracteres” o “palabras”.
+  - Alinear `README.md`, `sanity/schemas/review.ts`, `lib/constants.ts` (límites) y `components/TLDR.tsx`.
+- Revisar `metadata` y `alternates.canonical` en nuevas páginas y comprobar JSON-LD en venue/review/post.
+
+### Anuncios (ads)
+
+- Respetar `ADS_CONFIG.enabled` al renderizar anuncios:
+  - Gatear `HeaderAd`, `SidebarAd`, `InArticleAd` y/o la lógica de `components/AdSlot.tsx`.
+  - Mantener contenedores con dimensiones fijas solo si están habilitados (evitar placeholders innecesarios).
+- Integrar proveedor real (GAM/AdSense) con `dynamic import` sin SSR y controlado por consentimiento.
+- Documentar la bandera `NEXT_PUBLIC_ADS_ENABLED` en `README.md` y completar `env.example`.
+
+### Breadcrumbs y Studio
+
+- Actualizar breadcrumbs a la estructura final de rutas (ciudad/local, categorías, blog).
+- Corregir `productionUrl` en `sanity.config.tsx` para que apunte a las rutas reales tras la decisión de paths.
+
+### Testing
+
+- Restaurar/actualizar tests de `AdSlot` con mocks de `IntersectionObserver` y `googletag`; validar CLS=0.
+- Ajustar E2E de Playwright para clicks sobre elementos potencialmente cubiertos por overlays/ads (usar `force: true` o esperar a no-intercepción).
+- Ejecutar y estabilizar tests unitarios y E2E tras cambios de rutas/SEO.
+
+### Documentación y configuración
+
+- Completar `env.example` con:
+  - `NEXT_PUBLIC_ADS_ENABLED`, `ADS_PROVIDER`, `ADS_SCRIPT_URL`.
+  - `NEXT_PUBLIC_SANITY_API_VERSION`.
+  - Claves de Maps/Analytics necesarias.
+- Actualizar `README.md` con la bandera de anuncios, pasos de configuración y notas de consentimiento (CMP).
+- Decidir estrategia de fail-safe del cliente Sanity en producción (loggear/romper vs. silencioso).
+
+### Mejoras varias
+
+- Valorar `experimental.typedRoutes` o crear rutas reales para evitar casts en `Link`.
+- Revisar duplicidad de `urlFor` en `lib/images.ts` y `lib/sanity.client.ts` para evitar confusiones de import.
+- Añadir endpoint top-level `/sitemap.xml` (si se quiere exponer además de `/api/sitemap`).
+
