@@ -5,7 +5,7 @@ import { visionTool } from '@sanity/vision';
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { colorInput } from '@sanity/color-input';
-import { orderableDocumentListPlugin } from '@sanity/orderable-document-list';
+// import { orderableDocumentListPlugin } from '@sanity/orderable-document-list';
 
 // Import schemas
 import { schemaTypes } from './sanity/schemas';
@@ -17,7 +17,8 @@ const singletonActions = new Set(['publish', 'discardChanges', 'restore']);
 // Define the singleton document types
 const singletonTypes = new Set(['settings']);
 
-export default defineConfig({
+type DocWithSlug = { slug?: { current?: string } } & Record<string, unknown>;
+	export default defineConfig({
   name: 'blog-resenas-locales',
   title: 'Blog de Reseñas de Locales',
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '',
@@ -78,11 +79,11 @@ export default defineConfig({
     // Plugin para manejar colores
     colorInput(),
     
-    // Plugin para ordenar documentos
-    orderableDocumentListPlugin({
-      type: 'category',
-      title: 'Ordenar Categorías',
-    }),
+    // Plugin para ordenar documentos (opcional)
+    // orderableDocumentListPlugin({
+    //   type: 'category',
+    //   title: 'Ordenar Categorías',
+    // }),
     
     // Plugin Vision para desarrollo
     visionTool({
@@ -109,20 +110,20 @@ export default defineConfig({
     productionUrl: async (prev, { document }) => {
       // URL base del sitio (reemplazar con tu dominio real)
       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      const d = (document || {}) as DocWithSlug;
+      if (!d.slug?.current) return prev;
       
-      if (!document.slug?.current) return prev;
-      
-      switch (document._type) {
+      switch ((document as any)._type) {
         case 'review':
-          return `${baseUrl}/resenas/${document.slug.current}`;
+          return `${baseUrl}/resenas/${d.slug?.current}`;
         case 'venue':
-          return `${baseUrl}/locales/${document.slug.current}`;
+          return `${baseUrl}/locales/${d.slug?.current}`;
         case 'post':
-          return `${baseUrl}/blog/${document.slug.current}`;
+          return `${baseUrl}/blog/${d.slug?.current}`;
         case 'city':
-          return `${baseUrl}/ciudades/${document.slug.current}`;
+          return `${baseUrl}/ciudades/${d.slug?.current}`;
         case 'category':
-          return `${baseUrl}/categorias/${document.slug.current}`;
+          return `${baseUrl}/categorias/${d.slug?.current}`;
         default:
           return prev;
       }
@@ -152,23 +153,8 @@ export default defineConfig({
     },
   },
   
-  // Configurar la búsqueda
-  search: {
-    // Configurar qué campos se incluyen en la búsqueda global
-    filters: [
-      {
-        name: 'type',
-        title: 'Tipo',
-        options: [
-          { title: 'Reseñas', value: 'review' },
-          { title: 'Locales', value: 'venue' },
-          { title: 'Posts', value: 'post' },
-          { title: 'Ciudades', value: 'city' },
-          { title: 'Categorías', value: 'category' },
-        ],
-      },
-    ],
-  },
+  // Configurar la búsqueda: usar la configuración por defecto por compatibilidad
+  // search: {},
   
   // Configurar la API
   api: {

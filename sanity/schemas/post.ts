@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-export const post = defineType({
+const post = defineType({
   name: 'post',
   title: 'Crónica/Post',
   type: 'document',
@@ -306,7 +306,7 @@ export const post = defineType({
     },
     prepare({ title, author, publishedAt, media, featured, hasFaq }) {
       const date = publishedAt ? new Date(publishedAt).toLocaleDateString('es-ES') : 'Sin fecha';
-      const badges = [];
+      const badges = [] as string[];
       if (featured) badges.push('⭐');
       if (hasFaq) badges.push('❓');
       
@@ -338,3 +338,5 @@ export const post = defineType({
     },
   ],
 });
+
+export default post;
