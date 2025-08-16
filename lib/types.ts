@@ -400,3 +400,45 @@ export const RATING_CATEGORIES = [
   'ambience',
   'value'
 ] as const;
+
+// Tipos para Homepage con datos de Sanity
+export interface HomepageData {
+  featuredReviews: Array<{
+    _id: string;
+    title: string;
+    slug: { current: string };
+    ratings: Ratings;
+    gallery: SanityImage[];
+    venue: {
+      title: string;
+      slug: { current: string };
+      city: string;
+      citySlug: string;
+    };
+  }>;
+  featuredPosts: Array<{
+    _id: string;
+    title: string;
+    slug: { current: string };
+    excerpt?: string;
+    heroImage?: SanityImage;
+    publishedAt: string;
+  }>;
+  featuredCities: Array<{
+    _id: string;
+    title: string;
+    slug: { current: string };
+    description?: string;
+    heroImage?: SanityImage;
+    venueCount?: number;
+  }>;
+  featuredCategories: Array<{
+    _id: string;
+    title: string;
+    slug: { current: string };
+    icon?: string;
+    color?: string;
+    description?: string;
+    venueCount?: number;
+  }>;
+}

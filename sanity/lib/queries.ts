@@ -316,7 +316,8 @@ export const homepageQuery = `{
     "venue": venue-> {
       title,
       slug,
-      "city": city->title
+      "city": city->title,
+      "citySlug": city->slug.current
     }
   },
   "featuredPosts": *[_type == "post" && featured == true] | order(publishedAt desc)[0...3] {
