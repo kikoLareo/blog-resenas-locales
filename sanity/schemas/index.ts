@@ -3,12 +3,12 @@
 
 // Base content types
 import { city } from './city';
-import { category } from './category';
+import category from './category';
 
 // Main content types
-import { venue } from './venue';
-import { review } from './review';
-import { post } from './post';
+import venue from './venue';
+import review from './review';
+import post from './post';
 
 // Export schema types in logical order
 export const schemaTypes = [

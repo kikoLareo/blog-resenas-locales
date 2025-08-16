@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-export const category = defineType({
+const category = defineType({
   name: 'category',
   title: 'Categoría',
   type: 'document',
@@ -91,7 +91,7 @@ export const category = defineType({
           { title: 'Fusión', value: 'fusion' },
           { title: 'Internacional', value: 'international' },
         ],
-        layout: 'checkboxes',
+        layout: 'list',
       },
       validation: (rule) => rule.max(3),
       description: 'Tipos de cocina asociados a esta categoría (máximo 3)',
@@ -212,7 +212,7 @@ export const category = defineType({
       media: 'heroImage',
     },
     prepare({ title, description, color, icon, featured, priceRange, media }) {
-      const badges = [];
+      const badges = [] as string[];
       if (featured) badges.push('⭐');
       if (priceRange) badges.push(priceRange);
       
@@ -259,3 +259,5 @@ export const category = defineType({
     },
   ],
 });
+
+export default category;
