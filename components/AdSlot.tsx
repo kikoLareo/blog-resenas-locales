@@ -103,6 +103,7 @@ export default function AdSlot({ slot, className = '', priority = false }: AdSlo
         }, Math.random() * 1000 + 500); // Random delay to simulate real ad loading
 
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error loading ad:', error);
         setHasError(true);
         
