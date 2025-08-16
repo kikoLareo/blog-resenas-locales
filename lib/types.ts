@@ -56,6 +56,9 @@ export interface Category {
     current: string;
   };
   description?: string;
+  icon?: string;
+  color?: string;
+  heroImage?: SanityImage;
   // Campos calculados
   venueCount?: number;
   reviewCount?: number;
