@@ -21,14 +21,12 @@ interface VenuePageProps {
 // Mock data - In production, fetch from Sanity
 const mockVenue: Venue = {
   _id: 'venue-1',
-  _type: 'venue',
   title: 'Casa Pepe',
-  slug: { current: 'casa-pepe', _type: 'slug' },
+  slug: { current: 'casa-pepe' },
   city: {
     _id: 'city-1',
-    _type: 'city',
     title: 'Santiago de Compostela',
-    slug: { current: 'santiago-compostela', _type: 'slug' },
+    slug: { current: 'santiago-compostela' },
     region: 'Galicia',
   },
   address: 'Rúa do Franco, 24',
@@ -52,24 +50,27 @@ const mockVenue: Venue = {
   categories: [
     {
       _id: 'cat-1',
-      _type: 'category',
       title: 'Restaurante Gallego',
-      slug: { current: 'restaurante-gallego', _type: 'slug' },
+      slug: { current: 'restaurante-gallego' },
     },
   ],
   images: [
     {
+      _type: 'image',
       asset: {
         _id: 'img-1',
         url: 'https://cdn.sanity.io/images/project/dataset/image-1.jpg',
+        metadata: { dimensions: { width: 1200, height: 800, aspectRatio: 1.5 } }
       },
       alt: 'Fachada de Casa Pepe en Santiago',
       caption: 'Entrada principal del restaurante',
     },
     {
+      _type: 'image',
       asset: {
         _id: 'img-2',
         url: 'https://cdn.sanity.io/images/project/dataset/image-2.jpg',
+        metadata: { dimensions: { width: 1200, height: 800, aspectRatio: 1.5 } }
       },
       alt: 'Interior de Casa Pepe',
       caption: 'Comedor principal con ambiente tradicional',
@@ -86,9 +87,8 @@ const mockVenue: Venue = {
 const mockReviews: Review[] = [
   {
     _id: 'review-1',
-    _type: 'review',
     title: 'Casa Pepe: Auténtica cocina gallega en el corazón de Santiago',
-    slug: { current: 'casa-pepe-autentica-cocina-gallega', _type: 'slug' },
+    slug: { current: 'casa-pepe-autentica-cocina-gallega' },
     venue: mockVenue,
     visitDate: '2024-01-15',
     ratings: { food: 8.5, service: 8.0, ambience: 7.5, value: 8.5 },
@@ -138,7 +138,7 @@ export async function generateMetadata({ params }: VenuePageProps): Promise<Meta
     openGraph: {
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
-      type: 'place',
+      type: 'website',
       url: `${SITE_CONFIG.url}/${params.city}/${params.venue}`,
       images: venue.images.length > 0 ? [
         {
@@ -254,7 +254,7 @@ function VenueReviewCard({ review }: { review: Review }) {
         <div>
           <h4 className="text-sm font-medium text-red-700 mb-2">✗ Contras</h4>
           <ul className="text-sm text-gray-600 space-y-1">
-            {review.cons.map((con, index) => (
+            {review.cons?.map((con, index) => (
               <li key={index}>• {con}</li>
             ))}
           </ul>

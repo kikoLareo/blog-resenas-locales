@@ -12,19 +12,18 @@ import { Review, Post, Venue } from '@/lib/types';
 const mockReviews: Review[] = [
   {
     _id: '1',
-    _type: 'review',
+    
     title: 'Casa Pepe: Auténtica cocina gallega en el corazón de Santiago',
-    slug: { current: 'casa-pepe-autentica-cocina-gallega', _type: 'slug' },
+    slug: { current: 'casa-pepe-autentica-cocina-gallega' },
     venue: {
       _id: 'venue-1',
-      _type: 'venue',
+      
       title: 'Casa Pepe',
-      slug: { current: 'casa-pepe', _type: 'slug' },
+      slug: { current: 'casa-pepe' },
       city: {
         _id: 'city-1',
-        _type: 'city',
         title: 'Santiago de Compostela',
-        slug: { current: 'santiago-compostela', _type: 'slug' },
+        slug: { current: 'santiago-compostela' },
       },
       address: 'Rúa do Franco, 24',
       priceRange: '€€' as const,
@@ -58,7 +57,7 @@ const mockPosts: Post[] = [
     _id: 'post-1',
     _type: 'post',
     title: 'Los 10 mejores restaurantes gallegos de Santiago',
-    slug: { current: 'mejores-restaurantes-gallegos-santiago', _type: 'slug' },
+    slug: { current: 'mejores-restaurantes-gallegos-santiago' },
     excerpt: 'Descubre los restaurantes que mejor representan la gastronomía gallega en la capital compostelana.',
     author: 'Carlos Fernández',
     publishedAt: '2024-01-18T14:00:00Z',
@@ -180,7 +179,7 @@ function ReviewCard({ review }: { review: Review }) {
           <div>
             <h4 className="text-sm font-medium text-red-700 mb-1">✗ Contras</h4>
             <ul className="text-sm text-gray-600 space-y-1">
-              {review.cons.slice(0, 2).map((con, index) => (
+              {review.cons?.slice(0, 2).map((con, index) => (
                 <li key={index} className="truncate">{con}</li>
               ))}
             </ul>
