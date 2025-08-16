@@ -9,6 +9,24 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Design tokens basados en CSS variables (para clases como bg-background, text-foreground, etc.)
+        background: 'rgb(var(--background) / <alpha-value>)',
+        foreground: 'rgb(var(--foreground) / <alpha-value>)',
+        card: 'rgb(var(--card) / <alpha-value>)',
+        'card-foreground': 'rgb(var(--card-foreground) / <alpha-value>)',
+        popover: 'rgb(var(--popover) / <alpha-value>)',
+        'popover-foreground': 'rgb(var(--popover-foreground) / <alpha-value>)',
+        muted: 'rgb(var(--muted) / <alpha-value>)',
+        'muted-foreground': 'rgb(var(--muted-foreground) / <alpha-value>)',
+        accent: 'rgb(var(--accent) / <alpha-value>)',
+        'accent-foreground': 'rgb(var(--accent-foreground) / <alpha-value>)',
+        secondary: 'rgb(var(--secondary) / <alpha-value>)',
+        'secondary-foreground': 'rgb(var(--secondary-foreground) / <alpha-value>)',
+        destructive: 'rgb(var(--destructive) / <alpha-value>)',
+        'destructive-foreground': 'rgb(var(--destructive-foreground) / <alpha-value>)',
+        border: 'rgb(var(--border) / <alpha-value>)',
+        input: 'rgb(var(--input) / <alpha-value>)',
+        ring: 'rgb(var(--ring) / <alpha-value>)',
         brand: {
           50: '#fef7ee',
           100: '#fdebd4',
@@ -22,7 +40,7 @@ const config: Config = {
           900: '#782511',
           950: '#400f05',
         },
-        // Alias de colores usados en la UI
+        // Paleta primaria (para clases -50..-900 como text-primary-600)
         primary: {
           50: '#fef7ee',
           100: '#fdebd4',
