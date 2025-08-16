@@ -18,6 +18,10 @@
 - ♿ **Accesibilidad** AA completa
 - 🧪 **Testing** E2E y unitario
 - 📈 **Analytics** y métricas de rendimiento
+- 🍪 **Sistema de consentimiento** GDPR compliant
+- 📺 **Gestión de anuncios** con control de privacidad
+- 🗺️ **Sitemaps automáticos** para mejor indexación
+- 🔒 **Páginas legales** (privacidad, términos, cookies)
 
 ## 🏗️ Arquitectura
 
@@ -79,13 +83,32 @@ NEXT_PUBLIC_SITE_NAME="Tu Blog de Reseñas"
 # Sanity Configuration
 NEXT_PUBLIC_SANITY_PROJECT_ID=tu-project-id
 NEXT_PUBLIC_SANITY_DATASET=production
+NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
 SANITY_API_READ_TOKEN=tu-read-token
 SANITY_WEBHOOK_SECRET=tu-webhook-secret
 
-# Opcional: Analytics, Maps, Ads
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+# Ads Configuration
+NEXT_PUBLIC_ADS_ENABLED=false
+ADS_PROVIDER=gam
+ADS_SCRIPT_URL=https://securepubads.g.doubleclick.net/tag/js/gpt.js
+
+# Maps Configuration
+MAPS_PROVIDER=google
 NEXT_PUBLIC_GOOGLE_MAPS_KEY=tu-maps-key
+
+# Analytics
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+NEXT_PUBLIC_PLAUSIBLE_DOMAIN=tu-dominio.com
 ```
+
+#### Configuración de Anuncios
+
+El sistema de anuncios está controlado por la variable `NEXT_PUBLIC_ADS_ENABLED`:
+
+- `false`: Los anuncios no se renderizarán (recomendado para desarrollo)
+- `true`: Los anuncios se mostrarán respetando el consentimiento del usuario
+
+**Importante**: Los anuncios solo se cargan después de que el usuario dé su consentimiento para cookies publicitarias, cumpliendo con GDPR.
 
 ### 4. Ejecutar en desarrollo
 
