@@ -2,8 +2,7 @@ import {
   MapPinIcon, 
   PhoneIcon, 
   ClockIcon, 
-  GlobeAltIcon,
-  StarIcon
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
 import { Venue } from '@/lib/types';
 import { MAPS_CONFIG, PRICE_RANGES } from '@/lib/constants';
@@ -12,7 +11,6 @@ interface LocalInfoProps {
   venue: Venue;
   className?: string;
   showMap?: boolean;
-  showRating?: boolean;
   compact?: boolean;
 }
 
@@ -20,7 +18,6 @@ export default function LocalInfo({
   venue,
   className = '',
   showMap = true,
-  showRating = true,
   compact = false,
 }: LocalInfoProps) {
   // Format opening hours for display
@@ -47,9 +44,7 @@ export default function LocalInfo({
 
   // Get current day status
   const getCurrentDayStatus = (): { isOpen: boolean; nextChange?: string } => {
-    const now = new Date();
-    const currentDay = now.toLocaleDateString('es-ES', { weekday: 'long' });
-    const currentTime = now.getHours() * 100 + now.getMinutes();
+    // const now = new Date();
 
     // This is a simplified version - in production you'd want more robust logic
     return { isOpen: true }; // Placeholder

@@ -8,8 +8,10 @@ interface FAQItem {
   answer: string;
 }
 
-interface FAQProps {
-  faqs: FAQItem[];
+interface FAQProps extends React.HTMLAttributes<HTMLElement> {
+  faqs?: FAQItem[];
+  // Alias para compatibilidad con tests: `items`
+  items?: FAQItem[];
   title?: string;
   className?: string;
   allowMultipleOpen?: boolean;
@@ -17,11 +19,16 @@ interface FAQProps {
 
 export default function FAQ({ 
   faqs, 
-  title = 'Preguntas Frecuentes',
+  items,
+  title = 'Preguntas frecuentes',
   className = '',
-  allowMultipleOpen = false
+  allowMultipleOpen = true,
+  ...rest
 }: FAQProps) {
   const [openItems, setOpenItems] = useState<Set<number>>(new Set());
+
+  // Normalizar fuente de datos
+  const list: FAQItem[] | undefined = faqs ?? items;
 
   const toggleItem = (index: number) => {
     const newOpenItems = new Set(openItems);
@@ -53,11 +60,15 @@ export default function FAQ({
     }
   };
 
+  if (!list || list.length === 0) {
+    return null;
+  }
+  
   // Generate JSON-LD schema for FAQs
   const faqSchema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: faqs.map((faq) => ({
+    mainEntity: list.map((faq) => ({
       '@type': 'Question',
       name: faq.question,
       acceptedAnswer: {
@@ -67,12 +78,14 @@ export default function FAQ({
     })),
   };
 
-  if (!faqs || faqs.length === 0) {
-    return null;
-  }
-
   return (
-    <section className={`faq-section ${className}`} aria-labelledby="faq-heading">
+    <section 
+      className={`faq ${className}`}
+      aria-labelledby="faq-heading"
+      role="region"
+      data-testid={(rest as any)['data-testid'] ?? 'faq'}
+      {...rest}
+    >
       {/* JSON-LD Schema */}
       <script
         type="application/ld+json"
@@ -93,12 +106,11 @@ export default function FAQ({
       </div>
 
       {/* FAQ Items */}
-      <div className="space-y-4" role="region" aria-labelledby="faq-heading">
-        {faqs.map((faq, index) => {
+      <div className="space-y-4" aria-labelledby="faq-heading">
+        {list.map((faq, index) => {
           const isOpen = openItems.has(index);
-          const itemId = `faq-item-${index}`;
-          const buttonId = `faq-button-${index}`;
-          const panelId = `faq-panel-${index}`;
+          const buttonId = `faq-item-${index}`;
+          const panelId = `faq-content-${index}`;
 
           return (
             <div
@@ -110,7 +122,7 @@ export default function FAQ({
               {/* Question Button */}
               <button
                 id={buttonId}
-                className="w-full px-6 py-4 text-left focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg"
+                className="faq-question w-full px-6 py-4 text-left focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg"
                 onClick={() => toggleItem(index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
                 aria-expanded={isOpen}
@@ -141,26 +153,26 @@ export default function FAQ({
               </button>
 
               {/* Answer Panel */}
-              <div
-                id={panelId}
-                role="region"
-                aria-labelledby={buttonId}
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                  isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                }`}
-                itemScope
-                itemType="https://schema.org/Answer"
-              >
-                <div className="px-6 pb-4">
-                  <div 
-                    className="text-gray-700 leading-relaxed prose prose-sm max-w-none"
-                    itemProp="text"
-                    dangerouslySetInnerHTML={{ 
-                      __html: faq.answer.replace(/\n/g, '<br />') 
-                    }}
-                  />
+              {isOpen && (
+                <div
+                  id={panelId}
+                  role="region"
+                  aria-labelledby={buttonId}
+                  className="overflow-hidden transition-all duration-300 ease-in-out max-h-96 opacity-100"
+                  itemScope
+                  itemType="https://schema.org/Answer"
+                >
+                  <div className="px-6 pb-4">
+                    <div 
+                      className="text-gray-700 leading-relaxed prose prose-sm max-w-none"
+                      itemProp="text"
+                      dangerouslySetInnerHTML={{ 
+                        __html: faq.answer.replace(/\n/g, '<br />') 
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           );
         })}

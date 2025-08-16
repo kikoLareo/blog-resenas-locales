@@ -3,10 +3,9 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import { HeaderAd, SidebarAd } from '@/components/AdSlot';
 import TLDR from '@/components/TLDR';
-import ScoreBar, { CompactScore } from '@/components/ScoreBar';
-import { CompactGallery } from '@/components/Gallery';
-import { SITE_CONFIG, SEO_DEFAULTS, PAGINATION } from '@/lib/constants';
-import { Review, Post, Venue } from '@/lib/types';
+import { CompactScore } from '@/components/ScoreBar';
+import { SITE_CONFIG } from '@/lib/constants';
+import { Review, Post } from '@/lib/types';
 
 // Mock data - In production, fetch from Sanity
 const mockReviews: Review[] = [
