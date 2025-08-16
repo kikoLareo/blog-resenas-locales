@@ -20,6 +20,25 @@ export const citiesQuery = `
   }
 `;
 
+// Obtener ciudad individual con metadatos
+export const cityQuery = `
+  *[_type == "city" && slug.current == $citySlug][0] {
+    _id,
+    title,
+    slug,
+    region,
+    description,
+    heroImage,
+    featured,
+    geo,
+    population,
+    highlights,
+    cuisineSpecialties,
+    "venueCount": count(*[_type == "venue" && city._ref == ^._id]),
+    "reviewCount": count(*[_type == "review" && venue->city._ref == ^._id])
+  }
+`;
+
 // Obtener categorías destacadas
 export const featuredCategoriesQuery = `
   *[_type == "category" && featured == true] | order(order asc) {
@@ -32,6 +51,23 @@ export const featuredCategoriesQuery = `
     heroImage,
     cuisineType,
     priceRangeTypical
+  }
+`;
+
+// Obtener categoría individual con metadatos
+export const categoryQuery = `
+  *[_type == "category" && slug.current == $categorySlug][0] {
+    _id,
+    title,
+    slug,
+    description,
+    icon,
+    color,
+    heroImage,
+    cuisineType,
+    priceRangeTypical,
+    "venueCount": count(*[_type == "venue" && ^._id in categories[]._ref]),
+    "reviewCount": count(*[_type == "review" && ^._id in venue->categories[]._ref])
   }
 `;
 
@@ -53,22 +89,33 @@ export const venuesQuery = `
   }
 `;
 
-// Obtener locales por ciudad
+// Obtener locales por ciudad con paginación
 export const venuesByCityQuery = `
-  *[_type == "venue" && city->slug.current == $citySlug] | order(title asc) {
+  *[_type == "venue" && city->slug.current == $citySlug] | order(title asc) [$offset...$limit] {
     _id,
     title,
     slug,
     description,
     priceRange,
     images[0],
-    "city": city->title,
-    "categories": categories[]->title,
+    "city": city-> {
+      title,
+      slug
+    },
+    "categories": categories[]-> {
+      title,
+      slug
+    },
     geo,
     address,
     phone,
     website
   }
+`;
+
+// Contar locales por ciudad para paginación
+export const venuesByCityCountQuery = `
+  count(*[_type == "venue" && city->slug.current == $citySlug])
 `;
 
 // Obtener local individual con toda la información
@@ -289,18 +336,32 @@ export const searchQuery = `
   }
 `;
 
-// Filtrar por categoría
+// Filtrar por categoría con paginación
 export const venuesByCategoryQuery = `
-  *[_type == "venue" && $categorySlug in categories[]->slug.current] | order(title asc) {
+  *[_type == "venue" && $categorySlug in categories[]->slug.current] | order(title asc) [$offset...$limit] {
     _id,
     title,
     slug,
     description,
     priceRange,
     images[0],
-    "city": city->title,
-    "categories": categories[]->title
+    "city": city-> {
+      title,
+      slug
+    },
+    "categories": categories[]-> {
+      title,
+      slug
+    },
+    address,
+    phone,
+    website
   }
+`;
+
+// Contar locales por categoría para paginación
+export const venuesByCategoryCountQuery = `
+  count(*[_type == "venue" && $categorySlug in categories[]->slug.current])
 `;
 
 // ===== QUERIES PARA PÁGINAS ESPECIALES =====

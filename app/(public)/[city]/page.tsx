@@ -3,33 +3,33 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { SITE_CONFIG } from '@/lib/constants';
-import { Category, Venue } from '@/lib/types';
+import { City, Venue } from '@/lib/types';
 import { sanityFetch } from '@/lib/sanity.client';
-import { categoryQuery, venuesByCategoryQuery, venuesByCategoryCountQuery } from '@/sanity/lib/queries';
+import { cityQuery, venuesByCityQuery, venuesByCityCountQuery } from '@/sanity/lib/queries';
 import { collectionPageJsonLd, breadcrumbsJsonLd, combineJsonLd } from '@/lib/schema';
 import { urlFor } from '@/lib/sanity.client';
 
-interface CategoryPageProps {
-  params: { slug: string };
+interface CityPageProps {
+  params: { city: string };
   searchParams: { page?: string };
 }
 
 const ITEMS_PER_PAGE = 12;
 
-async function getCategoryData(categorySlug: string): Promise<Category | null> {
+async function getCityData(citySlug: string): Promise<City | null> {
   try {
-    return await sanityFetch<Category>({
-      query: categoryQuery,
-      params: { categorySlug },
-      tags: ['categories'],
+    return await sanityFetch<City>({
+      query: cityQuery,
+      params: { citySlug },
+      tags: ['cities'],
     });
   } catch {
     return null;
   }
 }
 
-async function getVenuesByCategory(
-  categorySlug: string, 
+async function getVenuesByCity(
+  citySlug: string, 
   page: number = 1
 ): Promise<{ venues: Venue[]; total: number }> {
   try {
@@ -38,13 +38,13 @@ async function getVenuesByCategory(
     
     const [venues, total] = await Promise.all([
       sanityFetch<Venue[]>({
-        query: venuesByCategoryQuery,
-        params: { categorySlug, offset, limit },
+        query: venuesByCityQuery,
+        params: { citySlug, offset, limit },
         tags: ['venues'],
       }),
       sanityFetch<number>({
-        query: venuesByCategoryCountQuery,
-        params: { categorySlug },
+        query: venuesByCityCountQuery,
+        params: { citySlug },
         tags: ['venues'],
       }),
     ]);
@@ -55,17 +55,17 @@ async function getVenuesByCategory(
   }
 }
 
-export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
-  const category = await getCategoryData(params.slug);
+export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
+  const city = await getCityData(params.city);
   
-  if (!category) {
+  if (!city) {
     return {
-      title: 'Categoría no encontrada',
+      title: 'Ciudad no encontrada',
     };
   }
 
-  const title = `${category.title} - Mejores Locales y Reseñas`;
-  const description = category.description || `Descubre los mejores ${category.title.toLowerCase()} con nuestras reseñas detalladas y honestas.`;
+  const title = `${city.title} - Mejores Locales y Reseñas`;
+  const description = city.description || `Descubre los mejores locales en ${city.title} con nuestras reseñas detalladas y honestas.`;
 
   return {
     title,
@@ -74,29 +74,29 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
       type: 'website',
-      url: `${SITE_CONFIG.url}/categorias/${params.slug}`,
-      images: category.heroImage ? [{
-        url: urlFor(category.heroImage).width(1200).height(630).url(),
+      url: `${SITE_CONFIG.url}/${params.city}`,
+      images: city.heroImage ? [{
+        url: urlFor(city.heroImage).width(1200).height(630).url(),
         width: 1200,
         height: 630,
-        alt: category.title,
+        alt: city.title,
       }] : [],
     },
     alternates: {
-      canonical: `${SITE_CONFIG.url}/categorias/${params.slug}`,
+      canonical: `${SITE_CONFIG.url}/${params.city}`,
     },
   };
 }
 
-export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
+export default async function CityPage({ params, searchParams }: CityPageProps) {
   const currentPage = parseInt(searchParams.page || '1', 10);
   
-  const [category, { venues, total }] = await Promise.all([
-    getCategoryData(params.slug),
-    getVenuesByCategory(params.slug, currentPage),
+  const [city, { venues, total }] = await Promise.all([
+    getCityData(params.city),
+    getVenuesByCity(params.city, currentPage),
   ]);
 
-  if (!category) {
+  if (!city) {
     notFound();
   }
 
@@ -107,15 +107,14 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   // Generar JSON-LD
   const breadcrumbs = [
     { name: 'Inicio', url: '/' },
-    { name: 'Categorías', url: '/categorias' },
-    { name: category.title, url: `/categorias/${params.slug}` },
+    { name: city.title, url: `/${params.city}` },
   ];
 
   const jsonLd = combineJsonLd(
     collectionPageJsonLd(
-      `${category.title} - Mejores Locales`,
-      category.description || `Los mejores ${category.title.toLowerCase()}`,
-      `${SITE_CONFIG.url}/categorias/${params.slug}`,
+      `${city.title} - Mejores Locales`,
+      city.description || `Los mejores locales en ${city.title}`,
+      `${SITE_CONFIG.url}/${params.city}`,
       venues
     ),
     breadcrumbsJsonLd(breadcrumbs),
@@ -129,11 +128,12 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         item: {
           '@type': venue.schemaType || 'LocalBusiness',
           name: venue.title,
-          url: `${SITE_CONFIG.url}/${venue.city.slug.current}/${venue.slug.current}`,
+          url: `${SITE_CONFIG.url}/${params.city}/${venue.slug.current}`,
           address: {
             '@type': 'PostalAddress',
             streetAddress: venue.address,
-            addressLocality: venue.city.title,
+            addressLocality: city.title,
+            addressRegion: city.region,
             addressCountry: 'ES',
           },
           priceRange: venue.priceRange,
@@ -165,46 +165,38 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 </svg>
               </li>
-              <li>
-                <Link href="/categorias" className="hover:text-primary-600">Categorías</Link>
-              </li>
-              <li>
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                </svg>
-              </li>
-              <li className="text-gray-900 font-medium">{category.title}</li>
+              <li className="text-gray-900 font-medium">{city.title}</li>
             </ol>
           </nav>
 
           {/* Hero Section */}
           <div className="text-center mb-12">
-            {category.heroImage && (
+            {city.heroImage && (
               <div className="aspect-[3/1] relative mb-8 rounded-lg overflow-hidden">
                 <Image
-                  src={urlFor(category.heroImage).width(1200).height(400).url()}
-                  alt={category.title}
+                  src={urlFor(city.heroImage).width(1200).height(400).url()}
+                  alt={city.title}
                   fill
                   className="object-cover"
                   priority
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
                   <h1 className="text-4xl md:text-6xl font-bold text-white text-center">
-                    {category.title}
+                    {city.title}
                   </h1>
                 </div>
               </div>
             )}
             
-            {!category.heroImage && (
+            {!city.heroImage && (
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                {category.title}
+                {city.title}
               </h1>
             )}
             
-            {category.description && (
+            {city.description && (
               <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                {category.description}
+                {city.description}
               </p>
             )}
             
@@ -213,14 +205,14 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
-                {category.venueCount || total} locales
+                {city.venueCount || total} locales
               </div>
-              {category.reviewCount && (
+              {city.reviewCount && (
                 <div className="flex items-center">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                   </svg>
-                  {category.reviewCount} reseñas
+                  {city.reviewCount} reseñas
                 </div>
               )}
             </div>
@@ -233,7 +225,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 {venues.map((venue) => (
                   <article key={venue._id} className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
                     {/* Image */}
-                    <Link href={`/${venue.city.slug.current}/${venue.slug.current}`}>
+                    <Link href={`/${params.city}/${venue.slug.current}`}>
                       <div className="aspect-video bg-gray-100 relative">
                         {venue.images?.[0] ? (
                           <Image
@@ -267,12 +259,12 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        {venue.city.title} • {venue.address}
+                        {venue.address}
                       </div>
 
                       <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
                         <Link 
-                          href={`/${venue.city.slug.current}/${venue.slug.current}`}
+                          href={`/${params.city}/${venue.slug.current}`}
                           className="hover:text-primary-600 transition-colors"
                         >
                           {venue.title}
@@ -287,12 +279,12 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
                       {venue.categories && venue.categories.length > 0 && (
                         <div className="flex flex-wrap gap-1">
-                          {venue.categories.slice(0, 2).map((cat) => (
+                          {venue.categories.slice(0, 2).map((category) => (
                             <span 
-                              key={cat.slug.current}
+                              key={category.slug.current}
                               className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800"
                             >
-                              {cat.title}
+                              {category.title}
                             </span>
                           ))}
                           {venue.categories.length > 2 && (
@@ -313,7 +305,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                   <div className="flex flex-1 justify-between sm:hidden">
                     {hasPreviousPage && (
                       <Link
-                        href={`/categorias/${params.slug}?page=${currentPage - 1}`}
+                        href={`/${params.city}?page=${currentPage - 1}`}
                         className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                       >
                         Anterior
@@ -321,7 +313,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                     )}
                     {hasNextPage && (
                       <Link
-                        href={`/categorias/${params.slug}?page=${currentPage + 1}`}
+                        href={`/${params.city}?page=${currentPage + 1}`}
                         className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                       >
                         Siguiente
@@ -346,7 +338,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                       <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                         {hasPreviousPage && (
                           <Link
-                            href={`/categorias/${params.slug}?page=${currentPage - 1}`}
+                            href={`/${params.city}?page=${currentPage - 1}`}
                             className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                           >
                             <span className="sr-only">Anterior</span>
@@ -363,7 +355,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                           return (
                             <Link
                               key={pageNum}
-                              href={`/categorias/${params.slug}?page=${pageNum}`}
+                              href={`/${params.city}?page=${pageNum}`}
                               className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
                                 pageNum === currentPage
                                   ? 'z-10 bg-primary-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600'
@@ -377,7 +369,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                         
                         {hasNextPage && (
                           <Link
-                            href={`/categorias/${params.slug}?page=${currentPage + 1}`}
+                            href={`/${params.city}?page=${currentPage + 1}`}
                             className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                           >
                             <span className="sr-only">Siguiente</span>
@@ -399,7 +391,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               </svg>
               <h3 className="mt-2 text-sm font-medium text-gray-900">No hay locales</h3>
               <p className="mt-1 text-sm text-gray-500">
-                Aún no hay locales registrados en la categoría {category.title}.
+                Aún no hay locales registrados en {city.title}.
               </p>
             </div>
           )}
