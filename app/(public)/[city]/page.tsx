@@ -4,23 +4,38 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Suspense } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
+// import { ReviewCard } from '@/components/ReviewCard'; // Component will be created inline
 import { SidebarAd, InArticleAd } from '@/components/AdSlot';
-import { Venue, Category } from '@/lib/types';
+import { Venue, Review, City } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';
-import { categoryPageJsonLd } from '@/lib/schema';
+import { cityPageJsonLd } from '@/lib/schema';
 
-interface CategoryPageProps {
+interface CityPageProps {
   params: {
-    slug: string;
+    city: string;
   };
 }
 
 // Mock data - In production, fetch from Sanity
-const mockCategory: Category = {
-  _id: 'cat-1',
-  title: 'Restaurantes Gallegos',
-  slug: { current: 'restaurantes-gallegos' },
-  description: 'Descubre los mejores restaurantes de cocina gallega tradicional. Pulpo, mariscos, empanadas y toda la gastronomía auténtica de Galicia.',
+const mockCity: City = {
+  _id: 'city-1',
+  title: 'Santiago de Compostela',
+  slug: { current: 'santiago-compostela' },
+  region: 'Galicia',
+  description: 'Capital de Galicia y destino del Camino de Santiago, famosa por su gastronomía tradicional y sus mariscos frescos.',
+  geo: {
+    lat: 42.8782,
+    lng: -8.5448,
+  },
+  heroImage: {
+    _type: 'image',
+    asset: {
+      _id: 'city-hero-1',
+      url: 'https://cdn.sanity.io/images/project/dataset/santiago-hero.jpg',
+      metadata: { dimensions: { width: 1200, height: 800, aspectRatio: 1.5 } }
+    },
+    alt: 'Vista de la Catedral de Santiago de Compostela',
+  },
 };
 
 const mockVenues: Venue[] = [
@@ -28,17 +43,18 @@ const mockVenues: Venue[] = [
     _id: 'venue-1',
     title: 'Casa Pepe',
     slug: { current: 'casa-pepe' },
-    city: {
-      _id: 'city-1',
-      title: 'Santiago de Compostela',
-      slug: { current: 'santiago-compostela' },
-      region: 'Galicia',
-    },
+    city: mockCity,
     address: 'Rúa do Franco, 24',
     postalCode: '15705',
     phone: '+34 981 58 38 09',
     priceRange: '€€',
-    categories: [mockCategory],
+    categories: [
+      {
+        _id: 'cat-1',
+        title: 'Restaurante Gallego',
+        slug: { current: 'restaurante-gallego' },
+      },
+    ],
     images: [
       {
         _type: 'image',
@@ -57,77 +73,69 @@ const mockVenues: Venue[] = [
   },
   {
     _id: 'venue-2',
-    title: 'Taberna do Real',
-    slug: { current: 'taberna-do-real' },
-    city: {
-      _id: 'city-1',
-      title: 'Santiago de Compostela',
-      slug: { current: 'santiago-compostela' },
-      region: 'Galicia',
-    },
-    address: 'Rúa do Vilar, 1',
-    priceRange: '€€',
-    categories: [mockCategory],
+    title: 'O Dezaseis',
+    slug: { current: 'o-dezaseis' },
+    city: mockCity,
+    address: 'Rúa de San Pedro, 16',
+    priceRange: '€€€',
+    categories: [
+      {
+        _id: 'cat-2',
+        title: 'Restaurante Moderno',
+        slug: { current: 'restaurante-moderno' },
+      },
+    ],
     images: [
       {
         _type: 'image',
         asset: {
           _id: 'img-2',
-          url: 'https://cdn.sanity.io/images/project/dataset/taberna-real.jpg',
+          url: 'https://cdn.sanity.io/images/project/dataset/o-dezaseis.jpg',
           metadata: { dimensions: { width: 600, height: 400, aspectRatio: 1.5 } }
         },
-        alt: 'Interior de Taberna do Real',
+        alt: 'Interior de O Dezaseis',
       },
     ],
-    description: 'Taberna tradicional con ambiente auténtico y cocina casera gallega.',
+    description: 'Cocina gallega contemporánea con productos de temporada.',
     schemaType: 'Restaurant',
-    avgRating: 7.8,
-    reviewCount: 22,
+    avgRating: 9.1,
+    reviewCount: 8,
   },
+];
+
+const mockReviews: Review[] = [
   {
-    _id: 'venue-3',
-    title: 'O Curro da Parra',
-    slug: { current: 'o-curro-da-parra' },
-    city: {
-      _id: 'city-1',
-      title: 'Santiago de Compostela',
-      slug: { current: 'santiago-compostela' },
-      region: 'Galicia',
-    },
-    address: 'Travesa de Fonseca, 1',
-    priceRange: '€€€',
-    categories: [mockCategory],
-    images: [
-      {
-        _type: 'image',
-        asset: {
-          _id: 'img-3',
-          url: 'https://cdn.sanity.io/images/project/dataset/curro-parra.jpg',
-          metadata: { dimensions: { width: 600, height: 400, aspectRatio: 1.5 } }
-        },
-        alt: 'Plato de O Curro da Parra',
-      },
-    ],
-    description: 'Cocina gallega contemporánea con productos de primera calidad.',
-    schemaType: 'Restaurant',
-    avgRating: 8.9,
-    reviewCount: 18,
+    _id: 'review-1',
+    title: 'Casa Pepe: Auténtica cocina gallega',
+    slug: { current: 'casa-pepe-autentica-cocina-gallega' },
+    venue: mockVenues[0],
+    visitDate: '2024-01-15',
+    publishedAt: '2024-01-20T10:00:00Z',
+    ratings: { food: 8.5, service: 8.0, ambience: 7.5, value: 8.5 },
+    pros: ['Pulpo excelente', 'Ambiente auténtico'],
+    cons: ['Algo ruidoso'],
+    tldr: 'Auténtica cocina gallega con el mejor pulpo de Santiago.',
+    faq: [],
+    body: [],
+    gallery: [],
+    author: 'María González',
+    tags: ['gallego', 'pulpo'],
   },
 ];
 
 // Generate metadata
-export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
-  // In production, fetch category data from Sanity
-  const category = mockCategory;
+export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
+  // In production, fetch city data from Sanity
+  const city = mockCity;
   
-  if (!category) {
+  if (!city) {
     return {
-      title: 'Categoría no encontrada',
+      title: 'Ciudad no encontrada',
     };
   }
 
-  const title = category.title;
-  const description = category.description || `Descubre los mejores ${category.title.toLowerCase()} con nuestras reseñas detalladas y recomendaciones.`;
+  const title = `Restaurantes en ${city.title}`;
+  const description = `Descubre los mejores restaurantes y locales en ${city.title}. ${city.description || 'Reseñas, direcciones y recomendaciones de los mejores lugares para comer.'}`;
 
   return {
     title,
@@ -136,16 +144,25 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
       type: 'website',
-      url: `${SITE_CONFIG.url}/categorias/${params.slug}`,
+      url: `${SITE_CONFIG.url}/${params.city}`,
+      images: city.heroImage ? [
+        {
+          url: city.heroImage.asset.url,
+          width: 1200,
+          height: 630,
+          alt: city.heroImage.alt || title,
+        },
+      ] : [],
       locale: 'es_ES',
     },
     twitter: {
       card: 'summary_large_image',
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
+      images: city.heroImage ? [city.heroImage.asset.url] : [],
     },
     alternates: {
-      canonical: `${SITE_CONFIG.url}/categorias/${params.slug}`,
+      canonical: `${SITE_CONFIG.url}/${params.city}`,
     },
   };
 }
@@ -167,21 +184,97 @@ function VenueCardSkeleton() {
   );
 }
 
+// Review Card Component
+function ReviewCard({ review }: { review: Review }) {
+  const overallRating = (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4;
+
+  return (
+    <article className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
+      {/* Image */}
+      <div className="aspect-video bg-gray-100 relative">
+        {review.gallery?.[0] ? (
+          <Image
+            src={review.gallery[0].asset.url}
+            alt={review.gallery[0].alt || review.title}
+            fill
+            className="object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-400">
+            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+        )}
+        
+        {/* Rating Badge */}
+        <div className="absolute top-4 right-4">
+          <div className="bg-white rounded-full px-3 py-1 shadow-sm">
+            <span className="text-sm font-semibold text-gray-900">
+              {overallRating.toFixed(1)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        {/* Venue Info */}
+        <div className="flex items-center text-sm text-gray-600 mb-2">
+          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          {review.venue.title} • {review.venue.city.title}
+        </div>
+
+        {/* Title */}
+        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+          <Link 
+            href={`/${review.venue.city.slug.current}/${review.venue.slug.current}/review/${review.slug.current}`}
+            className="hover:text-primary-600 transition-colors"
+          >
+            {review.title}
+          </Link>
+        </h3>
+
+        {/* TLDR */}
+        <p className="text-gray-600 mb-4 line-clamp-2">
+          {review.tldr}
+        </p>
+
+        {/* Meta */}
+        <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-100">
+          <span>{review.author}</span>
+          <time dateTime={review.publishedAt}>
+            {new Date(review.publishedAt).toLocaleDateString('es-ES', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })}
+          </time>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 // Venue Card Component
 function VenueCard({ venue }: { venue: Venue }) {
   return (
     <article className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
       {/* Image */}
       <div className="aspect-video bg-gray-100 relative">
-                 {venue.images?.[0] ? (
-           <Image
-             src={venue.images[0].asset.url}
-             alt={venue.images[0].alt || venue.title}
-             fill
-             className="object-cover"
-             loading="lazy"
-           />
-         ) : (
+        {venue.images?.[0] ? (
+          <Image
+            src={venue.images[0].asset.url}
+            alt={venue.images[0].alt || venue.title}
+            fill
+            className="object-cover"
+            loading="lazy"
+          />
+        ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
             <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -213,13 +306,13 @@ function VenueCard({ venue }: { venue: Venue }) {
           </Link>
         </h3>
 
-        {/* Location */}
+        {/* Address */}
         <div className="flex items-center text-sm text-gray-600 mb-3">
           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          {venue.address} • {venue.city.title}
+          {venue.address}
         </div>
 
         {/* Description */}
@@ -229,17 +322,25 @@ function VenueCard({ venue }: { venue: Venue }) {
           </p>
         )}
 
-        {/* Price Range and Reviews */}
+        {/* Categories and Price Range */}
         <div className="flex items-center justify-between">
+          <div className="flex flex-wrap gap-1">
+            {venue.categories.slice(0, 2).map((category) => (
+              <span
+                key={category._id}
+                className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary-100 text-primary-800"
+              >
+                {category.title}
+              </span>
+            ))}
+          </div>
           <div className="flex items-center">
             <span className="text-sm font-medium text-gray-900">
               {venue.priceRange}
             </span>
-          </div>
-          <div className="flex items-center">
             {venue.reviewCount && (
-              <span className="text-sm text-gray-500">
-                {venue.reviewCount} reseñas
+              <span className="ml-2 text-sm text-gray-500">
+                ({venue.reviewCount} reseñas)
               </span>
             )}
           </div>
@@ -249,19 +350,18 @@ function VenueCard({ venue }: { venue: Venue }) {
   );
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
-  // In production, fetch category data from Sanity based on params.slug
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { slug } = params;
-  const category = mockCategory;
+export default async function CityPage({ params }: CityPageProps) {
+  // In production, fetch city data from Sanity
+  const city = mockCity;
   const venues = mockVenues;
+  const reviews = mockReviews;
 
-  if (!category) {
+  if (!city) {
     notFound();
   }
 
   // Generate JSON-LD
-  const jsonLd = categoryPageJsonLd(category, venues);
+  const jsonLd = cityPageJsonLd(city, venues);
 
   return (
     <>
@@ -282,8 +382,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             <Breadcrumbs 
               items={[
                 { name: 'Inicio', url: '/' },
-                { name: 'Categorías', url: '/categorias' },
-                { name: category.title, url: `/categorias/${category.slug.current}` },
+                { name: city.title, url: `/${city.slug.current}` },
               ]}
             />
           </div>
@@ -294,16 +393,17 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           <div className="container-wide py-12">
             <div className="text-center max-w-4xl mx-auto">
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                {category.title}
+                Restaurantes en{' '}
+                <span className="text-primary-600">{city.title}</span>
               </h1>
-              {category.description && (
+              {city.description && (
                 <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                  {category.description}
+                  {city.description}
                 </p>
               )}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <div className="text-sm text-gray-500">
-                  {venues.length} locales encontrados
+                  {venues.length} locales • {reviews.length} reseñas
                 </div>
               </div>
             </div>
@@ -316,19 +416,22 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             {/* Main Content */}
             <main className="lg:col-span-3">
               {/* Venues */}
-              <section>
+              <section className="mb-12">
                 <div className="flex items-center justify-between mb-8">
                   <h2 className="text-3xl font-bold text-gray-900">
                     Locales destacados
                   </h2>
-                  <div className="text-sm text-gray-600">
-                    Mostrando {venues.length} resultados
-                  </div>
+                  <Link
+                    href={`/${params.city}/locales`}
+                    className="text-primary-600 hover:text-primary-700 font-medium"
+                  >
+                    Ver todos →
+                  </Link>
                 </div>
 
                 <Suspense fallback={
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {Array.from({ length: 6 }).map((_, i) => (
+                    {Array.from({ length: 4 }).map((_, i) => (
                       <VenueCardSkeleton key={i} />
                     ))}
                   </div>
@@ -342,26 +445,26 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
               </section>
 
               {/* In-Article Ad */}
-              <div className="my-12">
-                <InArticleAd />
-              </div>
+              <InArticleAd />
 
-              {/* Additional Info */}
-              <section className="bg-white rounded-lg border border-gray-200 p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                  Sobre {category.title}
-                </h2>
-                <div className="prose prose-gray max-w-none">
-                  <p>
-                    Los {category.title.toLowerCase()} representan una parte fundamental de la gastronomía española. 
-                    En nuestra selección encontrarás desde locales tradicionales que mantienen las recetas de toda la vida, 
-                    hasta propuestas más modernas que reinterpretan los clásicos con técnicas contemporáneas.
-                  </p>
-                  <p>
-                    Cada establecimiento ha sido visitado y evaluado por nuestro equipo, teniendo en cuenta aspectos como 
-                    la calidad de los ingredientes, la preparación de los platos, el servicio al cliente y la relación 
-                    calidad-precio.
-                  </p>
+              {/* Recent Reviews */}
+              <section>
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-3xl font-bold text-gray-900">
+                    Últimas reseñas
+                  </h2>
+                  <Link
+                    href={`/${params.city}/resenas`}
+                    className="text-primary-600 hover:text-primary-700 font-medium"
+                  >
+                    Ver todas →
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {reviews.map((review) => (
+                    <ReviewCard key={review._id} review={review} />
+                  ))}
                 </div>
               </section>
             </main>
@@ -371,7 +474,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
               {/* Sidebar Ad */}
               <SidebarAd />
 
-              {/* Category Stats */}
+              {/* City Stats */}
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Estadísticas
@@ -382,6 +485,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                     <span className="font-semibold">{venues.length}</span>
                   </div>
                   <div className="flex justify-between">
+                    <span className="text-gray-600">Reseñas:</span>
+                    <span className="font-semibold">{reviews.length}</span>
+                  </div>
+                  <div className="flex justify-between">
                     <span className="text-gray-600">Puntuación media:</span>
                     <span className="font-semibold">
                       {venues.length > 0 
@@ -390,44 +497,20 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                       }
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total reseñas:</span>
-                    <span className="font-semibold">
-                      {venues.reduce((sum, v) => sum + (v.reviewCount || 0), 0)}
-                    </span>
-                  </div>
                 </div>
               </div>
 
-              {/* Price Range Filter */}
+              {/* Popular Categories */}
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Rango de precios
-                </h3>
-                <div className="space-y-3">
-                  {['€', '€€', '€€€', '€€€€'].map((range) => {
-                    const count = venues.filter(v => v.priceRange === range).length;
-                    return (
-                      <div key={range} className="flex items-center justify-between">
-                        <span className="text-gray-700">{range}</span>
-                        <span className="text-sm text-gray-500">({count})</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Related Categories */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Categorías relacionadas
+                  Categorías populares
                 </h3>
                 <ul className="space-y-3">
                   {[
+                    'Restaurantes gallegos',
                     'Marisquerías',
                     'Bares de tapas',
-                    'Tabernas tradicionales',
-                    'Restaurantes de autor',
+                    'Cafeterías',
                   ].map((category, index) => (
                     <li key={index}>
                       <Link

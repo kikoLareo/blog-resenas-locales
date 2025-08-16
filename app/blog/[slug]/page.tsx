@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { SITE_CONFIG } from '@/lib/constants';
 import { Post } from '@/lib/types';
+import { postPageJsonLd } from '@/lib/schema';
 import FAQ from '@/components/FAQ';
 
 interface BlogPostPageProps {
@@ -94,9 +95,23 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
+  // Generate JSON-LD
+  const jsonLd = postPageJsonLd(post);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container-wide py-12">
+    <>
+      {/* JSON-LD Schema */}
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd, null, 0),
+          }}
+        />
+      )}
+
+      <div className="min-h-screen bg-gray-50">
+        <div className="container-wide py-12">
         {/* Breadcrumbs */}
         <nav className="mb-8" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2 text-sm text-gray-500">
@@ -244,6 +259,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
           </section>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -7,6 +7,7 @@ import TLDR from '@/components/TLDR';
 import { CompactScore } from '@/components/ScoreBar';
 import { SITE_CONFIG } from '@/lib/constants';
 import { Review, Post } from '@/lib/types';
+import { homePageJsonLd } from '@/lib/schema';
 
 // Mock data - In production, fetch from Sanity
 const mockReviews: Review[] = [
@@ -240,9 +241,23 @@ function PostCard({ post }: { post: Post }) {
 }
 
 export default function HomePage() {
+  // Generate JSON-LD
+  const jsonLd = homePageJsonLd(mockReviews.slice(0, 3), mockPosts);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header Ad */}
+    <>
+      {/* JSON-LD Schema */}
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd, null, 0),
+          }}
+        />
+      )}
+
+      <div className="min-h-screen bg-gray-50">
+        {/* Header Ad */}
       <div className="container-wide py-4">
         <HeaderAd className="mx-auto" />
       </div>
@@ -412,6 +427,7 @@ export default function HomePage() {
           </aside>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
