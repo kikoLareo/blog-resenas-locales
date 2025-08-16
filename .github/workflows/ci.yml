@@ -1,3 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  setup-and-cache:
+    name: Setup Node and Cache
+    runs-on: ubuntu-latest
+    outputs:
+      node-version: ${{ steps.vars.outputs.node_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - id: vars
+        name: Expose Node version
+        run: echo "node_version=20" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+  type-check:
+    name: Type Check
+    needs: setup-and-cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.setup-and-cache.outputs.node-version }}
+          cache: npm
+      - name: Install deps
+        run: npm ci --no-audit --no-fund
+      - name: Run type-check
+        run: npm run type-check
+
+  lint:
+    name: Lint
+    needs: setup-and-cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.setup-and-cache.outputs.node-version }}
+          cache: npm
+      - name: Install deps
+        run: npm ci --no-audit --no-fund
+      - name: Run ESLint
+        run: npm run lint
+
+  unit-tests:
+    name: Unit Tests
+    needs: [type-check, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install deps
+        run: npm ci --no-audit --no-fund
+      - name: Run unit tests
+        run: npm run test -- --run
+
+  build:
+    name: Build
+    needs: [type-check, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install deps
+        run: npm ci --no-audit --no-fund
+      - name: Build
+        run: npm run build
+
 name: CI/CD Pipeline
 
 on:
