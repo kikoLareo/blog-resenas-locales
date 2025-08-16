@@ -18,6 +18,9 @@ export interface SanityImage {
   caption?: string;
 }
 
+// Alias para compatibilidad con componentes que importan `Image`
+export type Image = SanityImage;
+
 export interface GeoPoint {
   lat: number;
   lng: number;
@@ -318,6 +321,12 @@ export interface BreadcrumbJsonLd {
     name: string;
     item: string;
   }>;
+}
+
+// Tipo base para breadcrumbs usado por componentes UI
+export interface BreadcrumbItem {
+  name: string;
+  url: string;
 }
 
 // Tipos para utilidades SEO
