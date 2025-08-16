@@ -8,6 +8,8 @@ import {
   ArticleJsonLd,
   FAQJsonLd,
   BreadcrumbJsonLd,
+  City,
+  Category,
 } from './types';
 import { SITE_CONFIG } from './constants';
 
@@ -95,7 +97,7 @@ export function reviewJsonLd(review: Review, venue: Venue): ReviewJsonLd {
   ) / 4;
   const rating5 = Math.round(((avgRating / 10) * 5) * 10) / 10; // un decimal
   const baseUrl = SITE_CONFIG.url;
-  const reviewUrl = `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}/review-${review.slug.current}`;
+  const reviewUrl = `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}/review/${review.slug.current}`;
 
   return {
     '@context': 'https://schema.org',
@@ -138,7 +140,7 @@ export function reviewJsonLd(review: Review, venue: Venue): ReviewJsonLd {
 }
 
 /**
- * Generate Article/BlogPosting JSON-LD for reviews
+ * Generate Article/BlogPosting JSON-LD for posts
  */
 export function articleJsonLd(post: Post): ArticleJsonLd {
   const baseUrl = SITE_CONFIG.url;
@@ -266,9 +268,10 @@ export function organizationJsonLd() {
  * Generate ItemList JSON-LD for review listings
  */
 export function itemListJsonLd(
-  reviews: Review[],
+  items: (Review | Venue | Post)[],
   listName: string,
-  description?: string
+  description?: string,
+  listUrl?: string
 ) {
   const baseUrl = SITE_CONFIG.url;
 
@@ -277,32 +280,45 @@ export function itemListJsonLd(
     '@type': 'ItemList',
     name: listName,
     description,
-    numberOfItems: reviews.length,
-    itemListElement: reviews.map((review, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      item: {
-        '@type': 'Article',
-        name: review.title,
-        url: `${baseUrl}/${review.venue.city.slug.current}/${review.venue.slug.current}/${review.slug.current}`,
-        datePublished: review.publishedAt,
-        author: {
-          '@type': 'Person',
-          name: review.author,
+    url: listUrl,
+    numberOfItems: items.length,
+    itemListElement: items.map((item, index) => {
+      // Determinar el tipo de item y generar la URL correspondiente
+      let url: string;
+      let itemType: string;
+      
+      if ('venue' in item) {
+        // Es una Review
+        const review = item as Review;
+        url = `${baseUrl}/${review.venue.city.slug.current}/${review.venue.slug.current}/review/${review.slug.current}`;
+        itemType = 'Review';
+      } else if ('city' in item) {
+        // Es un Venue
+        const venue = item as Venue;
+        url = `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}`;
+        itemType = 'LocalBusiness';
+      } else {
+        // Es un Post
+        const post = item as Post;
+        url = `${baseUrl}/blog/${post.slug.current}`;
+        itemType = 'BlogPosting';
+      }
+
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': itemType,
+          name: item.title,
+          url,
+          datePublished: 'publishedAt' in item ? item.publishedAt : undefined,
+          author: 'author' in item ? {
+            '@type': 'Person',
+            name: item.author,
+          } : undefined,
         },
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: (
-            review.ratings.food + 
-            review.ratings.service + 
-            review.ratings.ambience + 
-            review.ratings.value
-          ) / 4,
-          bestRating: 10,
-          worstRating: 0,
-        },
-      },
-    })),
+      };
+    }),
   };
 }
 
@@ -313,7 +329,7 @@ export function collectionPageJsonLd(
   title: string,
   description: string,
   url: string,
-  items: Venue[] | Review[]
+  items: (Venue | Review)[] = []
 ) {
   return {
     '@context': 'https://schema.org',
@@ -324,17 +340,32 @@ export function collectionPageJsonLd(
     mainEntity: {
       '@type': 'ItemList',
       numberOfItems: items.length,
-      itemListElement: items.map((item, index) => ({
-        '@type': 'ListItem',
-        position: index + 1,
-        item: {
-          '@type': 'title' in item ? 'LocalBusiness' : 'Article',
-          name: item.title,
-          url: 'city' in item 
-            ? `${SITE_CONFIG.url}/${item.city.slug.current}/${item.slug.current}`
-            : `${SITE_CONFIG.url}/${(item as Review).venue.city.slug.current}/${(item as Review).venue.slug.current}/${item.slug.current}`,
-        },
-      })),
+      itemListElement: items.map((item, index) => {
+        let url: string;
+        let itemType: string;
+        
+        if ('venue' in item) {
+          // Es una Review
+          const review = item as Review;
+          url = `${SITE_CONFIG.url}/${review.venue.city.slug.current}/${review.venue.slug.current}/review/${review.slug.current}`;
+          itemType = 'Review';
+        } else {
+          // Es un Venue
+          const venue = item as Venue;
+          url = `${SITE_CONFIG.url}/${venue.city.slug.current}/${venue.slug.current}`;
+          itemType = 'LocalBusiness';
+        }
+
+        return {
+          '@type': 'ListItem',
+          position: index + 1,
+          item: {
+            '@type': itemType,
+            name: item.title,
+            url,
+          },
+        };
+      }),
     },
   };
 }
@@ -358,7 +389,7 @@ export function reviewPageJsonLd(review: Review, venue: Venue) {
     { name: 'Inicio', url: '/' },
     { name: venue.city.title, url: `/${venue.city.slug.current}` },
     { name: venue.title, url: `/${venue.city.slug.current}/${venue.slug.current}` },
-    { name: review.title, url: `/${venue.city.slug.current}/${venue.slug.current}/${review.slug.current}` },
+    { name: review.title, url: `/${venue.city.slug.current}/${venue.slug.current}/review/${review.slug.current}` },
   ];
   schemas.push(breadcrumbsJsonLd(breadcrumbs));
 
@@ -386,7 +417,175 @@ export function venuePageJsonLd(venue: Venue, recentReviews?: Review[]) {
     schemas.push(itemListJsonLd(
       recentReviews,
       `Reseñas de ${venue.title}`,
-      `Las mejores reseñas de ${venue.title} en ${venue.city.title}`
+      `Las mejores reseñas de ${venue.title} en ${venue.city.title}`,
+      `${SITE_CONFIG.url}/${venue.city.slug.current}/${venue.slug.current}`
+    ));
+  }
+
+  return combineJsonLd(...schemas);
+}
+
+/**
+ * Generate complete page JSON-LD for city pages
+ */
+export function cityPageJsonLd(city: City, venues: Venue[] = []) {
+  const baseUrl = SITE_CONFIG.url;
+  const cityUrl = `${baseUrl}/${city.slug.current}`;
+  
+  const schemas: object[] = [
+    collectionPageJsonLd(
+      `Restaurantes y locales en ${city.title}`,
+      `Descubre los mejores restaurantes y locales en ${city.title}. Reseñas, direcciones y recomendaciones.`,
+      cityUrl,
+      venues
+    ),
+  ];
+
+  // Generar breadcrumbs
+  const breadcrumbs = [
+    { name: 'Inicio', url: '/' },
+    { name: city.title, url: `/${city.slug.current}` },
+  ];
+  schemas.push(breadcrumbsJsonLd(breadcrumbs));
+
+  // Agregar lista de venues si existen
+  if (venues.length > 0) {
+    schemas.push(itemListJsonLd(
+      venues,
+      `Locales en ${city.title}`,
+      `Los mejores restaurantes y locales en ${city.title}`,
+      cityUrl
+    ));
+  }
+
+  return combineJsonLd(...schemas);
+}
+
+/**
+ * Generate complete page JSON-LD for category pages
+ */
+export function categoryPageJsonLd(category: Category, venues: Venue[] = []) {
+  const baseUrl = SITE_CONFIG.url;
+  const categoryUrl = `${baseUrl}/categorias/${category.slug.current}`;
+  
+  const schemas: object[] = [
+    collectionPageJsonLd(
+      `${category.title} - Restaurantes y locales`,
+      category.description || `Descubre los mejores ${category.title.toLowerCase()} con nuestras reseñas detalladas.`,
+      categoryUrl,
+      venues
+    ),
+  ];
+
+  // Generar breadcrumbs
+  const breadcrumbs = [
+    { name: 'Inicio', url: '/' },
+    { name: 'Categorías', url: '/categorias' },
+    { name: category.title, url: `/categorias/${category.slug.current}` },
+  ];
+  schemas.push(breadcrumbsJsonLd(breadcrumbs));
+
+  // Agregar lista de venues si existen
+  if (venues.length > 0) {
+    schemas.push(itemListJsonLd(
+      venues,
+      `${category.title}`,
+      `Los mejores ${category.title.toLowerCase()} reseñados por nuestro equipo`,
+      categoryUrl
+    ));
+  }
+
+  return combineJsonLd(...schemas);
+}
+
+/**
+ * Generate complete page JSON-LD for blog listing page
+ */
+export function blogPageJsonLd(posts: Post[] = []) {
+  const baseUrl = SITE_CONFIG.url;
+  const blogUrl = `${baseUrl}/blog`;
+  
+  const schemas: object[] = [
+    collectionPageJsonLd(
+      'Blog - Artículos sobre gastronomía',
+      'Artículos, guías y consejos sobre restaurantes, cocina y gastronomía.',
+      blogUrl
+    ),
+  ];
+
+  // Generar breadcrumbs
+  const breadcrumbs = [
+    { name: 'Inicio', url: '/' },
+    { name: 'Blog', url: '/blog' },
+  ];
+  schemas.push(breadcrumbsJsonLd(breadcrumbs));
+
+  // Agregar lista de posts si existen
+  if (posts.length > 0) {
+    schemas.push(itemListJsonLd(
+      posts,
+      'Artículos del blog',
+      'Los últimos artículos sobre gastronomía y restaurantes',
+      blogUrl
+    ));
+  }
+
+  return combineJsonLd(...schemas);
+}
+
+/**
+ * Generate complete page JSON-LD for blog post pages
+ */
+export function postPageJsonLd(post: Post) {
+  const schemas: object[] = [
+    articleJsonLd(post),
+  ];
+
+  // Agregar FAQ si existe
+  if (post.faq && post.faq.length > 0) {
+    const faqSchema = faqJsonLd(post.faq);
+    if (faqSchema) {
+      schemas.push(faqSchema);
+    }
+  }
+
+  // Generar breadcrumbs
+  const breadcrumbs = [
+    { name: 'Inicio', url: '/' },
+    { name: 'Blog', url: '/blog' },
+    { name: post.title, url: `/blog/${post.slug.current}` },
+  ];
+  schemas.push(breadcrumbsJsonLd(breadcrumbs));
+
+  return combineJsonLd(...schemas);
+}
+
+/**
+ * Generate complete page JSON-LD for home page
+ */
+export function homePageJsonLd(featuredReviews: Review[] = [], featuredPosts: Post[] = []) {
+  const schemas: object[] = [
+    websiteJsonLd(),
+    organizationJsonLd(),
+  ];
+
+  // Agregar lista de reseñas destacadas si existen
+  if (featuredReviews.length > 0) {
+    schemas.push(itemListJsonLd(
+      featuredReviews,
+      'Reseñas destacadas',
+      'Las mejores reseñas de restaurantes y locales',
+      SITE_CONFIG.url
+    ));
+  }
+
+  // Agregar lista de posts destacados si existen
+  if (featuredPosts.length > 0) {
+    schemas.push(itemListJsonLd(
+      featuredPosts,
+      'Artículos destacados',
+      'Los mejores artículos sobre gastronomía',
+      `${SITE_CONFIG.url}/blog`
     ));
   }
 
@@ -407,3 +606,15 @@ export function combineJsonLd(...schemas: (object | null | undefined)[]) {
     '@graph': validSchemas,
   };
 }
+<<<<<<< Current (Your changes)
+=======
+
+/**
+ * Utility to render JSON-LD script tag
+ */
+export function renderJsonLd(schema: object | null) {
+  if (!schema) return null;
+  
+  return JSON.stringify(schema, null, 0);
+}
+>>>>>>> Incoming (Background Agent changes)

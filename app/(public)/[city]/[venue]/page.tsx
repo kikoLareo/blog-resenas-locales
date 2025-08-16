@@ -10,6 +10,7 @@ import FAQ from '@/components/FAQ';
 import { SidebarAd, InArticleAd } from '@/components/AdSlot';
 import { Venue, Review } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';
+import { venuePageJsonLd } from '@/lib/schema';
 
 interface VenuePageProps {
   params: {
@@ -294,9 +295,23 @@ export default async function VenuePage({ params }: VenuePageProps) {
   const overallRating = avgRatings ? 
     (avgRatings.food + avgRatings.service + avgRatings.ambience + avgRatings.value) / 4 : 0;
 
+  // Generate JSON-LD
+  const jsonLd = venuePageJsonLd(venue, reviews);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumbs */}
+    <>
+      {/* JSON-LD Schema */}
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd, null, 0),
+          }}
+        />
+      )}
+
+      <div className="min-h-screen bg-gray-50">
+        {/* Breadcrumbs */}
       <div className="bg-white border-b border-gray-200">
         <div className="container-wide py-4">
           <VenueBreadcrumbs 
@@ -518,6 +533,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
           </aside>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

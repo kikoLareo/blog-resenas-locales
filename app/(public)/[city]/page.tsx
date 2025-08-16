@@ -1,62 +1,132 @@
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
+import Breadcrumbs from '@/components/Breadcrumbs';
+// import { ReviewCard } from '@/components/ReviewCard'; // Component will be created inline
+import { SidebarAd, InArticleAd } from '@/components/AdSlot';
+import { Venue, Review, City } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';
-import { City, Venue } from '@/lib/types';
-import { sanityFetch } from '@/lib/sanity.client';
-import { cityQuery, venuesByCityQuery, venuesByCityCountQuery } from '@/sanity/lib/queries';
-import { collectionPageJsonLd, breadcrumbsJsonLd, combineJsonLd } from '@/lib/schema';
-import { urlFor } from '@/lib/sanity.client';
+import { cityPageJsonLd } from '@/lib/schema';
 
 interface CityPageProps {
-  params: { city: string };
-  searchParams: { page?: string };
+  params: {
+    city: string;
+  };
 }
 
-const ITEMS_PER_PAGE = 12;
+// Mock data - In production, fetch from Sanity
+const mockCity: City = {
+  _id: 'city-1',
+  title: 'Santiago de Compostela',
+  slug: { current: 'santiago-compostela' },
+  region: 'Galicia',
+  description: 'Capital de Galicia y destino del Camino de Santiago, famosa por su gastronomía tradicional y sus mariscos frescos.',
+  geo: {
+    lat: 42.8782,
+    lng: -8.5448,
+  },
+  heroImage: {
+    _type: 'image',
+    asset: {
+      _id: 'city-hero-1',
+      url: 'https://cdn.sanity.io/images/project/dataset/santiago-hero.jpg',
+      metadata: { dimensions: { width: 1200, height: 800, aspectRatio: 1.5 } }
+    },
+    alt: 'Vista de la Catedral de Santiago de Compostela',
+  },
+};
 
-async function getCityData(citySlug: string): Promise<City | null> {
-  try {
-    return await sanityFetch<City>({
-      query: cityQuery,
-      params: { citySlug },
-      tags: ['cities'],
-    });
-  } catch {
-    return null;
-  }
-}
+const mockVenues: Venue[] = [
+  {
+    _id: 'venue-1',
+    title: 'Casa Pepe',
+    slug: { current: 'casa-pepe' },
+    city: mockCity,
+    address: 'Rúa do Franco, 24',
+    postalCode: '15705',
+    phone: '+34 981 58 38 09',
+    priceRange: '€€',
+    categories: [
+      {
+        _id: 'cat-1',
+        title: 'Restaurante Gallego',
+        slug: { current: 'restaurante-gallego' },
+      },
+    ],
+    images: [
+      {
+        _type: 'image',
+        asset: {
+          _id: 'img-1',
+          url: 'https://cdn.sanity.io/images/project/dataset/casa-pepe.jpg',
+          metadata: { dimensions: { width: 600, height: 400, aspectRatio: 1.5 } }
+        },
+        alt: 'Fachada de Casa Pepe',
+      },
+    ],
+    description: 'Restaurante tradicional gallego especializado en pulpo y mariscos.',
+    schemaType: 'Restaurant',
+    avgRating: 8.2,
+    reviewCount: 15,
+  },
+  {
+    _id: 'venue-2',
+    title: 'O Dezaseis',
+    slug: { current: 'o-dezaseis' },
+    city: mockCity,
+    address: 'Rúa de San Pedro, 16',
+    priceRange: '€€€',
+    categories: [
+      {
+        _id: 'cat-2',
+        title: 'Restaurante Moderno',
+        slug: { current: 'restaurante-moderno' },
+      },
+    ],
+    images: [
+      {
+        _type: 'image',
+        asset: {
+          _id: 'img-2',
+          url: 'https://cdn.sanity.io/images/project/dataset/o-dezaseis.jpg',
+          metadata: { dimensions: { width: 600, height: 400, aspectRatio: 1.5 } }
+        },
+        alt: 'Interior de O Dezaseis',
+      },
+    ],
+    description: 'Cocina gallega contemporánea con productos de temporada.',
+    schemaType: 'Restaurant',
+    avgRating: 9.1,
+    reviewCount: 8,
+  },
+];
 
-async function getVenuesByCity(
-  citySlug: string, 
-  page: number = 1
-): Promise<{ venues: Venue[]; total: number }> {
-  try {
-    const offset = (page - 1) * ITEMS_PER_PAGE;
-    const limit = offset + ITEMS_PER_PAGE;
-    
-    const [venues, total] = await Promise.all([
-      sanityFetch<Venue[]>({
-        query: venuesByCityQuery,
-        params: { citySlug, offset, limit },
-        tags: ['venues'],
-      }),
-      sanityFetch<number>({
-        query: venuesByCityCountQuery,
-        params: { citySlug },
-        tags: ['venues'],
-      }),
-    ]);
+const mockReviews: Review[] = [
+  {
+    _id: 'review-1',
+    title: 'Casa Pepe: Auténtica cocina gallega',
+    slug: { current: 'casa-pepe-autentica-cocina-gallega' },
+    venue: mockVenues[0],
+    visitDate: '2024-01-15',
+    publishedAt: '2024-01-20T10:00:00Z',
+    ratings: { food: 8.5, service: 8.0, ambience: 7.5, value: 8.5 },
+    pros: ['Pulpo excelente', 'Ambiente auténtico'],
+    cons: ['Algo ruidoso'],
+    tldr: 'Auténtica cocina gallega con el mejor pulpo de Santiago.',
+    faq: [],
+    body: [],
+    gallery: [],
+    author: 'María González',
+    tags: ['gallego', 'pulpo'],
+  },
+];
 
-    return { venues: venues || [], total: total || 0 };
-  } catch {
-    return { venues: [], total: 0 };
-  }
-}
-
+// Generate metadata
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
-  const city = await getCityData(params.city);
+  // In production, fetch city data from Sanity
+  const city = mockCity;
   
   if (!city) {
     return {
@@ -64,8 +134,8 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
     };
   }
 
-  const title = `${city.title} - Mejores Locales y Reseñas`;
-  const description = city.description || `Descubre los mejores locales en ${city.title} con nuestras reseñas detalladas y honestas.`;
+  const title = `Restaurantes en ${city.title}`;
+  const description = `Descubre los mejores restaurantes y locales en ${city.title}. ${city.description || 'Reseñas, direcciones y recomendaciones de los mejores lugares para comer.'}`;
 
   return {
     title,
@@ -75,12 +145,21 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
       description,
       type: 'website',
       url: `${SITE_CONFIG.url}/${params.city}`,
-      images: city.heroImage ? [{
-        url: urlFor(city.heroImage).width(1200).height(630).url(),
-        width: 1200,
-        height: 630,
-        alt: city.title,
-      }] : [],
+      images: city.heroImage ? [
+        {
+          url: city.heroImage.asset.url,
+          width: 1200,
+          height: 630,
+          alt: city.heroImage.alt || title,
+        },
+      ] : [],
+      locale: 'es_ES',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} | ${SITE_CONFIG.name}`,
+      description,
+      images: city.heroImage ? [city.heroImage.asset.url] : [],
     },
     alternates: {
       canonical: `${SITE_CONFIG.url}/${params.city}`,
@@ -88,313 +167,364 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   };
 }
 
-export default async function CityPage({ params, searchParams }: CityPageProps) {
-  const currentPage = parseInt(searchParams.page || '1', 10);
-  
-  const [city, { venues, total }] = await Promise.all([
-    getCityData(params.city),
-    getVenuesByCity(params.city, currentPage),
-  ]);
+// Loading components
+function VenueCardSkeleton() {
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden animate-pulse">
+      <div className="h-48 bg-gray-200" />
+      <div className="p-6 space-y-4">
+        <div className="h-4 bg-gray-200 rounded w-3/4" />
+        <div className="h-4 bg-gray-200 rounded w-1/2" />
+        <div className="space-y-2">
+          <div className="h-3 bg-gray-200 rounded" />
+          <div className="h-3 bg-gray-200 rounded w-5/6" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Review Card Component
+function ReviewCard({ review }: { review: Review }) {
+  const overallRating = (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4;
+
+  return (
+    <article className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
+      {/* Image */}
+      <div className="aspect-video bg-gray-100 relative">
+        {review.gallery?.[0] ? (
+          <Image
+            src={review.gallery[0].asset.url}
+            alt={review.gallery[0].alt || review.title}
+            fill
+            className="object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-400">
+            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+        )}
+        
+        {/* Rating Badge */}
+        <div className="absolute top-4 right-4">
+          <div className="bg-white rounded-full px-3 py-1 shadow-sm">
+            <span className="text-sm font-semibold text-gray-900">
+              {overallRating.toFixed(1)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        {/* Venue Info */}
+        <div className="flex items-center text-sm text-gray-600 mb-2">
+          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          {review.venue.title} • {review.venue.city.title}
+        </div>
+
+        {/* Title */}
+        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+          <Link 
+            href={`/${review.venue.city.slug.current}/${review.venue.slug.current}/review/${review.slug.current}`}
+            className="hover:text-primary-600 transition-colors"
+          >
+            {review.title}
+          </Link>
+        </h3>
+
+        {/* TLDR */}
+        <p className="text-gray-600 mb-4 line-clamp-2">
+          {review.tldr}
+        </p>
+
+        {/* Meta */}
+        <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-100">
+          <span>{review.author}</span>
+          <time dateTime={review.publishedAt}>
+            {new Date(review.publishedAt).toLocaleDateString('es-ES', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })}
+          </time>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+// Venue Card Component
+function VenueCard({ venue }: { venue: Venue }) {
+  return (
+    <article className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
+      {/* Image */}
+      <div className="aspect-video bg-gray-100 relative">
+        {venue.images?.[0] ? (
+          <Image
+            src={venue.images[0].asset.url}
+            alt={venue.images[0].alt || venue.title}
+            fill
+            className="object-cover"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-400">
+            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+        )}
+        
+        {/* Rating Badge */}
+        {venue.avgRating && (
+          <div className="absolute top-4 right-4">
+            <div className="bg-white rounded-full px-3 py-1 shadow-sm">
+              <span className="text-sm font-semibold text-gray-900">
+                {venue.avgRating.toFixed(1)}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        {/* Title */}
+        <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <Link 
+            href={`/${venue.city.slug.current}/${venue.slug.current}`}
+            className="hover:text-primary-600 transition-colors"
+          >
+            {venue.title}
+          </Link>
+        </h3>
+
+        {/* Address */}
+        <div className="flex items-center text-sm text-gray-600 mb-3">
+          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          {venue.address}
+        </div>
+
+        {/* Description */}
+        {venue.description && (
+          <p className="text-gray-600 mb-4 line-clamp-2">
+            {venue.description}
+          </p>
+        )}
+
+        {/* Categories and Price Range */}
+        <div className="flex items-center justify-between">
+          <div className="flex flex-wrap gap-1">
+            {venue.categories.slice(0, 2).map((category) => (
+              <span
+                key={category._id}
+                className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary-100 text-primary-800"
+              >
+                {category.title}
+              </span>
+            ))}
+          </div>
+          <div className="flex items-center">
+            <span className="text-sm font-medium text-gray-900">
+              {venue.priceRange}
+            </span>
+            {venue.reviewCount && (
+              <span className="ml-2 text-sm text-gray-500">
+                ({venue.reviewCount} reseñas)
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export default async function CityPage({ params }: CityPageProps) {
+  // In production, fetch city data from Sanity
+  const city = mockCity;
+  const venues = mockVenues;
+  const reviews = mockReviews;
 
   if (!city) {
     notFound();
   }
 
-  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
-  const hasNextPage = currentPage < totalPages;
-  const hasPreviousPage = currentPage > 1;
-
-  // Generar JSON-LD
-  const breadcrumbs = [
-    { name: 'Inicio', url: '/' },
-    { name: city.title, url: `/${params.city}` },
-  ];
-
-  const jsonLd = combineJsonLd(
-    collectionPageJsonLd(
-      `${city.title} - Mejores Locales`,
-      city.description || `Los mejores locales en ${city.title}`,
-      `${SITE_CONFIG.url}/${params.city}`,
-      venues
-    ),
-    breadcrumbsJsonLd(breadcrumbs),
-    venues.length > 0 ? {
-      '@context': 'https://schema.org',
-      '@type': 'ItemList',
-      numberOfItems: venues.length,
-      itemListElement: venues.map((venue, index) => ({
-        '@type': 'ListItem',
-        position: index + 1,
-        item: {
-          '@type': venue.schemaType || 'LocalBusiness',
-          name: venue.title,
-          url: `${SITE_CONFIG.url}/${params.city}/${venue.slug.current}`,
-          address: {
-            '@type': 'PostalAddress',
-            streetAddress: venue.address,
-            addressLocality: city.title,
-            addressRegion: city.region,
-            addressCountry: 'ES',
-          },
-          priceRange: venue.priceRange,
-          image: venue.images?.[0] ? urlFor(venue.images[0]).width(400).height(300).url() : undefined,
-        },
-      })),
-    } : null
-  );
+  // Generate JSON-LD
+  const jsonLd = cityPageJsonLd(city, venues);
 
   return (
     <>
+      {/* JSON-LD Schema */}
       {jsonLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd, null, 0),
+          }}
         />
       )}
-      
-      <div className="min-h-screen bg-gray-50">
-        <div className="container-wide py-12">
-          {/* Breadcrumbs */}
-          <nav className="mb-8" aria-label="Breadcrumb">
-            <ol className="flex items-center space-x-2 text-sm text-gray-500">
-              <li>
-                <Link href="/" className="hover:text-primary-600">Inicio</Link>
-              </li>
-              <li>
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                </svg>
-              </li>
-              <li className="text-gray-900 font-medium">{city.title}</li>
-            </ol>
-          </nav>
 
-          {/* Hero Section */}
-          <div className="text-center mb-12">
-            {city.heroImage && (
-              <div className="aspect-[3/1] relative mb-8 rounded-lg overflow-hidden">
-                <Image
-                  src={urlFor(city.heroImage).width(1200).height(400).url()}
-                  alt={city.title}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                  <h1 className="text-4xl md:text-6xl font-bold text-white text-center">
-                    {city.title}
-                  </h1>
-                </div>
-              </div>
-            )}
-            
-            {!city.heroImage && (
+      <div className="min-h-screen bg-gray-50">
+        {/* Breadcrumbs */}
+        <div className="bg-white border-b border-gray-200">
+          <div className="container-wide py-4">
+            <Breadcrumbs 
+              items={[
+                { name: 'Inicio', url: '/' },
+                { name: city.title, url: `/${city.slug.current}` },
+              ]}
+            />
+          </div>
+        </div>
+
+        {/* Hero Section */}
+        <section className="bg-white">
+          <div className="container-wide py-12">
+            <div className="text-center max-w-4xl mx-auto">
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                {city.title}
+                Restaurantes en{' '}
+                <span className="text-primary-600">{city.title}</span>
               </h1>
-            )}
-            
-            {city.description && (
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                {city.description}
-              </p>
-            )}
-            
-            <div className="flex items-center justify-center space-x-8 text-gray-500">
-              <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-                {city.venueCount || total} locales
-              </div>
-              {city.reviewCount && (
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                  </svg>
-                  {city.reviewCount} reseñas
-                </div>
+              {city.description && (
+                <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                  {city.description}
+                </p>
               )}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="text-sm text-gray-500">
+                  {venues.length} locales • {reviews.length} reseñas
+                </div>
+              </div>
             </div>
           </div>
+        </section>
 
-          {/* Venues Grid */}
-          {venues.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-                {venues.map((venue) => (
-                  <article key={venue._id} className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
-                    {/* Image */}
-                    <Link href={`/${params.city}/${venue.slug.current}`}>
-                      <div className="aspect-video bg-gray-100 relative">
-                        {venue.images?.[0] ? (
-                          <Image
-                            src={urlFor(venue.images[0]).width(400).height(300).url()}
-                            alt={venue.images[0].alt || venue.title}
-                            fill
-                            className="object-cover"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                        )}
-                        
-                        {/* Price Range Badge */}
-                        <div className="absolute top-4 right-4">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white text-gray-800 shadow-sm">
-                            {venue.priceRange}
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
+        {/* Main Content */}
+        <div className="container-wide py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Main Content */}
+            <main className="lg:col-span-3">
+              {/* Venues */}
+              <section className="mb-12">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-3xl font-bold text-gray-900">
+                    Locales destacados
+                  </h2>
+                  <Link
+                    href={`/${params.city}/locales`}
+                    className="text-primary-600 hover:text-primary-700 font-medium"
+                  >
+                    Ver todos →
+                  </Link>
+                </div>
 
-                    {/* Content */}
-                    <div className="p-4">
-                      <div className="flex items-center text-xs text-gray-500 mb-2">
-                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        {venue.address}
-                      </div>
+                <Suspense fallback={
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <VenueCardSkeleton key={i} />
+                    ))}
+                  </div>
+                }>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {venues.map((venue) => (
+                      <VenueCard key={venue._id} venue={venue} />
+                    ))}
+                  </div>
+                </Suspense>
+              </section>
 
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
-                        <Link 
-                          href={`/${params.city}/${venue.slug.current}`}
-                          className="hover:text-primary-600 transition-colors"
-                        >
-                          {venue.title}
-                        </Link>
-                      </h3>
+              {/* In-Article Ad */}
+              <InArticleAd />
 
-                      {venue.description && (
-                        <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                          {venue.description}
-                        </p>
-                      )}
+              {/* Recent Reviews */}
+              <section>
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-3xl font-bold text-gray-900">
+                    Últimas reseñas
+                  </h2>
+                  <Link
+                    href={`/${params.city}/resenas`}
+                    className="text-primary-600 hover:text-primary-700 font-medium"
+                  >
+                    Ver todas →
+                  </Link>
+                </div>
 
-                      {venue.categories && venue.categories.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {venue.categories.slice(0, 2).map((category) => (
-                            <span 
-                              key={category.slug.current}
-                              className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800"
-                            >
-                              {category.title}
-                            </span>
-                          ))}
-                          {venue.categories.length > 2 && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
-                              +{venue.categories.length - 2}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </article>
-                ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {reviews.map((review) => (
+                    <ReviewCard key={review._id} review={review} />
+                  ))}
+                </div>
+              </section>
+            </main>
+
+            {/* Sidebar */}
+            <aside className="lg:col-span-1 space-y-8">
+              {/* Sidebar Ad */}
+              <SidebarAd />
+
+              {/* City Stats */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Estadísticas
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Locales:</span>
+                    <span className="font-semibold">{venues.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Reseñas:</span>
+                    <span className="font-semibold">{reviews.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Puntuación media:</span>
+                    <span className="font-semibold">
+                      {venues.length > 0 
+                        ? (venues.reduce((sum, v) => sum + (v.avgRating || 0), 0) / venues.length).toFixed(1)
+                        : 'N/A'
+                      }
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <nav className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 rounded-lg">
-                  <div className="flex flex-1 justify-between sm:hidden">
-                    {hasPreviousPage && (
+              {/* Popular Categories */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Categorías populares
+                </h3>
+                <ul className="space-y-3">
+                  {[
+                    'Restaurantes gallegos',
+                    'Marisquerías',
+                    'Bares de tapas',
+                    'Cafeterías',
+                  ].map((category, index) => (
+                    <li key={index}>
                       <Link
-                        href={`/${params.city}?page=${currentPage - 1}`}
-                        className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        href={`/categorias/${category.toLowerCase().replace(/\s+/g, '-')}`}
+                        className="text-gray-600 hover:text-primary-600 text-sm transition-colors"
                       >
-                        Anterior
+                        {category}
                       </Link>
-                    )}
-                    {hasNextPage && (
-                      <Link
-                        href={`/${params.city}?page=${currentPage + 1}`}
-                        className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                      >
-                        Siguiente
-                      </Link>
-                    )}
-                  </div>
-                  <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-sm text-gray-700">
-                        Mostrando{' '}
-                        <span className="font-medium">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span>
-                        {' '}-{' '}
-                        <span className="font-medium">
-                          {Math.min(currentPage * ITEMS_PER_PAGE, total)}
-                        </span>
-                        {' '}de{' '}
-                        <span className="font-medium">{total}</span>
-                        {' '}locales
-                      </p>
-                    </div>
-                    <div>
-                      <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                        {hasPreviousPage && (
-                          <Link
-                            href={`/${params.city}?page=${currentPage - 1}`}
-                            className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                          >
-                            <span className="sr-only">Anterior</span>
-                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                              <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
-                            </svg>
-                          </Link>
-                        )}
-                        
-                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                          const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
-                          if (pageNum > totalPages) return null;
-                          
-                          return (
-                            <Link
-                              key={pageNum}
-                              href={`/${params.city}?page=${pageNum}`}
-                              className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
-                                pageNum === currentPage
-                                  ? 'z-10 bg-primary-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600'
-                                  : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0'
-                              }`}
-                            >
-                              {pageNum}
-                            </Link>
-                          );
-                        })}
-                        
-                        {hasNextPage && (
-                          <Link
-                            href={`/${params.city}?page=${currentPage + 1}`}
-                            className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                          >
-                            <span className="sr-only">Siguiente</span>
-                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                              <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-                            </svg>
-                          </Link>
-                        )}
-                      </nav>
-                    </div>
-                  </div>
-                </nav>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-12">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No hay locales</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Aún no hay locales registrados en {city.title}.
-              </p>
-            </div>
-          )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </aside>
+          </div>
         </div>
       </div>
     </>

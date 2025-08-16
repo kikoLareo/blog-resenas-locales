@@ -1,43 +1,71 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Suspense } from 'react';
 import { HeaderAd, SidebarAd } from '@/components/AdSlot';
+import TLDR from '@/components/TLDR';
 import { CompactScore } from '@/components/ScoreBar';
 import { SITE_CONFIG } from '@/lib/constants';
-import { HomepageData } from '@/lib/types';
-import { sanityFetch } from '@/lib/sanity.client';
-import { homepageQuery } from '@/sanity/lib/queries';
-import { urlFor } from '@/lib/sanity.client';
+import { Review, Post } from '@/lib/types';
+import { homePageJsonLd } from '@/lib/schema';
 
-// Función server para obtener datos de homepage con manejo de errores
-async function getHomepageData(): Promise<HomepageData> {
-  try {
-    const data = await sanityFetch<HomepageData>({
-      query: homepageQuery,
-      tags: ['homepage', 'reviews', 'posts', 'cities', 'categories'],
-      revalidate: 3600, // 1 hora
-    });
+// Mock data - In production, fetch from Sanity
+const mockReviews: Review[] = [
+  {
+    _id: '1',
+    
+    title: 'Casa Pepe: Auténtica cocina gallega en el corazón de Santiago',
+    slug: { current: 'casa-pepe-autentica-cocina-gallega' },
+    venue: {
+      _id: 'venue-1',
+      
+      title: 'Casa Pepe',
+      slug: { current: 'casa-pepe' },
+      city: {
+        _id: 'city-1',
+        title: 'Santiago de Compostela',
+        slug: { current: 'santiago-compostela' },
+      },
+      address: 'Rúa do Franco, 24',
+      priceRange: '€€' as const,
+      categories: [],
+      images: [],
+      schemaType: 'Restaurant' as const,
+    },
+    visitDate: '2024-01-15',
+    ratings: { food: 8.5, service: 8.0, ambience: 7.5, value: 8.5 },
+    avgTicket: 35,
+    pros: ['Pulpo excelente', 'Ambiente auténtico', 'Buen precio'],
+    cons: ['Algo ruidoso', 'Servicio lento en horas punta'],
+    tldr: '¿Buscas auténtica cocina gallega? Casa Pepe ofrece el mejor pulpo de Santiago con precios justos y ambiente tradicional. Ideal para turistas y locales que valoran la tradición culinaria gallega.',
+    faq: [
+      {
+        question: '¿Necesito reserva en Casa Pepe?',
+        answer: 'Se recomienda reservar, especialmente los fines de semana y en temporada alta. Puedes llamar al teléfono del restaurante o reservar online.',
+      },
+    ],
+    body: [],
+    gallery: [],
+    author: 'María González',
+    tags: ['gallego', 'pulpo', 'tradicional'],
+    publishedAt: '2024-01-20T10:00:00Z',
+  },
+  // Add more mock reviews...
+];
 
-    // Asegurar que siempre tenemos arrays (fallback)
-    return {
-      featuredReviews: data?.featuredReviews || [],
-      featuredPosts: data?.featuredPosts || [],
-      featuredCities: data?.featuredCities || [],
-      featuredCategories: data?.featuredCategories || [],
-    };
-  } catch (error) {
-    // Error silencioso para producción, fallback a datos vacíos
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error fetching homepage data:', error);
-    }
-    return {
-      featuredReviews: [],
-      featuredPosts: [],
-      featuredCities: [],
-      featuredCategories: [],
-    };
-  }
-}
+const mockPosts: Post[] = [
+  {
+    _id: 'post-1',
+    _type: 'post',
+    title: 'Los 10 mejores restaurantes gallegos de Santiago',
+    slug: { current: 'mejores-restaurantes-gallegos-santiago' },
+    excerpt: 'Descubre los restaurantes que mejor representan la gastronomía gallega en la capital compostelana.',
+    author: 'Carlos Fernández',
+    publishedAt: '2024-01-18T14:00:00Z',
+    body: [],
+    tags: ['guías', 'gastronomía', 'gallego'],
+  },
+];
 
 export const metadata: Metadata = {
   title: 'Inicio',
@@ -69,21 +97,35 @@ export const metadata: Metadata = {
   },
 };
 
+// Loading components
+function ReviewCardSkeleton() {
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden animate-pulse">
+      <div className="h-48 bg-gray-200" />
+      <div className="p-6 space-y-4">
+        <div className="h-4 bg-gray-200 rounded w-3/4" />
+        <div className="h-4 bg-gray-200 rounded w-1/2" />
+        <div className="space-y-2">
+          <div className="h-3 bg-gray-200 rounded" />
+          <div className="h-3 bg-gray-200 rounded w-5/6" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
-
-// Review Card Component actualizado para datos de Sanity
-function ReviewCard({ review }: { review: HomepageData['featuredReviews'][0] }) {
+// Review Card Component
+function ReviewCard({ review }: { review: Review }) {
   const overallRating = (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4;
-  const firstImage = review.gallery?.[0];
 
   return (
     <article className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
       {/* Image */}
       <div className="aspect-video bg-gray-100 relative">
-        {firstImage ? (
+        {review.gallery?.[0] ? (
           <Image
-            src={urlFor(firstImage).width(600).height(400).url()}
-            alt={firstImage.alt || review.title}
+            src={review.gallery[0].asset.url}
+            alt={review.gallery[0].alt || review.title}
             fill
             className="object-cover"
             loading="lazy"
@@ -110,68 +152,64 @@ function ReviewCard({ review }: { review: HomepageData['featuredReviews'][0] }) 
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          {review.venue.title} • {review.venue.city}
+          {review.venue.title} • {review.venue.city.title}
         </div>
 
         {/* Title */}
         <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
           <Link 
-            href={`/${review.venue.citySlug}/${review.venue.slug.current}/review/${review.slug.current}`}
+            href={`/${review.venue.city.slug.current}/${review.venue.slug.current}/review-${new Date(review.visitDate).getFullYear()}-${String(new Date(review.visitDate).getMonth() + 1).padStart(2, '0')}`}
             className="hover:text-primary-600 transition-colors"
           >
             {review.title}
           </Link>
         </h2>
 
-        {/* Rating breakdown */}
-        <div className="grid grid-cols-2 gap-2 text-sm mb-4">
-          <div className="flex justify-between">
-            <span className="text-gray-600">Comida:</span>
-            <span className="font-medium">{review.ratings.food}/10</span>
+        {/* TLDR */}
+        <div className="mb-4">
+          <TLDR content={review.tldr} title="Resumen" className="text-sm" />
+        </div>
+
+        {/* Pros/Cons */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <h4 className="text-sm font-medium text-green-700 mb-1">✓ Pros</h4>
+            <ul className="text-sm text-gray-600 space-y-1">
+              {review.pros.slice(0, 2).map((pro, index) => (
+                <li key={index} className="truncate">{pro}</li>
+              ))}
+            </ul>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Servicio:</span>
-            <span className="font-medium">{review.ratings.service}/10</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Ambiente:</span>
-            <span className="font-medium">{review.ratings.ambience}/10</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Valor:</span>
-            <span className="font-medium">{review.ratings.value}/10</span>
+          <div>
+            <h4 className="text-sm font-medium text-red-700 mb-1">✗ Contras</h4>
+            <ul className="text-sm text-gray-600 space-y-1">
+              {review.cons?.slice(0, 2).map((con, index) => (
+                <li key={index} className="truncate">{con}</li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        {/* Overall rating */}
-        <div className="text-center pt-4 border-t border-gray-100">
-          <span className="text-2xl font-bold text-primary-600">
-            {overallRating.toFixed(1)}
-          </span>
-          <span className="text-gray-500 text-sm ml-1">/10</span>
+        {/* Meta */}
+        <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-100">
+          <span>{review.author}</span>
+          <time dateTime={review.publishedAt}>
+            {new Date(review.publishedAt).toLocaleDateString('es-ES', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })}
+          </time>
         </div>
       </div>
     </article>
   );
 }
 
-// Post Card Component actualizado
-function PostCard({ post }: { post: HomepageData['featuredPosts'][0] }) {
+// Blog Post Card
+function PostCard({ post }: { post: Post }) {
   return (
     <article className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
-      {/* Hero Image */}
-      {post.heroImage && (
-        <div className="aspect-video bg-gray-100 relative">
-          <Image
-            src={urlFor(post.heroImage).width(600).height(400).url()}
-            alt={post.heroImage.alt || post.title}
-            fill
-            className="object-cover"
-            loading="lazy"
-          />
-        </div>
-      )}
-      
       <div className="p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
           <Link 
@@ -189,11 +227,11 @@ function PostCard({ post }: { post: HomepageData['featuredPosts'][0] }) {
         )}
 
         <div className="flex items-center justify-between text-sm text-gray-500">
+          <span>{post.author}</span>
           <time dateTime={post.publishedAt}>
             {new Date(post.publishedAt).toLocaleDateString('es-ES', {
               day: 'numeric',
-              month: 'long',
-              year: 'numeric',
+              month: 'short',
             })}
           </time>
         </div>
@@ -202,67 +240,24 @@ function PostCard({ post }: { post: HomepageData['featuredPosts'][0] }) {
   );
 }
 
-// City Card Component
-function CityCard({ city }: { city: HomepageData['featuredCities'][0] }) {
-  return (
-    <Link
-      href={`/${city.slug.current}`}
-      className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-200 overflow-hidden"
-    >
-      {city.heroImage && (
-        <div className="aspect-video bg-gray-100 relative">
-          <Image
-            src={urlFor(city.heroImage).width(400).height(300).url()}
-            alt={city.heroImage.alt || city.title}
-            fill
-            className="object-cover"
-            loading="lazy"
-          />
-        </div>
-      )}
-      <div className="p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          {city.title}
-        </h3>
-        {city.description && (
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-            {city.description}
-          </p>
-        )}
-        {city.venueCount && (
-          <p className="text-primary-600 text-sm font-medium">
-            {city.venueCount} locales
-          </p>
-        )}
-      </div>
-    </Link>
-  );
-}
-
-// Category Card Component
-function CategoryCard({ category }: { category: HomepageData['featuredCategories'][0] }) {
-  return (
-    <Link
-      href={`/categorias/${category.slug.current}`}
-      className="bg-white rounded-lg border border-gray-200 p-6 text-center hover:border-gray-300 hover:shadow-md transition-all duration-200"
-    >
-      {category.icon && (
-        <div className="text-3xl mb-2">{category.icon}</div>
-      )}
-      <h3 className="font-semibold text-gray-900 mb-1">{category.title}</h3>
-      {category.venueCount && (
-        <p className="text-sm text-gray-500">{category.venueCount} locales</p>
-      )}
-    </Link>
-  );
-}
-
-export default async function HomePage() {
-  const homepageData = await getHomepageData();
+export default function HomePage() {
+  // Generate JSON-LD
+  const jsonLd = homePageJsonLd(mockReviews.slice(0, 3), mockPosts);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header Ad */}
+    <>
+      {/* JSON-LD Schema */}
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd, null, 0),
+          }}
+        />
+      )}
+
+      <div className="min-h-screen bg-gray-50">
+        {/* Header Ad */}
       <div className="container-wide py-4">
         <HeaderAd className="mx-auto" />
       </div>
@@ -302,11 +297,11 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content */}
           <main className="lg:col-span-3">
-            {/* Featured Reviews */}
+            {/* Latest Reviews */}
             <section className="mb-12">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-3xl font-bold text-gray-900">
-                  Reseñas Destacadas
+                  Últimas Reseñas
                 </h2>
                 <Link
                   href="/resenas"
@@ -316,57 +311,51 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              {homepageData.featuredReviews.length > 0 ? (
+              <Suspense fallback={
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {homepageData.featuredReviews.slice(0, 4).map((review) => (
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <ReviewCardSkeleton key={i} />
+                  ))}
+                </div>
+              }>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {mockReviews.slice(0, 4).map((review) => (
                     <ReviewCard key={review._id} review={review} />
                   ))}
                 </div>
-              ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <p>Próximamente tendremos reseñas destacadas para ti.</p>
-                </div>
-              )}
+              </Suspense>
             </section>
 
             {/* Featured Categories */}
             <section className="mb-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-8">
-                Categorías Destacadas
+                Categorías Populares
               </h2>
               
-              {homepageData.featuredCategories.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {homepageData.featuredCategories.slice(0, 6).map((category) => (
-                    <CategoryCard key={category._id} category={category} />
-                  ))}
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {[
-                    { name: 'Restaurantes', icon: '🍽️', href: '/categorias/restaurantes' },
-                    { name: 'Bares', icon: '🍺', href: '/categorias/bares' },
-                    { name: 'Cafeterías', icon: '☕', href: '/categorias/cafeterias' },
-                    { name: 'Tapas', icon: '🍤', href: '/categorias/tapas' },
-                  ].map((category) => (
-                    <Link
-                      key={category.name}
-                      href={category.href}
-                      className="bg-white rounded-lg border border-gray-200 p-6 text-center hover:border-gray-300 hover:shadow-md transition-all duration-200"
-                    >
-                      <div className="text-3xl mb-2">{category.icon}</div>
-                      <h3 className="font-semibold text-gray-900">{category.name}</h3>
-                    </Link>
-                  ))}
-                </div>
-              )}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { name: 'Restaurantes', icon: '🍽️', href: '/categorias/restaurantes' },
+                  { name: 'Bares', icon: '🍺', href: '/categorias/bares' },
+                  { name: 'Cafeterías', icon: '☕', href: '/categorias/cafeterias' },
+                  { name: 'Tapas', icon: '🍤', href: '/categorias/tapas' },
+                ].map((category) => (
+                  <Link
+                    key={category.name}
+                    href={category.href}
+                    className="bg-white rounded-lg border border-gray-200 p-6 text-center hover:border-gray-300 hover:shadow-md transition-all duration-200"
+                  >
+                    <div className="text-3xl mb-2">{category.icon}</div>
+                    <h3 className="font-semibold text-gray-900">{category.name}</h3>
+                  </Link>
+                ))}
+              </div>
             </section>
 
-            {/* Featured Posts */}
-            <section className="mb-12">
+            {/* Blog Posts */}
+            <section>
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-3xl font-bold text-gray-900">
-                  Artículos Destacados
+                  Artículos del Blog
                 </h2>
                 <Link
                   href="/blog"
@@ -376,41 +365,12 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              {homepageData.featuredPosts.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {homepageData.featuredPosts.slice(0, 4).map((post) => (
-                    <PostCard key={post._id} post={post} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <p>Próximamente tendremos artículos destacados para ti.</p>
-                </div>
-              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {mockPosts.map((post) => (
+                  <PostCard key={post._id} post={post} />
+                ))}
+              </div>
             </section>
-
-            {/* Featured Cities */}
-            {homepageData.featuredCities.length > 0 && (
-              <section>
-                <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-3xl font-bold text-gray-900">
-                    Ciudades Destacadas
-                  </h2>
-                  <Link
-                    href="/ciudades"
-                    className="text-primary-600 hover:text-primary-700 font-medium"
-                  >
-                    Ver todas →
-                  </Link>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {homepageData.featuredCities.slice(0, 4).map((city) => (
-                    <CityCard key={city._id} city={city} />
-                  ))}
-                </div>
-              </section>
-            )}
           </main>
 
           {/* Sidebar */}
@@ -441,45 +401,33 @@ export default async function HomePage() {
               </form>
             </div>
 
-            {/* Popular Categories */}
+            {/* Top Categories */}
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Más Populares
               </h3>
               <ul className="space-y-3">
-                {homepageData.featuredCategories.slice(0, 4).length > 0 ? (
-                  homepageData.featuredCategories.slice(0, 4).map((category) => (
-                    <li key={category._id}>
-                      <Link
-                        href={`/categorias/${category.slug.current}`}
-                        className="text-gray-600 hover:text-primary-600 text-sm transition-colors"
-                      >
-                        {category.title}
-                      </Link>
-                    </li>
-                  ))
-                ) : (
-                  [
-                    'Restaurantes gallegos',
-                    'Marisquerías',
-                    'Bares de tapas',
-                    'Cafeterías con encanto',
-                  ].map((category, index) => (
-                    <li key={index}>
-                      <Link
-                        href={`/categorias/${category.toLowerCase().replace(/\s+/g, '-')}`}
-                        className="text-gray-600 hover:text-primary-600 text-sm transition-colors"
-                      >
-                        {category}
-                      </Link>
-                    </li>
-                  ))
-                )}
+                {[
+                  'Restaurantes gallegos',
+                  'Marisquerías',
+                  'Bares de tapas',
+                  'Cafeterías con encanto',
+                ].map((category, index) => (
+                  <li key={index}>
+                    <Link
+                      href={`/categorias/${category.toLowerCase().replace(/\s+/g, '-')}`}
+                      className="text-gray-600 hover:text-primary-600 text-sm transition-colors"
+                    >
+                      {category}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
           </aside>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

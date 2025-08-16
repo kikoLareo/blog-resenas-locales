@@ -182,7 +182,7 @@ describe('Schema.org JSON-LD Generators', () => {
 
       expect(schema['@context']).toBe('https://schema.org');
       expect(schema['@type']).toBe('Review');
-      expect(schema['@id']).toBe('https://test-blog.com/madrid/restaurante-el-buen-sabor/review-excelente-experiencia-gastronomica#review');
+      expect(schema['@id']).toBe('https://test-blog.com/madrid/restaurante-el-buen-sabor/review/excelente-experiencia-gastronomica#review');
       expect(schema.headline).toBe(mockReview.title);
       expect(schema.reviewBody).toBe(mockReview.tldr);
     });
