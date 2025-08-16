@@ -83,7 +83,7 @@ export default function FAQ({
       className={`faq ${className}`}
       aria-labelledby="faq-heading"
       role="region"
-      data-testid={rest['data-testid'] ?? 'faq'}
+      data-testid={(rest as Record<string, unknown>)['data-testid'] as string ?? 'faq'}
       {...rest}
     >
       {/* JSON-LD Schema */}
