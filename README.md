@@ -335,6 +335,57 @@ SANITY_WEBHOOK_SECRET=super-secret-key
 
 # Analytics (opcional)
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+
+# IndexNow (opcional)
+INDEXNOW_HOST=tu-dominio.com
+INDEXNOW_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+INDEXNOW_KEY_LOCATION=https://tu-dominio.com/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.txt
+```
+
+## 🔍 IndexNow Integration
+
+IndexNow permite notificar automáticamente a los motores de búsqueda (Bing, Yandex) cuando el contenido se actualiza.
+
+### Configuración
+
+1. **Obtener clave de IndexNow**:
+   - Genera una clave de 32 caracteres hexadecimales
+   - Ejemplo: `abcdef1234567890abcdef1234567890`
+
+2. **Configurar variables de entorno**:
+   ```bash
+   INDEXNOW_HOST=tu-dominio.com
+   INDEXNOW_KEY=abcdef1234567890abcdef1234567890
+   INDEXNOW_KEY_LOCATION=https://tu-dominio.com/abcdef1234567890abcdef1234567890.txt
+   ```
+
+3. **Generar archivo de verificación**:
+   ```bash
+   npm run indexnow:verify
+   ```
+
+4. **Verificar configuración**:
+   - Después del deploy, verifica que `https://tu-dominio.com/[TU_CLAVE].txt` devuelve tu clave
+   - El archivo debe contener exactamente tu clave de IndexNow
+
+### Funcionamiento
+
+- **Automático**: Se ejecuta en cada webhook de Sanity
+- **No bloquea**: El envío es asíncrono y no afecta la revalidación
+- **Resiliente**: Los errores se registran pero no interrumpen el flujo
+- **Dry-run**: En desarrollo, solo registra el payload sin enviar
+
+### Logs
+
+```bash
+# Éxito
+IndexNow: 3 URLs enviadas exitosamente (200)
+
+# Configuración incompleta
+IndexNow: Configuración incompleta, saltando envío
+
+# Modo desarrollo
+IndexNow (dry-run): { "host": "...", "urlList": [...] }
 ```
 
 ## 📈 Monitoreo y Métricas

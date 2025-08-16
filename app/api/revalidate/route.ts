@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag, revalidatePath } from 'next/cache';
 import { parseBody } from 'next-sanity/webhook';
 import { REVALIDATE_TAGS } from '@/lib/sanity.client';
+import { submitToIndexNow, buildAbsoluteUrls } from '@/lib/indexnow';
+import { SITE_CONFIG } from '@/lib/constants';
 
 // Tipos para el webhook de Sanity
 interface SanityWebhookPayload {
@@ -167,6 +169,28 @@ export async function POST(req: NextRequest) {
     // eslint-disable-next-line no-console
     console.log(`✅ Revalidated: ${body._type} - ${body._id}`);
 
+    // IndexNow integration - enviar URLs actualizadas sin bloquear la respuesta
+    let indexnowSubmitted = 0;
+    try {
+      const absoluteUrls = buildAbsoluteUrls(pathsToRevalidate, SITE_CONFIG.url);
+      // No usar await para no bloquear la respuesta
+      submitToIndexNow(absoluteUrls)
+        .then((count) => {
+          if (count > 0) {
+            // eslint-disable-next-line no-console
+            console.log(`IndexNow: ${count} URLs enviadas exitosamente`);
+          }
+        })
+        .catch((error) => {
+          // eslint-disable-next-line no-console
+          console.error('IndexNow: Error en envío asíncrono:', error);
+        });
+      indexnowSubmitted = absoluteUrls.length;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('IndexNow: Error preparando URLs:', error);
+    }
+
     return NextResponse.json({
       success: true,
       revalidated: true,
@@ -174,6 +198,7 @@ export async function POST(req: NextRequest) {
       id: body._id,
       tag: tagToRevalidate,
       paths: revalidationResults,
+      indexnowSubmitted,
       now: Date.now(),
       timestamp: new Date().toISOString(),
     });
