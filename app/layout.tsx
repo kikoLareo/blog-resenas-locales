@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import '@/styles/globals.css';
 import { SITE_CONFIG, SEO_DEFAULTS } from '@/lib/constants';
 import { websiteJsonLd, organizationJsonLd } from '@/lib/schema';
+import ConsentBanner from '@/components/ConsentBanner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,6 +26,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: SITE_CONFIG.name,
     description: SITE_CONFIG.description,
+    creator: '@blogresenas',
+    site: '@blogresenas',
   },
   robots: {
     index: true,
@@ -169,6 +172,9 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+
+        {/* Consent Banner */}
+        <ConsentBanner />
       </body>
     </html>
   );

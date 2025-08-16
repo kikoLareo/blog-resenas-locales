@@ -9,12 +9,11 @@ const STATIC_PAGES = [
   { url: '/', priority: 1.0, changefreq: 'daily' },
   { url: '/blog', priority: 0.8, changefreq: 'daily' },
   { url: '/categorias', priority: 0.7, changefreq: 'weekly' },
-  { url: '/tags', priority: 0.6, changefreq: 'weekly' },
-  { url: '/buscar', priority: 0.6, changefreq: 'monthly' },
-  { url: '/sobre-nosotros', priority: 0.5, changefreq: 'monthly' },
+  { url: '/sobre', priority: 0.5, changefreq: 'monthly' },
   { url: '/contacto', priority: 0.5, changefreq: 'monthly' },
   { url: '/politica-privacidad', priority: 0.3, changefreq: 'yearly' },
-  { url: '/terminos-condiciones', priority: 0.3, changefreq: 'yearly' },
+  { url: '/terminos', priority: 0.3, changefreq: 'yearly' },
+  { url: '/cookies', priority: 0.3, changefreq: 'yearly' },
 ];
 
 // Generar URL completa
@@ -59,7 +58,7 @@ function generateStaticSitemap(): string {
 // Generar sitemap de venues
 function generateVenuesSitemap(venues: SitemapUrl[]): string {
   const urls = venues.map(venue => ({
-    url: getFullUrl(`/${venue.slug}`), // Asumiendo estructura de URL
+    url: getFullUrl(`/${venue.slug}`), // TODO: Necesita incluir city.slug cuando tengamos datos reales
     lastmod: new Date(venue._updatedAt).toISOString().split('T')[0],
     changefreq: 'weekly' as const,
     priority: 0.8,
@@ -71,7 +70,7 @@ function generateVenuesSitemap(venues: SitemapUrl[]): string {
 // Generar sitemap de reseñas
 function generateReviewsSitemap(reviews: SitemapUrl[]): string {
   const urls = reviews.map(review => ({
-    url: getFullUrl(`/resenas/${review.slug}`), // Asumiendo estructura de URL
+    url: getFullUrl(`/${review.slug}`), // TODO: Necesita incluir city.slug/venue.slug cuando tengamos datos reales
     lastmod: review.publishedAt 
       ? new Date(review.publishedAt).toISOString().split('T')[0]
       : new Date(review._updatedAt).toISOString().split('T')[0],
