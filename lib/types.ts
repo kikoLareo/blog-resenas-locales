@@ -153,11 +153,14 @@ export interface SitemapUrl {
   slug: string;
   _updatedAt: string;
   publishedAt?: string;
+  citySlug?: string;
+  venueSlug?: string;
 }
 
 export interface SitemapData {
   venues: SitemapUrl[];
   reviews: SitemapUrl[];
+  posts: SitemapUrl[];
   cities: SitemapUrl[];
   categories: SitemapUrl[];
 }

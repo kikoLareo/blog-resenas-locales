@@ -427,9 +427,17 @@ export const SITEMAP_URLS_QUERY = groq`
   {
     "venues": *[_type == "venue"]{
       "slug": slug.current,
-      _updatedAt
+      _updatedAt,
+      "citySlug": city->slug.current
     },
     "reviews": *[_type == "review"]{
+      "slug": slug.current,
+      _updatedAt,
+      publishedAt,
+      "venueSlug": venue->slug.current,
+      "citySlug": venue->city->slug.current
+    },
+    "posts": *[_type == "post"]{
       "slug": slug.current,
       _updatedAt,
       publishedAt

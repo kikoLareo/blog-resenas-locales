@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sanityFetch } from '@/lib/sanity.client';
 import { SITEMAP_URLS_QUERY } from '@/lib/groq';
 import { SitemapData, SitemapUrl } from '@/lib/types';
-import { SITE_CONFIG } from '@/lib/constants';
+import { generateSitemapXML, getFullUrl, formatSitemapDate } from '@/lib/sitemap';
 
 // Páginas estáticas del sitio
 const STATIC_PAGES = [
@@ -16,39 +16,14 @@ const STATIC_PAGES = [
   { url: '/cookies', priority: 0.3, changefreq: 'yearly' },
 ];
 
-// Generar URL completa
-function getFullUrl(path: string): string {
-  return `${SITE_CONFIG.url}${path.startsWith('/') ? '' : '/'}${path}`;
-}
 
-// Generar XML para sitemap específico
-function generateSitemapXML(urls: Array<{
-  url: string;
-  lastmod?: string;
-  changefreq?: string;
-  priority?: number;
-}>): string {
-  const urlsXML = urls.map(({ url, lastmod, changefreq, priority }) => {
-    return `  <url>
-    <loc>${url}</loc>
-    ${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}
-    ${changefreq ? `<changefreq>${changefreq}</changefreq>` : ''}
-    ${priority ? `<priority>${priority}</priority>` : ''}
-  </url>`;
-  }).join('\n');
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urlsXML}
-</urlset>`;
-}
 
 // Generar sitemap estático
 function generateStaticSitemap(): string {
   const urls = STATIC_PAGES.map(page => ({
     url: getFullUrl(page.url),
-    lastmod: new Date().toISOString().split('T')[0], // Solo fecha
-    changefreq: page.changefreq,
+    lastmod: formatSitemapDate(new Date().toISOString()),
+    changefreq: page.changefreq as 'daily' | 'weekly' | 'monthly' | 'yearly',
     priority: page.priority,
   }));
 
@@ -57,50 +32,70 @@ function generateStaticSitemap(): string {
 
 // Generar sitemap de venues
 function generateVenuesSitemap(venues: SitemapUrl[]): string {
-  const urls = venues.map(venue => ({
-    url: getFullUrl(`/${venue.slug}`), // TODO: Necesita incluir city.slug cuando tengamos datos reales
-    lastmod: new Date(venue._updatedAt).toISOString().split('T')[0],
-    changefreq: 'weekly' as const,
-    priority: 0.8,
-  }));
+  const urls = venues
+    .filter(venue => venue.citySlug && venue.slug) // Solo incluir venues con datos completos
+    .map(venue => ({
+      url: getFullUrl(`/${venue.citySlug}/${venue.slug}`),
+      lastmod: formatSitemapDate(venue._updatedAt),
+      changefreq: 'weekly' as const,
+      priority: 0.8,
+    }));
 
   return generateSitemapXML(urls);
 }
 
 // Generar sitemap de reseñas
 function generateReviewsSitemap(reviews: SitemapUrl[]): string {
-  const urls = reviews.map(review => ({
-    url: getFullUrl(`/${review.slug}`), // TODO: Necesita incluir city.slug/venue.slug cuando tengamos datos reales
-    lastmod: review.publishedAt 
-      ? new Date(review.publishedAt).toISOString().split('T')[0]
-      : new Date(review._updatedAt).toISOString().split('T')[0],
-    changefreq: 'monthly' as const,
-    priority: 0.9,
-  }));
+  const urls = reviews
+    .filter(review => review.citySlug && review.venueSlug && review.slug) // Solo incluir reviews con datos completos
+    .map(review => ({
+      url: getFullUrl(`/${review.citySlug}/${review.venueSlug}/review/${review.slug}`),
+      lastmod: formatSitemapDate(review.publishedAt || review._updatedAt),
+      changefreq: 'monthly' as const,
+      priority: 0.9,
+    }));
 
   return generateSitemapXML(urls);
 }
 
 // Generar sitemap de ciudades
 function generateCitiesSitemap(cities: SitemapUrl[]): string {
-  const urls = cities.map(city => ({
-    url: getFullUrl(`/${city.slug}`),
-    lastmod: new Date(city._updatedAt).toISOString().split('T')[0],
-    changefreq: 'weekly' as const,
-    priority: 0.7,
-  }));
+  const urls = cities
+    .filter(city => city.slug) // Solo incluir ciudades con slug
+    .map(city => ({
+      url: getFullUrl(`/${city.slug}`),
+      lastmod: formatSitemapDate(city._updatedAt),
+      changefreq: 'weekly' as const,
+      priority: 0.7,
+    }));
+
+  return generateSitemapXML(urls);
+}
+
+// Generar sitemap de posts
+function generatePostsSitemap(posts: SitemapUrl[]): string {
+  const urls = posts
+    .filter(post => post.slug) // Solo incluir posts con slug
+    .map(post => ({
+      url: getFullUrl(`/blog/${post.slug}`),
+      lastmod: formatSitemapDate(post.publishedAt || post._updatedAt),
+      changefreq: 'monthly' as const,
+      priority: 0.7,
+    }));
 
   return generateSitemapXML(urls);
 }
 
 // Generar sitemap de categorías
 function generateCategoriesSitemap(categories: SitemapUrl[]): string {
-  const urls = categories.map(category => ({
-    url: getFullUrl(`/categorias/${category.slug}`),
-    lastmod: new Date(category._updatedAt).toISOString().split('T')[0],
-    changefreq: 'weekly' as const,
-    priority: 0.6,
-  }));
+  const urls = categories
+    .filter(category => category.slug) // Solo incluir categorías con slug
+    .map(category => ({
+      url: getFullUrl(`/categorias/${category.slug}`),
+      lastmod: formatSitemapDate(category._updatedAt),
+      changefreq: 'weekly' as const,
+      priority: 0.6,
+    }));
 
   return generateSitemapXML(urls);
 }
@@ -121,6 +116,7 @@ export async function GET(
 
       case 'venues':
       case 'reviews':
+      case 'posts':
       case 'cities':
       case 'categories':
         // Obtener datos de Sanity
@@ -136,6 +132,9 @@ export async function GET(
             break;
           case 'reviews':
             sitemapXML = generateReviewsSitemap(data.reviews);
+            break;
+          case 'posts':
+            sitemapXML = generatePostsSitemap(data.posts);
             break;
           case 'cities':
             sitemapXML = generateCitiesSitemap(data.cities);
@@ -157,7 +156,7 @@ export async function GET(
 
     return new Response(sitemapXML, {
       headers: {
-        'Content-Type': 'application/xml',
+        'Content-Type': 'application/xml; charset=utf-8',
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
       },
     });
