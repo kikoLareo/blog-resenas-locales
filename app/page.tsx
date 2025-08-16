@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Suspense } from 'react';
 import { HeaderAd, SidebarAd } from '@/components/AdSlot';
 import TLDR from '@/components/TLDR';
@@ -87,6 +88,8 @@ export const metadata: Metadata = {
     title: `${SITE_CONFIG.name} - Reseñas de restaurantes`,
     description: 'Descubre los mejores restaurantes y locales con nuestras reseñas detalladas.',
     images: [`${SITE_CONFIG.url}/og/home.jpg`],
+    creator: '@blogresenas',
+    site: '@blogresenas',
   },
   alternates: {
     canonical: SITE_CONFIG.url,
@@ -119,10 +122,11 @@ function ReviewCard({ review }: { review: Review }) {
       {/* Image */}
       <div className="aspect-video bg-gray-100 relative">
         {review.gallery?.[0] ? (
-          <img
+          <Image
             src={review.gallery[0].asset.url}
             alt={review.gallery[0].alt || review.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
             loading="lazy"
           />
         ) : (

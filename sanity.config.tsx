@@ -115,13 +115,15 @@ type DocWithSlug = { slug?: { current?: string } } & Record<string, unknown>;
       
       switch ((document as any)._type) {
         case 'review':
-          return `${baseUrl}/resenas/${d.slug?.current}`;
+          // TODO: En producción necesitará city.slug/venue.slug
+          return `${baseUrl}/${d.slug?.current}`;
         case 'venue':
-          return `${baseUrl}/locales/${d.slug?.current}`;
+          // TODO: En producción necesitará city.slug
+          return `${baseUrl}/${d.slug?.current}`;
         case 'post':
           return `${baseUrl}/blog/${d.slug?.current}`;
         case 'city':
-          return `${baseUrl}/ciudades/${d.slug?.current}`;
+          return `${baseUrl}/${d.slug?.current}`;
         case 'category':
           return `${baseUrl}/categorias/${d.slug?.current}`;
         default:
