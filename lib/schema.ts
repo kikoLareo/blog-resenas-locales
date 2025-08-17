@@ -606,8 +606,6 @@ export function combineJsonLd(...schemas: (object | null | undefined)[]) {
     '@graph': validSchemas,
   };
 }
-<<<<<<< Current (Your changes)
-=======
 
 /**
  * Utility to render JSON-LD script tag
@@ -617,4 +615,3 @@ export function renderJsonLd(schema: object | null) {
   
   return JSON.stringify(schema, null, 0);
 }
->>>>>>> Incoming (Background Agent changes)
