@@ -406,8 +406,6 @@ export const RATING_CATEGORIES = [
   'ambience',
   'value'
 ] as const;
-<<<<<<< Current (Your changes)
-=======
 
 // Tipos para Homepage con datos de Sanity
 export interface HomepageData {
@@ -450,4 +448,3 @@ export interface HomepageData {
     venueCount?: number;
   }>;
 }
->>>>>>> Incoming (Background Agent changes)
