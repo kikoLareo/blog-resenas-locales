@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -12,12 +12,12 @@ import { Venue, Review } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';
 import { venuePageJsonLd } from '@/lib/schema';
 
-interface VenuePageProps {
-  params: {
+type VenuePageProps = {
+  params: Promise<{
     city: string;
     venue: string;
-  };
-}
+  }>;
+};
 
 // Mock data - In production, fetch from Sanity
 const mockVenue: Venue = {
@@ -140,7 +140,7 @@ export async function generateMetadata({ params }: VenuePageProps): Promise<Meta
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
       type: 'website',
-      url: `${SITE_CONFIG.url}/${params.city}/${params.venue}`,
+      url: `${SITE_CONFIG.url}/${(await params).city}/${(await params).venue}`,
       images: venue.images.length > 0 ? [
         {
           url: venue.images[0].asset.url,
@@ -158,7 +158,7 @@ export async function generateMetadata({ params }: VenuePageProps): Promise<Meta
       images: venue.images.length > 0 ? [venue.images[0].asset.url] : [],
     },
     alternates: {
-      canonical: `${SITE_CONFIG.url}/${params.city}/${params.venue}`,
+      canonical: `${SITE_CONFIG.url}/${(await params).city}/${(await params).venue}`,
     },
   };
 }
@@ -428,7 +428,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
                   Reseñas ({reviews.length})
                 </h2>
                 <Link
-                  href={`/${params.city}/${params.venue}/resenas`}
+                  href={`/${(await params).city}/${(await params).venue}/resenas`}
                   className="text-primary-600 hover:text-primary-700 font-medium"
                 >
                   Ver todas →
