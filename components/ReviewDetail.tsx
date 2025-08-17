@@ -93,7 +93,9 @@ export function ReviewDetail({ slug, onBack, review: reviewFromSanity }: ReviewD
       address: reviewFromSanity.venue?.address || '',
       rating: rating5 || 4.5,
       readTime: '5 min',
-      publishDate: reviewFromSanity.publishedAt ? new Date(reviewFromSanity.publishedAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }) : '',
+      publishDate: reviewFromSanity.publishedAt
+        ? new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(reviewFromSanity.publishedAt))
+        : '',
       author: reviewFromSanity.author || 'Equipo',
       authorImage: reviewFromSanity.authorAvatar?.asset?.url || '',
       heroImage: heroImage || '',

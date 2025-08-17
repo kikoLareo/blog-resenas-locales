@@ -9,6 +9,8 @@ import { SidebarAd, InArticleAd } from '@/components/AdSlot';
 import { Venue, Review, City } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';
 import { cityPageJsonLd } from '@/lib/schema';
+import { sanityFetch } from '@/lib/sanity.client';
+import { cityQuery, venuesByCityQuery } from '@/sanity/lib/queries';
 
 type CityPageProps = {
   params: Promise<{
@@ -16,117 +18,29 @@ type CityPageProps = {
   }>;
 };
 
-// Mock data - In production, fetch from Sanity
-const mockCity: City = {
-  _id: 'city-1',
-  title: 'Santiago de Compostela',
-  slug: { current: 'santiago-compostela' },
-  region: 'Galicia',
-  description: 'Capital de Galicia y destino del Camino de Santiago, famosa por su gastronomía tradicional y sus mariscos frescos.',
-  geo: {
-    lat: 42.8782,
-    lng: -8.5448,
-  },
-  heroImage: {
-    _type: 'image',
-    asset: {
-      _id: 'city-hero-1',
-      url: 'https://cdn.sanity.io/images/project/dataset/santiago-hero.jpg',
-      metadata: { dimensions: { width: 1200, height: 800, aspectRatio: 1.5 } }
-    },
-    alt: 'Vista de la Catedral de Santiago de Compostela',
-  },
-};
-
-const mockVenues: Venue[] = [
-  {
-    _id: 'venue-1',
-    title: 'Casa Pepe',
-    slug: { current: 'casa-pepe' },
-    city: mockCity,
-    address: 'Rúa do Franco, 24',
-    postalCode: '15705',
-    phone: '+34 981 58 38 09',
-    priceRange: '€€',
-    categories: [
-      {
-        _id: 'cat-1',
-        title: 'Restaurante Gallego',
-        slug: { current: 'restaurante-gallego' },
-      },
-    ],
-    images: [
-      {
-        _type: 'image',
-        asset: {
-          _id: 'img-1',
-          url: 'https://cdn.sanity.io/images/project/dataset/casa-pepe.jpg',
-          metadata: { dimensions: { width: 600, height: 400, aspectRatio: 1.5 } }
-        },
-        alt: 'Fachada de Casa Pepe',
-      },
-    ],
-    description: 'Restaurante tradicional gallego especializado en pulpo y mariscos.',
-    schemaType: 'Restaurant',
-    avgRating: 8.2,
-    reviewCount: 15,
-  },
-  {
-    _id: 'venue-2',
-    title: 'O Dezaseis',
-    slug: { current: 'o-dezaseis' },
-    city: mockCity,
-    address: 'Rúa de San Pedro, 16',
-    priceRange: '€€€',
-    categories: [
-      {
-        _id: 'cat-2',
-        title: 'Restaurante Moderno',
-        slug: { current: 'restaurante-moderno' },
-      },
-    ],
-    images: [
-      {
-        _type: 'image',
-        asset: {
-          _id: 'img-2',
-          url: 'https://cdn.sanity.io/images/project/dataset/o-dezaseis.jpg',
-          metadata: { dimensions: { width: 600, height: 400, aspectRatio: 1.5 } }
-        },
-        alt: 'Interior de O Dezaseis',
-      },
-    ],
-    description: 'Cocina gallega contemporánea con productos de temporada.',
-    schemaType: 'Restaurant',
-    avgRating: 9.1,
-    reviewCount: 8,
-  },
-];
-
-const mockReviews: Review[] = [
-  {
-    _id: 'review-1',
-    title: 'Casa Pepe: Auténtica cocina gallega',
-    slug: { current: 'casa-pepe-autentica-cocina-gallega' },
-    venue: mockVenues[0],
-    visitDate: '2024-01-15',
-    publishedAt: '2024-01-20T10:00:00Z',
-    ratings: { food: 8.5, service: 8.0, ambience: 7.5, value: 8.5 },
-    pros: ['Pulpo excelente', 'Ambiente auténtico'],
-    cons: ['Algo ruidoso'],
-    tldr: 'Auténtica cocina gallega con el mejor pulpo de Santiago.',
-    faq: [],
-    body: [],
-    gallery: [],
-    author: 'María González',
-    tags: ['gallego', 'pulpo'],
-  },
-];
+// Reseñas por ciudad (limit 6)
+const reviewsByCityQuery = `
+  *[_type == "review" && venue->city->slug.current == $citySlug] | order(publishedAt desc)[0...6] {
+    _id,
+    title,
+    slug,
+    tldr,
+    publishedAt,
+    ratings,
+    author,
+    gallery[0],
+    venue->{
+      title,
+      slug,
+      city->{title, slug}
+    }
+  }
+`;
 
 // Generate metadata
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
-  // In production, fetch city data from Sanity
-  const city = mockCity;
+  const { city: citySlug } = await params;
+  const city = await sanityFetch<City | null>({ query: cityQuery, params: { citySlug } });
   
   if (!city) {
     return {
@@ -144,13 +58,13 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
       type: 'website',
-      url: `${SITE_CONFIG.url}/${(await params).city}`,
-      images: city.heroImage ? [
+      url: `${SITE_CONFIG.url}/${citySlug}`,
+      images: (city as any).heroImage ? [
         {
-          url: city.heroImage.asset.url,
+          url: (city as any).heroImage.asset.url,
           width: 1200,
           height: 630,
-          alt: city.heroImage.alt || title,
+          alt: (city as any).heroImage.alt || title,
         },
       ] : [],
       locale: 'es_ES',
@@ -159,10 +73,10 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
       card: 'summary_large_image',
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
-      images: city.heroImage ? [city.heroImage.asset.url] : [],
+      images: (city as any).heroImage ? [(city as any).heroImage.asset.url] : [],
     },
     alternates: {
-      canonical: `${SITE_CONFIG.url}/${(await params).city}`,
+      canonical: `${SITE_CONFIG.url}/${citySlug}`,
     },
   };
 }
@@ -194,8 +108,8 @@ function ReviewCard({ review }: { review: Review }) {
       <div className="aspect-video bg-gray-100 relative">
         {review.gallery?.[0] ? (
           <Image
-            src={review.gallery[0].asset.url}
-            alt={review.gallery[0].alt || review.title}
+            src={(review as any).gallery?.asset?.url || (review as any).gallery?.url}
+            alt={(review as any).gallery?.alt || review.title}
             fill
             className="object-cover"
             loading="lazy"
@@ -247,12 +161,8 @@ function ReviewCard({ review }: { review: Review }) {
         {/* Meta */}
         <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-100">
           <span>{review.author}</span>
-          <time dateTime={review.publishedAt}>
-            {new Date(review.publishedAt).toLocaleDateString('es-ES', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-            })}
+          <time dateTime={review.publishedAt} suppressHydrationWarning>
+            {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(review.publishedAt))}
           </time>
         </div>
       </div>
@@ -268,8 +178,8 @@ function VenueCard({ venue }: { venue: Venue }) {
       <div className="aspect-video bg-gray-100 relative">
         {venue.images?.[0] ? (
           <Image
-            src={venue.images[0].asset.url}
-            alt={venue.images[0].alt || venue.title}
+            src={(venue.images[0] as any).asset?.url || (venue.images[0] as any).url}
+            alt={(venue.images[0] as any).alt || venue.title}
             fill
             className="object-cover"
             loading="lazy"
@@ -351,10 +261,10 @@ function VenueCard({ venue }: { venue: Venue }) {
 }
 
 export default async function CityPage({ params }: CityPageProps) {
-  // In production, fetch city data from Sanity
-  const city = mockCity;
-  const venues = mockVenues;
-  const reviews = mockReviews;
+  const { city: citySlug } = await params;
+  const city = await sanityFetch<City | null>({ query: cityQuery, params: { citySlug } });
+  const venues = await sanityFetch<Venue[]>({ query: venuesByCityQuery, params: { citySlug, $offset: 0, $limit: 12 } as any });
+  const reviews = await sanityFetch<Review[]>({ query: reviewsByCityQuery, params: { citySlug } });
 
   if (!city) {
     notFound();

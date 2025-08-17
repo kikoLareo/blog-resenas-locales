@@ -8,115 +8,22 @@ import { SidebarAd, InArticleAd } from '@/components/AdSlot';
 import { Venue, Category } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';
 import { categoryPageJsonLd } from '@/lib/schema';
+import { sanityFetch } from '@/lib/sanity.client';
+import { categoryQuery, venuesByCategoryQuery } from '@/sanity/lib/queries';
 
 type CategoryPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-// Mock data - In production, fetch from Sanity
-const mockCategory: Category = {
-  _id: 'cat-1',
-  title: 'Restaurantes Gallegos',
-  slug: { current: 'restaurantes-gallegos' },
-  description: 'Descubre los mejores restaurantes de cocina gallega tradicional. Pulpo, mariscos, empanadas y toda la gastronomía auténtica de Galicia.',
-};
+// Tamaño de página para listados
+// const PAGE_SIZE = 12; // reservado para paginación futura
 
-const mockVenues: Venue[] = [
-  {
-    _id: 'venue-1',
-    title: 'Casa Pepe',
-    slug: { current: 'casa-pepe' },
-    city: {
-      _id: 'city-1',
-      title: 'Santiago de Compostela',
-      slug: { current: 'santiago-compostela' },
-      region: 'Galicia',
-    },
-    address: 'Rúa do Franco, 24',
-    postalCode: '15705',
-    phone: '+34 981 58 38 09',
-    priceRange: '€€',
-    categories: [mockCategory],
-    images: [
-      {
-        _type: 'image',
-        asset: {
-          _id: 'img-1',
-          url: 'https://cdn.sanity.io/images/project/dataset/casa-pepe.jpg',
-          metadata: { dimensions: { width: 600, height: 400, aspectRatio: 1.5 } }
-        },
-        alt: 'Fachada de Casa Pepe',
-      },
-    ],
-    description: 'Restaurante tradicional gallego especializado en pulpo y mariscos.',
-    schemaType: 'Restaurant',
-    avgRating: 8.2,
-    reviewCount: 15,
-  },
-  {
-    _id: 'venue-2',
-    title: 'Taberna do Real',
-    slug: { current: 'taberna-do-real' },
-    city: {
-      _id: 'city-1',
-      title: 'Santiago de Compostela',
-      slug: { current: 'santiago-compostela' },
-      region: 'Galicia',
-    },
-    address: 'Rúa do Vilar, 1',
-    priceRange: '€€',
-    categories: [mockCategory],
-    images: [
-      {
-        _type: 'image',
-        asset: {
-          _id: 'img-2',
-          url: 'https://cdn.sanity.io/images/project/dataset/taberna-real.jpg',
-          metadata: { dimensions: { width: 600, height: 400, aspectRatio: 1.5 } }
-        },
-        alt: 'Interior de Taberna do Real',
-      },
-    ],
-    description: 'Taberna tradicional con ambiente auténtico y cocina casera gallega.',
-    schemaType: 'Restaurant',
-    avgRating: 7.8,
-    reviewCount: 22,
-  },
-  {
-    _id: 'venue-3',
-    title: 'O Curro da Parra',
-    slug: { current: 'o-curro-da-parra' },
-    city: {
-      _id: 'city-1',
-      title: 'Santiago de Compostela',
-      slug: { current: 'santiago-compostela' },
-      region: 'Galicia',
-    },
-    address: 'Travesa de Fonseca, 1',
-    priceRange: '€€€',
-    categories: [mockCategory],
-    images: [
-      {
-        _type: 'image',
-        asset: {
-          _id: 'img-3',
-          url: 'https://cdn.sanity.io/images/project/dataset/curro-parra.jpg',
-          metadata: { dimensions: { width: 600, height: 400, aspectRatio: 1.5 } }
-        },
-        alt: 'Plato de O Curro da Parra',
-      },
-    ],
-    description: 'Cocina gallega contemporánea con productos de primera calidad.',
-    schemaType: 'Restaurant',
-    avgRating: 8.9,
-    reviewCount: 18,
-  },
-];
+// Nota: los venues se obtienen desde Sanity en runtime
 
 // Generate metadata
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
-  // In production, fetch category data from Sanity
-  const category = mockCategory;
+  const { slug } = await params;
+  const category = await sanityFetch<Category | null>({ query: categoryQuery, params: { categorySlug: slug } });
   
   if (!category) {
     return {
@@ -134,7 +41,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
       type: 'website',
-      url: `${SITE_CONFIG.url}/categorias/${(await params).slug}`,
+      url: `${SITE_CONFIG.url}/categorias/${slug}`,
       locale: 'es_ES',
     },
     twitter: {
@@ -143,7 +50,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       description,
     },
     alternates: {
-      canonical: `${SITE_CONFIG.url}/categorias/${(await params).slug}`,
+      canonical: `${SITE_CONFIG.url}/categorias/${slug}`,
     },
   };
 }
@@ -173,8 +80,8 @@ function VenueCard({ venue }: { venue: Venue }) {
       <div className="aspect-video bg-gray-100 relative">
                  {venue.images?.[0] ? (
            <Image
-             src={venue.images[0].asset.url}
-             alt={venue.images[0].alt || venue.title}
+             src={(venue.images[0] as any).asset?.url || (venue.images[0] as any).url}
+             alt={(venue.images[0] as any).alt || venue.title}
              fill
              className="object-cover"
              loading="lazy"
@@ -248,11 +155,9 @@ function VenueCard({ venue }: { venue: Venue }) {
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  // In production, fetch category data from Sanity based on params.slug
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { slug } = await params;
-  const category = mockCategory;
-  const venues = mockVenues;
+  const category = await sanityFetch<Category | null>({ query: categoryQuery, params: { categorySlug: slug } });
+  const venues = await sanityFetch<Venue[]>({ query: venuesByCategoryQuery, params: { categorySlug: slug, $offset: 0, $limit: 12 } as any });
 
   if (!category) {
     notFound();

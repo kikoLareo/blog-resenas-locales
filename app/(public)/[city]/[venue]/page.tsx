@@ -11,6 +11,8 @@ import { SidebarAd, InArticleAd } from '@/components/AdSlot';
 import { Venue, Review } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';
 import { venuePageJsonLd } from '@/lib/schema';
+import { sanityFetch } from '@/lib/sanity.client';
+import { venueQuery } from '@/sanity/lib/queries';
 
 type VenuePageProps = {
   params: Promise<{
@@ -19,110 +21,34 @@ type VenuePageProps = {
   }>;
 };
 
-// Mock data - In production, fetch from Sanity
-const mockVenue: Venue = {
-  _id: 'venue-1',
-  title: 'Casa Pepe',
-  slug: { current: 'casa-pepe' },
-  city: {
-    _id: 'city-1',
-    title: 'Santiago de Compostela',
-    slug: { current: 'santiago-compostela' },
-    region: 'Galicia',
-  },
-  address: 'Rúa do Franco, 24',
-  postalCode: '15705',
-  phone: '+34 981 58 38 09',
-  website: 'https://www.casapepe-santiago.com',
-  geo: {
-    lat: 42.8782,
-    lng: -8.5448,
-  },
-  openingHours: [
-    'Monday 12:00-16:00,20:00-24:00',
-    'Tuesday 12:00-16:00,20:00-24:00',
-    'Wednesday 12:00-16:00,20:00-24:00',
-    'Thursday 12:00-16:00,20:00-24:00',
-    'Friday 12:00-16:00,20:00-01:00',
-    'Saturday 12:00-16:00,20:00-01:00',
-    'Sunday 12:00-16:00,20:00-24:00',
-  ],
-  priceRange: '€€',
-  categories: [
-    {
-      _id: 'cat-1',
-      title: 'Restaurante Gallego',
-      slug: { current: 'restaurante-gallego' },
-    },
-  ],
-  images: [
-    {
-      _type: 'image',
-      asset: {
-        _id: 'img-1',
-        url: 'https://cdn.sanity.io/images/project/dataset/image-1.jpg',
-        metadata: { dimensions: { width: 1200, height: 800, aspectRatio: 1.5 } }
-      },
-      alt: 'Fachada de Casa Pepe en Santiago',
-      caption: 'Entrada principal del restaurante',
-    },
-    {
-      _type: 'image',
-      asset: {
-        _id: 'img-2',
-        url: 'https://cdn.sanity.io/images/project/dataset/image-2.jpg',
-        metadata: { dimensions: { width: 1200, height: 800, aspectRatio: 1.5 } }
-      },
-      alt: 'Interior de Casa Pepe',
-      caption: 'Comedor principal con ambiente tradicional',
-    },
-  ],
-  description: 'Restaurante tradicional gallego ubicado en el corazón del casco histórico de Santiago de Compostela. Especializado en pulpo, mariscos y cocina gallega auténtica.',
-  social: {
-    instagram: 'https://instagram.com/casapepe_santiago',
-    facebook: 'https://facebook.com/casapepe.santiago',
-  },
-  schemaType: 'Restaurant',
-};
+//
 
-const mockReviews: Review[] = [
-  {
-    _id: 'review-1',
-    title: 'Casa Pepe: Auténtica cocina gallega en el corazón de Santiago',
-    slug: { current: 'casa-pepe-autentica-cocina-gallega' },
-    venue: mockVenue,
-    visitDate: '2024-01-15',
-    ratings: { food: 8.5, service: 8.0, ambience: 7.5, value: 8.5 },
-    avgTicket: 35,
-    pros: ['Pulpo excelente', 'Ambiente auténtico', 'Buen precio'],
-    cons: ['Algo ruidoso', 'Servicio lento en horas punta'],
-    tldr: '¿Buscas auténtica cocina gallega? Casa Pepe ofrece el mejor pulpo de Santiago con precios justos y ambiente tradicional.',
-    faq: [
-      {
-        question: '¿Necesito reserva en Casa Pepe?',
-        answer: 'Se recomienda reservar, especialmente los fines de semana y en temporada alta. Puedes llamar al teléfono del restaurante.',
-      },
-      {
-        question: '¿Cuál es el plato más recomendado?',
-        answer: 'El pulpo a feira es su especialidad más famosa, preparado de forma tradicional con pimentón dulce y aceite de oliva.',
-      },
-      {
-        question: '¿Tienen opciones vegetarianas?',
-        answer: 'Sí, ofrecen varias opciones vegetarianas como pimientos de padrón, ensalada mixta y tortilla española.',
-      },
-    ],
-    body: [],
-    gallery: mockVenue.images,
-    author: 'María González',
-    tags: ['gallego', 'pulpo', 'tradicional'],
-    publishedAt: '2024-01-20T10:00:00Z',
-  },
-];
+// mockReviews eliminado: las reseñas se cargan desde Sanity
 
 // Generate metadata
+const reviewsByVenueQuery = `
+  *[_type == "review" && venue->slug.current == $venueSlug] | order(publishedAt desc)[0...6] {
+    _id,
+    title,
+    slug,
+    tldr,
+    visitDate,
+    publishedAt,
+    ratings,
+    pros,
+    cons,
+    author,
+    venue->{
+      title,
+      slug,
+      city->{title, slug}
+    }
+  }
+`;
+
 export async function generateMetadata({ params }: VenuePageProps): Promise<Metadata> {
-  // In production, fetch venue data from Sanity
-  const venue = mockVenue;
+  const { venue: venueSlug, city } = await params;
+  const venue = await sanityFetch<Venue | null>({ query: venueQuery, params: { slug: venueSlug } });
   
   if (!venue) {
     return {
@@ -140,13 +66,13 @@ export async function generateMetadata({ params }: VenuePageProps): Promise<Meta
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
       type: 'website',
-      url: `${SITE_CONFIG.url}/${(await params).city}/${(await params).venue}`,
-      images: venue.images.length > 0 ? [
+      url: `${SITE_CONFIG.url}/${city}/${venueSlug}`,
+      images: (venue.images && venue.images.length > 0) ? [
         {
-          url: venue.images[0].asset.url,
+          url: (venue.images[0] as any).asset?.url || (venue.images[0] as any).url,
           width: 1200,
           height: 630,
-          alt: venue.images[0].alt || title,
+          alt: (venue.images[0] as any).alt || title,
         },
       ] : [],
       locale: 'es_ES',
@@ -155,10 +81,10 @@ export async function generateMetadata({ params }: VenuePageProps): Promise<Meta
       card: 'summary_large_image',
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
-      images: venue.images.length > 0 ? [venue.images[0].asset.url] : [],
+      images: (venue.images && venue.images.length > 0) ? [(venue.images[0] as any).asset?.url || (venue.images[0] as any).url] : [],
     },
     alternates: {
-      canonical: `${SITE_CONFIG.url}/${(await params).city}/${(await params).venue}`,
+      canonical: `${SITE_CONFIG.url}/${city}/${venueSlug}`,
     },
   };
 }
@@ -203,7 +129,7 @@ function VenueReviewCard({ review }: { review: Review }) {
         <div className="flex-1">
           <h3 className="text-xl font-bold text-gray-900 mb-2">
             <Link 
-              href={`/${review.venue.city.slug.current}/${review.venue.slug.current}/review-${new Date(review.visitDate).getFullYear()}-${String(new Date(review.visitDate).getMonth() + 1).padStart(2, '0')}`}
+              href={`/${review.venue.city.slug.current}/${review.venue.slug.current}/review/${review.slug.current}`}
               className="hover:text-primary-600 transition-colors"
             >
               {review.title}
@@ -212,12 +138,8 @@ function VenueReviewCard({ review }: { review: Review }) {
           <div className="flex items-center text-sm text-gray-600 mb-3">
             <span>{review.author}</span>
             <span className="mx-2">•</span>
-            <time dateTime={review.publishedAt}>
-              {new Date(review.publishedAt).toLocaleDateString('es-ES', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
+            <time dateTime={review.publishedAt} suppressHydrationWarning>
+              {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(review.publishedAt))}
             </time>
           </div>
         </div>
@@ -265,7 +187,7 @@ function VenueReviewCard({ review }: { review: Review }) {
       {/* Read More Link */}
       <div className="pt-4 border-t border-gray-100">
         <Link
-          href={`/${review.venue.city.slug.current}/${review.venue.slug.current}/review-${new Date(review.visitDate).getFullYear()}-${String(new Date(review.visitDate).getMonth() + 1).padStart(2, '0')}`}
+          href={`/${review.venue.city.slug.current}/${review.venue.slug.current}/review/${review.slug.current}`}
           className="text-primary-600 hover:text-primary-700 font-medium text-sm"
         >
           Leer reseña completa →
@@ -276,9 +198,9 @@ function VenueReviewCard({ review }: { review: Review }) {
 }
 
 export default async function VenuePage({ params }: VenuePageProps) {
-  // In production, fetch venue data from Sanity
-  const venue = mockVenue;
-  const reviews = mockReviews;
+  const { venue: venueSlug } = await params;
+  const venue = await sanityFetch<Venue | null>({ query: venueQuery, params: { slug: venueSlug } });
+  const reviews = await sanityFetch<Review[]>({ query: reviewsByVenueQuery, params: { venueSlug } });
 
   if (!venue) {
     notFound();
@@ -386,7 +308,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
         <section className="bg-white border-t border-gray-200">
           <div className="container-wide py-8">
             <Gallery 
-              images={venue.images}
+              images={venue.images as any}
               title="Fotos del local"
               columns={3}
               priority

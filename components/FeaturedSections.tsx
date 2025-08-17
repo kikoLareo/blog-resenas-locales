@@ -5,7 +5,18 @@ import { Button } from "./ui/button";
 import { slugify } from "@/lib/slug";
 import { ReviewCard } from "./ReviewCard";
 
-const trendingReviews = [
+type ReviewItem = {
+  id: string;
+  title: string;
+  image: string;
+  rating: number;
+  location: string;
+  readTime: string;
+  tags: string[];
+  description: string;
+};
+
+const trendingReviews: ReviewItem[] = [
   {
     id: "4",
     title: "Sushi de alta calidad en un ambiente acogedor",
@@ -28,7 +39,7 @@ const trendingReviews = [
   }
 ];
 
-const topRatedReviews = [
+const topRatedReviews: ReviewItem[] = [
   {
     id: "6",
     title: "Platos de autor que despiertan los sentidos",
@@ -43,9 +54,11 @@ const topRatedReviews = [
 
 interface FeaturedSectionsProps {
   onReviewClick?: (reviewId: string) => void;
+  trending?: ReviewItem[];
+  topRated?: ReviewItem[];
 }
 
-export function FeaturedSections({ onReviewClick }: FeaturedSectionsProps) {
+export function FeaturedSections({ onReviewClick, trending, topRated }: FeaturedSectionsProps) {
   return (
     <section className="py-12 sm:py-16 bg-white">
       <div className="container mx-auto px-4 space-y-12 sm:space-y-16">
@@ -61,7 +74,7 @@ export function FeaturedSections({ onReviewClick }: FeaturedSectionsProps) {
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-            {trendingReviews.map((review) => (
+            {(trending && trending.length > 0 ? trending : trendingReviews).map((review) => (
               <ReviewCard
                 key={review.id}
                 {...review}
@@ -84,7 +97,7 @@ export function FeaturedSections({ onReviewClick }: FeaturedSectionsProps) {
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            {topRatedReviews.map((review) => (
+            {(topRated && topRated.length > 0 ? topRated : topRatedReviews).map((review) => (
               <ReviewCard
                 key={review.id}
                 {...review}

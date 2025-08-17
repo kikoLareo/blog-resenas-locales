@@ -11,6 +11,8 @@ import { SidebarAd, InArticleAd } from '@/components/AdSlot';
 import { Venue, Review } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';
 import { reviewPageJsonLd } from '@/lib/schema';
+import { sanityFetch } from '@/lib/sanity.client';
+import { reviewQuery } from '@/sanity/lib/queries';
 
 type ReviewPageProps = {
   params: Promise<{
@@ -20,132 +22,15 @@ type ReviewPageProps = {
   }>;
 };
 
-// Mock data - In production, fetch from Sanity
-const mockVenue: Venue = {
-  _id: 'venue-1',
-  title: 'Casa Pepe',
-  slug: { current: 'casa-pepe' },
-  city: {
-    _id: 'city-1',
-    title: 'Santiago de Compostela',
-    slug: { current: 'santiago-compostela' },
-    region: 'Galicia',
-  },
-  address: 'Rúa do Franco, 24',
-  postalCode: '15705',
-  phone: '+34 981 58 38 09',
-  website: 'https://www.casapepe-santiago.com',
-  geo: {
-    lat: 42.8782,
-    lng: -8.5448,
-  },
-  openingHours: [
-    'Monday 12:00-16:00,20:00-24:00',
-    'Tuesday 12:00-16:00,20:00-24:00',
-    'Wednesday 12:00-16:00,20:00-24:00',
-    'Thursday 12:00-16:00,20:00-24:00',
-    'Friday 12:00-16:00,20:00-01:00',
-    'Saturday 12:00-16:00,20:00-01:00',
-    'Sunday 12:00-16:00,20:00-24:00',
-  ],
-  priceRange: '€€',
-  categories: [
-    {
-      _id: 'cat-1',
-      title: 'Restaurante Gallego',
-      slug: { current: 'restaurante-gallego' },
-    },
-  ],
-  images: [
-    {
-      _type: 'image',
-      asset: {
-        _id: 'img-1',
-        url: 'https://cdn.sanity.io/images/project/dataset/image-1.jpg',
-        metadata: { dimensions: { width: 1200, height: 800, aspectRatio: 1.5 } }
-      },
-      alt: 'Fachada de Casa Pepe en Santiago',
-      caption: 'Entrada principal del restaurante',
-    },
-  ],
-  description: 'Restaurante tradicional gallego ubicado en el corazón del casco histórico de Santiago de Compostela.',
-  social: {
-    instagram: 'https://instagram.com/casapepe_santiago',
-    facebook: 'https://facebook.com/casapepe.santiago',
-  },
-  schemaType: 'Restaurant',
-};
+//
 
-const mockReview: Review = {
-  _id: 'review-1',
-  title: 'Casa Pepe: Auténtica cocina gallega en el corazón de Santiago',
-  slug: { current: 'casa-pepe-autentica-cocina-gallega' },
-  venue: mockVenue,
-  visitDate: '2024-01-15',
-  publishedAt: '2024-01-20T10:00:00Z',
-  ratings: { food: 8.5, service: 8.0, ambience: 7.5, value: 8.5 },
-  avgTicket: 35,
-  highlights: ['Pulpo a feira excepcional', 'Ambiente tradicional auténtico', 'Excelente relación calidad-precio'],
-  pros: ['Pulpo excelente', 'Ambiente auténtico', 'Buen precio'],
-  cons: ['Algo ruidoso', 'Servicio lento en horas punta'],
-  tldr: '¿Buscas auténtica cocina gallega? Casa Pepe ofrece el mejor pulpo de Santiago con precios justos y ambiente tradicional.',
-  faq: [
-    {
-      question: '¿Necesito reserva en Casa Pepe?',
-      answer: 'Se recomienda reservar, especialmente los fines de semana y en temporada alta. Puedes llamar al teléfono del restaurante.',
-    },
-    {
-      question: '¿Cuál es el plato más recomendado?',
-      answer: 'El pulpo a feira es su especialidad más famosa, preparado de forma tradicional con pimentón dulce y aceite de oliva.',
-    },
-    {
-      question: '¿Tienen opciones vegetarianas?',
-      answer: 'Sí, ofrecen varias opciones vegetarianas como pimientos de padrón, ensalada mixta y tortilla española.',
-    },
-  ],
-  body: [],
-  gallery: [
-    {
-      _type: 'image',
-      asset: {
-        _id: 'img-gallery-1',
-        url: 'https://cdn.sanity.io/images/project/dataset/pulpo-1.jpg',
-        metadata: { dimensions: { width: 800, height: 600, aspectRatio: 1.33 } }
-      },
-      alt: 'Pulpo a feira de Casa Pepe',
-      caption: 'El famoso pulpo a feira, preparado de forma tradicional',
-    },
-    {
-      _type: 'image',
-      asset: {
-        _id: 'img-gallery-2',
-        url: 'https://cdn.sanity.io/images/project/dataset/interior-1.jpg',
-        metadata: { dimensions: { width: 800, height: 600, aspectRatio: 1.33 } }
-      },
-      alt: 'Interior de Casa Pepe',
-      caption: 'Ambiente tradicional gallego con decoración auténtica',
-    },
-  ],
-  author: 'María González',
-  authorAvatar: {
-    _type: 'image',
-    asset: {
-      _id: 'avatar-1',
-      url: 'https://cdn.sanity.io/images/project/dataset/maria-avatar.jpg',
-      metadata: { dimensions: { width: 150, height: 150, aspectRatio: 1 } }
-    },
-    alt: 'María González',
-  },
-  tags: ['gallego', 'pulpo', 'tradicional'],
-};
+// mockReview eliminado: los datos se cargan desde Sanity
 
 // Generate metadata
 export async function generateMetadata({ params }: ReviewPageProps): Promise<Metadata> {
-  // In production, fetch review data from Sanity based on params
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { city, venue, slug } = await params;
-  const review = mockReview;
-  const venueData = mockVenue;
+  const review = await sanityFetch<Review | null>({ query: reviewQuery, params: { slug } });
+  const venueData = review?.venue as unknown as Venue | undefined;
   
   if (!review || !venueData) {
     return {
@@ -164,12 +49,12 @@ export async function generateMetadata({ params }: ReviewPageProps): Promise<Met
       description,
       type: 'article',
       url: `${SITE_CONFIG.url}/${city}/${venue}/review/${slug}`,
-      images: review.gallery.length > 0 ? [
+      images: (review.gallery && review.gallery.length > 0) ? [
         {
-          url: review.gallery[0].asset.url,
+          url: (review.gallery[0] as any).asset?.url || (review.gallery[0] as any).url,
           width: 1200,
           height: 630,
-          alt: review.gallery[0].alt || title,
+          alt: (review.gallery[0] as any).alt || title,
         },
       ] : [],
       locale: 'es_ES',
@@ -178,7 +63,7 @@ export async function generateMetadata({ params }: ReviewPageProps): Promise<Met
       card: 'summary_large_image',
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
-      images: review.gallery.length > 0 ? [review.gallery[0].asset.url] : [],
+      images: (review.gallery && review.gallery.length > 0) ? [(review.gallery[0] as any).asset?.url || (review.gallery[0] as any).url] : [],
     },
     alternates: {
       canonical: `${SITE_CONFIG.url}/${city}/${venue}/review/${slug}`,
@@ -187,11 +72,9 @@ export async function generateMetadata({ params }: ReviewPageProps): Promise<Met
 }
 
 export default async function ReviewPage({ params }: ReviewPageProps) {
-  // In production, fetch review data from Sanity based on params
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { city, venue, slug } = await params;
-  const review = mockReview;
-  const venueData = mockVenue;
+  const { slug } = await params;
+  const review = await sanityFetch<Review | null>({ query: reviewQuery, params: { slug } });
+  const venueData = review?.venue as unknown as Venue | undefined;
 
   if (!review || !venueData) {
     notFound();
@@ -258,7 +141,7 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
                     <div className="flex items-center text-sm text-gray-600">
                       <span>{review.author}</span>
                       <span className="mx-2">•</span>
-                      <time dateTime={review.publishedAt}>
+                      <time dateTime={review.publishedAt} suppressHydrationWarning>
                         {new Date(review.publishedAt).toLocaleDateString('es-ES', {
                           day: 'numeric',
                           month: 'long',

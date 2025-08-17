@@ -133,12 +133,8 @@ export default function BlogPage() {
                     <div className="flex items-center text-sm text-gray-500">
                       <span>{mockPosts[0].author}</span>
                       <span className="mx-2">•</span>
-                      <time dateTime={mockPosts[0].publishedAt}>
-                        {new Date(mockPosts[0].publishedAt).toLocaleDateString('es-ES', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        })}
+                      <time dateTime={mockPosts[0].publishedAt} suppressHydrationWarning>
+                        {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(mockPosts[0].publishedAt))}
                       </time>
                     </div>
                     <Link
@@ -203,11 +199,8 @@ export default function BlogPage() {
 
                   <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-100">
                     <span>{post.author}</span>
-                    <time dateTime={post.publishedAt}>
-                      {new Date(post.publishedAt).toLocaleDateString('es-ES', {
-                        day: 'numeric',
-                        month: 'short',
-                      })}
+                    <time dateTime={post.publishedAt} suppressHydrationWarning>
+                      {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(post.publishedAt))}
                     </time>
                   </div>
                 </div>

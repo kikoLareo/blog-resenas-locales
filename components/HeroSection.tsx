@@ -1,12 +1,23 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, Star, MapPin, Clock } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "./ui/button";
 import { slugify } from "@/lib/slug";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
-const heroReviews = [
+type HeroItem = {
+  id: string;
+  title: string;
+  image: string;
+  rating: number;
+  location: string;
+  readTime: string;
+  tags: string[];
+  description: string;
+};
+
+const defaultHeroReviews: HeroItem[] = [
   {
     id: "1",
     title: "Experiencia única en el restaurante más moderno de la ciudad",
@@ -39,11 +50,23 @@ const heroReviews = [
   }
 ];
 
-type HeroSectionProps = object;
+type HeroSectionProps = {
+  reviews?: HeroItem[];
+};
 
-export function HeroSection({}: HeroSectionProps) {
+export function HeroSection({ reviews }: HeroSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const heroReviews = (reviews && reviews.length > 0 ? reviews : defaultHeroReviews);
+
+  const changeSlide = useCallback((newIndex: number) => {
+    if (isTransitioning || newIndex === currentIndex) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentIndex(newIndex);
+      setTimeout(() => setIsTransitioning(false), 200);
+    }, 200);
+  }, [currentIndex, isTransitioning]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -53,20 +76,11 @@ export function HeroSection({}: HeroSectionProps) {
       }
     }, 7000);
     return () => clearInterval(interval);
-  }, [currentIndex, isTransitioning]);
+  }, [currentIndex, isTransitioning, heroReviews.length, changeSlide]);
 
-  const changeSlide = (newIndex: number) => {
-    if (isTransitioning || newIndex === currentIndex) return;
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentIndex(newIndex);
-      setTimeout(() => setIsTransitioning(false), 200);
-    }, 200);
-  };
-
-  const nextSlide = () => changeSlide((currentIndex + 1) % heroReviews.length);
-  const prevSlide = () => changeSlide((currentIndex - 1 + heroReviews.length) % heroReviews.length);
-  const goToSlide = (index: number) => changeSlide(index);
+  const nextSlide = useCallback(() => changeSlide((currentIndex + 1) % heroReviews.length), [changeSlide, currentIndex, heroReviews.length]);
+  const prevSlide = useCallback(() => changeSlide((currentIndex - 1 + heroReviews.length) % heroReviews.length), [changeSlide, currentIndex, heroReviews.length]);
+  const goToSlide = useCallback((index: number) => changeSlide(index), [changeSlide]);
 
   return (
     <section className="relative">

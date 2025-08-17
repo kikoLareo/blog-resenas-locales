@@ -45,12 +45,8 @@ export default function PoliticaPrivacidadPage() {
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Política de <span className="text-primary-600">Privacidad</span>
             </h1>
-            <p className="text-lg text-gray-600">
-              Última actualización: {new Date().toLocaleDateString('es-ES', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
+            <p className="text-lg text-gray-600" suppressHydrationWarning>
+              Última actualización: {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date())}
             </p>
           </div>
 
