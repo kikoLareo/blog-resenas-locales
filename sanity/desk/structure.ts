@@ -1,4 +1,4 @@
-import { StructureBuilder } from 'sanity/structure';
+import type { StructureBuilder } from 'sanity/structure';
 
 export const structure = (S: StructureBuilder) =>
   S.list()
@@ -93,7 +93,7 @@ export const structure = (S: StructureBuilder) =>
                         .child(
                           S.documentTypeList('city')
                             .title('Ciudades')
-                            .child((cityId) =>
+                            .child((cityId: string) =>
                               S.documentList()
                                 .title('Locales en esta ciudad')
                                 .filter('_type == "venue" && city._ref == $cityId')
@@ -258,28 +258,28 @@ export const structure = (S: StructureBuilder) =>
                 .child(
                   S.documentTypeList('review')
                     .title('Nueva Reseña')
-                    .canHandleIntent((_name, params) => params.type === 'review')
+                    .canHandleIntent((_name: string, params: { type?: string }) => params.type === 'review')
                 ),
               S.listItem()
                 .title('📝 Nuevo Post')
                 .child(
                   S.documentTypeList('post')
                     .title('Nuevo Post')
-                    .canHandleIntent((_name, params) => params.type === 'post')
+                    .canHandleIntent((_name: string, params: { type?: string }) => params.type === 'post')
                 ),
               S.listItem()
                 .title('🏪 Nuevo Local')
                 .child(
                   S.documentTypeList('venue')
                     .title('Nuevo Local')
-                    .canHandleIntent((_name, params) => params.type === 'venue')
+                    .canHandleIntent((_name: string, params: { type?: string }) => params.type === 'venue')
                 ),
               S.listItem()
                 .title('🏙️ Nueva Ciudad')
                 .child(
                   S.documentTypeList('city')
                     .title('Nueva Ciudad')
-                    .canHandleIntent((_name, params) => params.type === 'city')
+                    .canHandleIntent((_name: string, params: { type?: string }) => params.type === 'city')
                 ),
               S.listItem()
                 .title('🏷️ Nueva Categoría')
