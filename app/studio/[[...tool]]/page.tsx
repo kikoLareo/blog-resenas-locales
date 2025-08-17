@@ -6,16 +6,17 @@
  * evitamos imports estáticos en producción y cargamos dinámicamente sólo en desarrollo.
  */
 
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 
-export const dynamic = 'force-static';
+// Nota: Evitamos export con el mismo nombre que el import para no mezclar declaraciones
+export const dynamicMode = 'force-static';
 
 export default function StudioPage() {
   if (process.env.NODE_ENV === 'production') {
     return null;
   }
 
-  const Studio = dynamic(async () => {
+  const Studio = nextDynamic(async () => {
     const { NextStudio } = await import('next-sanity/studio');
     const config = (await import('../../../sanity.config')).default;
     return function StudioWrapper() {
