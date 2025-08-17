@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -9,11 +9,9 @@ import { Venue, Category } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';
 import { categoryPageJsonLd } from '@/lib/schema';
 
-interface CategoryPageProps {
-  params: {
-    slug: string;
-  };
-}
+type CategoryPageProps = {
+  params: Promise<{ slug: string }>;
+};
 
 // Mock data - In production, fetch from Sanity
 const mockCategory: Category = {
@@ -136,7 +134,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
       type: 'website',
-      url: `${SITE_CONFIG.url}/categorias/${params.slug}`,
+      url: `${SITE_CONFIG.url}/categorias/${(await params).slug}`,
       locale: 'es_ES',
     },
     twitter: {
@@ -145,7 +143,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       description,
     },
     alternates: {
-      canonical: `${SITE_CONFIG.url}/categorias/${params.slug}`,
+      canonical: `${SITE_CONFIG.url}/categorias/${(await params).slug}`,
     },
   };
 }
@@ -252,7 +250,7 @@ function VenueCard({ venue }: { venue: Venue }) {
 export default async function CategoryPage({ params }: CategoryPageProps) {
   // In production, fetch category data from Sanity based on params.slug
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { slug } = params;
+  const { slug } = await params;
   const category = mockCategory;
   const venues = mockVenues;
 
