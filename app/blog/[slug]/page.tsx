@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { SITE_CONFIG } from '@/lib/constants';
@@ -6,9 +6,9 @@ import { Post } from '@/lib/types';
 import { postPageJsonLd } from '@/lib/schema';
 import FAQ from '@/components/FAQ';
 
-interface BlogPostPageProps {
-  params: { slug: string };
-}
+type BlogPostPageProps = {
+  params: Promise<{ slug: string }>;
+};
 
 // Mock data - En producción, obtener de Sanity
 const mockPost: Post = {
@@ -76,17 +76,17 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       title: `${post.title} | ${SITE_CONFIG.name}`,
       description: post.excerpt || 'Artículo del blog gastronómico',
       type: 'article',
-      url: `${SITE_CONFIG.url}/blog/${params.slug}`,
+      url: `${SITE_CONFIG.url}/blog/${(await params).slug}`,
       publishedTime: post.publishedAt,
     },
     alternates: {
-      canonical: `${SITE_CONFIG.url}/blog/${params.slug}`,
+      canonical: `${SITE_CONFIG.url}/blog/${(await params).slug}`,
     },
   };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function BlogPostPage({ params }: BlogPostPageProps) {
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
   // En producción, obtener datos reales de Sanity basado en params.slug
   // const post = await getPostData(params.slug);
   const post = mockPost;
