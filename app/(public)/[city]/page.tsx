@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -10,11 +10,11 @@ import { Venue, Review, City } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';
 import { cityPageJsonLd } from '@/lib/schema';
 
-interface CityPageProps {
-  params: {
+type CityPageProps = {
+  params: Promise<{
     city: string;
-  };
-}
+  }>;
+};
 
 // Mock data - In production, fetch from Sanity
 const mockCity: City = {
@@ -144,7 +144,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
       type: 'website',
-      url: `${SITE_CONFIG.url}/${params.city}`,
+      url: `${SITE_CONFIG.url}/${(await params).city}`,
       images: city.heroImage ? [
         {
           url: city.heroImage.asset.url,
@@ -162,7 +162,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
       images: city.heroImage ? [city.heroImage.asset.url] : [],
     },
     alternates: {
-      canonical: `${SITE_CONFIG.url}/${params.city}`,
+      canonical: `${SITE_CONFIG.url}/${(await params).city}`,
     },
   };
 }
@@ -422,7 +422,7 @@ export default async function CityPage({ params }: CityPageProps) {
                     Locales destacados
                   </h2>
                   <Link
-                    href={`/${params.city}/locales`}
+                    href={`/${(await params).city}/locales`}
                     className="text-primary-600 hover:text-primary-700 font-medium"
                   >
                     Ver todos →
@@ -454,7 +454,7 @@ export default async function CityPage({ params }: CityPageProps) {
                     Últimas reseñas
                   </h2>
                   <Link
-                    href={`/${params.city}/resenas`}
+                    href={`/${(await params).city}/resenas`}
                     className="text-primary-600 hover:text-primary-700 font-medium"
                   >
                     Ver todas →
