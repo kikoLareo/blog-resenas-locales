@@ -59,7 +59,7 @@ export function ReviewCard({ title, image, rating, location, readTime, tags, des
 
   if (href) {
     return (
-      <Link href={href} className="block" onClick={onClick ? (e) => { onClick(); } : undefined}>
+      <Link href={href} className="block" onClick={onClick ? () => { onClick(); } : undefined}>
         {content}
       </Link>
     );

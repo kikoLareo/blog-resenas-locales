@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Star, MapPin, Clock, Calendar, Share2, Bookmark, Heart } from "lucide-react";
+import { Star, MapPin, Clock, Calendar, Share2, Bookmark, Heart } from "lucide-react";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { ImageWithFallback } from "./figma/ImageWithFallback";

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
 interface FAQItem {
@@ -188,18 +189,18 @@ export default function FAQ({
             Estamos aquí para ayudarte con cualquier pregunta adicional
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a
+            <Link
               href="/contacto"
               className="inline-flex items-center justify-center px-6 py-2 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200"
             >
               Contactar
-            </a>
-            <a
+            </Link>
+            <Link
               href="/blog"
               className="inline-flex items-center justify-center px-6 py-2 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200"
             >
               Ver más artículos
-            </a>
+            </Link>
           </div>
         </div>
       </div>

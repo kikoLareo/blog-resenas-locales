@@ -39,11 +39,9 @@ const heroReviews = [
   }
 ];
 
-interface HeroSectionProps {
-  onReviewClick?: (reviewId: string) => void;
-}
+interface HeroSectionProps {}
 
-export function HeroSection({ onReviewClick }: HeroSectionProps) {
+export function HeroSection({}: HeroSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
