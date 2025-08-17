@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -12,13 +12,13 @@ import { Venue, Review } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';
 import { reviewPageJsonLd } from '@/lib/schema';
 
-interface ReviewPageProps {
-  params: {
+type ReviewPageProps = {
+  params: Promise<{
     city: string;
     venue: string;
     slug: string;
-  };
-}
+  }>;
+};
 
 // Mock data - In production, fetch from Sanity
 const mockVenue: Venue = {
@@ -143,7 +143,7 @@ const mockReview: Review = {
 export async function generateMetadata({ params }: ReviewPageProps): Promise<Metadata> {
   // In production, fetch review data from Sanity based on params
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { city, venue, slug } = params;
+  const { city, venue, slug } = await params;
   const review = mockReview;
   const venueData = mockVenue;
   
@@ -163,7 +163,7 @@ export async function generateMetadata({ params }: ReviewPageProps): Promise<Met
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
       type: 'article',
-      url: `${SITE_CONFIG.url}/${params.city}/${params.venue}/review/${params.slug}`,
+      url: `${SITE_CONFIG.url}/${city}/${venue}/review/${slug}`,
       images: review.gallery.length > 0 ? [
         {
           url: review.gallery[0].asset.url,
@@ -181,7 +181,7 @@ export async function generateMetadata({ params }: ReviewPageProps): Promise<Met
       images: review.gallery.length > 0 ? [review.gallery[0].asset.url] : [],
     },
     alternates: {
-      canonical: `${SITE_CONFIG.url}/${params.city}/${params.venue}/review/${params.slug}`,
+      canonical: `${SITE_CONFIG.url}/${city}/${venue}/review/${slug}`,
     },
   };
 }
@@ -189,7 +189,7 @@ export async function generateMetadata({ params }: ReviewPageProps): Promise<Met
 export default async function ReviewPage({ params }: ReviewPageProps) {
   // In production, fetch review data from Sanity based on params
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { city, venue, slug } = params;
+  const { city, venue, slug } = await params;
   const review = mockReview;
   const venueData = mockVenue;
 
