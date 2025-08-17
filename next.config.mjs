@@ -52,7 +52,7 @@ const nextConfig = {
       },
     ];
   },
-  swcMinify: true,
+  // swcMinify fue eliminado en Next 15; minificación está habilitada por defecto
   poweredByHeader: false,
   compress: true,
 };
