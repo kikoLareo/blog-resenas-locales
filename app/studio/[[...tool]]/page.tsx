@@ -8,8 +8,8 @@
 
 import nextDynamic from 'next/dynamic';
 
-// Nota: Evitamos export con el mismo nombre que el import para no mezclar declaraciones
-export const dynamicMode = 'force-static';
+// Usar la exportación aceptada por Next para controlar el modo de la página
+export const dynamic = 'force-static';
 
 export default function StudioPage() {
   if (process.env.NODE_ENV === 'production') {
