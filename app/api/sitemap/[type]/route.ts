@@ -102,10 +102,10 @@ function generateCategoriesSitemap(categories: SitemapUrl[]): string {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { type: string } }
+  context: { params: Promise<{ type: string }> }
 ) {
   try {
-    const { type } = params;
+    const { type } = await context.params;
     let sitemapXML: string;
 
     // Generar sitemap según el tipo
@@ -163,12 +163,12 @@ export async function GET(
 
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error(`Error generando sitemap ${params.type}:`, error);
+    console.error('Error generando sitemap:', error);
     
     return NextResponse.json(
       { 
         error: 'Error generando sitemap',
-        type: params.type,
+        type: (await context.params).type,
         message: error instanceof Error ? error.message : 'Error desconocido'
       },
       { status: 500 }
