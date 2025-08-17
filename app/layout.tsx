@@ -4,6 +4,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import './globals.css';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { AuthProvider } from '@/components/providers/AuthProvider';
 import { SITE_CONFIG, SEO_DEFAULTS } from '@/lib/constants';
 import { websiteJsonLd, organizationJsonLd } from '@/lib/schema';
 import ConsentBanner from '@/components/ConsentBanner';
@@ -87,23 +88,25 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
       </head>
       <body className={`${inter.className} antialiased`}>
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-XSLBYXBEZJ'} />
-        {/* Skip link for accessibility */}
-        <a href="#main-content" className="skip-link">
-          Saltar al contenido principal
-        </a>
-        
-        <Header />
+        <AuthProvider>
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-XSLBYXBEZJ'} />
+          {/* Skip link for accessibility */}
+          <a href="#main-content" className="skip-link">
+            Saltar al contenido principal
+          </a>
+          
+          <Header />
 
-        {/* Main content */}
-        <main id="main-content" className="min-h-screen">
-          {children}
-        </main>
+          {/* Main content */}
+          <main id="main-content" className="min-h-screen">
+            {children}
+          </main>
 
-        <Footer />
+          <Footer />
 
-        {/* Consent Banner */}
-        <ConsentBanner />
+          {/* Consent Banner */}
+          <ConsentBanner />
+        </AuthProvider>
       </body>
     </html>
   );

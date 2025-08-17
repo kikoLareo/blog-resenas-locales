@@ -97,10 +97,7 @@ export const venuesByCityQuery = `
     slug,
     description,
     priceRange,
-    images[0]{
-      ..., 
-      "asset": asset->{url, metadata}
-    },
+    images[0],
     "city": city-> {
       title,
       slug
@@ -135,10 +132,7 @@ export const venueQuery = `
     openingHours,
     priceRange,
     schemaType,
-    images[]{
-      ..., 
-      "asset": asset->{url, metadata}
-    },
+    images,
     geo,
     social,
     "city": city-> {
@@ -162,7 +156,7 @@ export const venueQuery = `
       ratings,
       tldr,
       author,
-      gallery[0]{..., "asset": asset->{url, metadata}}
+      gallery[0]
     }
   }
 `;
@@ -181,7 +175,7 @@ export const recentReviewsQuery = `
     ratings,
     author,
     authorAvatar,
-    gallery[0]{..., "asset": asset->{url, metadata}},
+    gallery[0],
     "venue": venue-> {
       title,
       slug,
@@ -206,9 +200,9 @@ export const reviewQuery = `
     tldr,
     faq,
     body,
-    gallery[]{..., "asset": asset->{url, metadata}},
+    gallery,
     author,
-    authorAvatar{..., "asset": asset->{url, metadata}},
+    authorAvatar,
     tags,
     "venue": venue-> {
       _id,
@@ -350,7 +344,7 @@ export const venuesByCategoryQuery = `
     slug,
     description,
     priceRange,
-    images[0]{..., "asset": asset->{url, metadata}},
+    images[0],
     "city": city-> {
       title,
       slug
@@ -374,38 +368,12 @@ export const venuesByCategoryCountQuery = `
 
 // Datos para homepage
 export const homepageQuery = `{
-  "featuredReviews": *[_type == "review" && defined(gallery[0])] | order(ratings.food desc, publishedAt desc)[0...3] {
+  "featuredReviews": *[_type == "review"] | order(ratings.food desc)[0...3] {
     _id,
     title,
     slug,
     ratings,
-    gallery[0]{..., "asset": asset->{url, metadata}},
-    "venue": venue-> {
-      title,
-      slug,
-      "city": city->title,
-      "citySlug": city->slug.current
-    }
-  },
-  "trendingReviews": *[_type == "review" && defined(gallery[0])] | order(publishedAt desc)[0...4] {
-    _id,
-    title,
-    slug,
-    ratings,
-    gallery[0]{..., "asset": asset->{url, metadata}},
-    "venue": venue-> {
-      title,
-      slug,
-      "city": city->title,
-      "citySlug": city->slug.current
-    }
-  },
-  "topReviews": *[_type == "review" && defined(gallery[0])] | order(ratings.food desc)[0...5] {
-    _id,
-    title,
-    slug,
-    ratings,
-    gallery[0]{..., "asset": asset->{url, metadata}},
+    gallery[0],
     "venue": venue-> {
       title,
       slug,

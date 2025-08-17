@@ -42,6 +42,16 @@
 
 ## Backlog ampliado (estado actual y tareas pendientes)
 
+### ✅ Panel de Administración (COMPLETADO)
+- ✅ Sistema de autenticación con Auth.js (JWT sin DB)
+- ✅ OAuth social (Google, GitHub) + allowlist de emails
+- ✅ Middleware de protección de rutas
+- ✅ Dashboard principal con estadísticas reales de Sanity
+- ✅ Páginas de gestión de contenido conectadas a Sanity
+- ✅ Configuración del sitio
+- ✅ Login/logout funcional
+- ✅ Arquitectura simplificada para 2-10 administradores
+
 ### Rutas y páginas
 
 - Alinear el esquema de rutas del sitio. Decidir entre `/{city}/{venue}` o `/ciudades/...` y unificar:

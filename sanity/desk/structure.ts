@@ -13,7 +13,7 @@ export const structure = (S: StructureBuilder) =>
             .items([
               // Reseñas
               S.listItem()
-                .title('⭐ Reseñas')
+                .title('Reseñas')
                 .icon(() => '⭐')
                 .child(
                   S.documentTypeList('review')
@@ -29,7 +29,7 @@ export const structure = (S: StructureBuilder) =>
               
               // Posts/Crónicas
               S.listItem()
-                .title('📝 Crónicas/Posts')
+                .title('Crónicas/Posts')
                 .icon(() => '📝')
                 .child(
                   S.list()
@@ -75,7 +75,7 @@ export const structure = (S: StructureBuilder) =>
             .items([
               // Locales
               S.listItem()
-                .title('🏪 Locales')
+                .title('Locales')
                 .icon(() => '🏪')
                 .child(
                   S.list()
@@ -142,7 +142,7 @@ export const structure = (S: StructureBuilder) =>
 
               // Ciudades
               S.listItem()
-                .title('🏙️ Ciudades')
+                .title('Ciudades')
                 .icon(() => '🏙️')
                 .child(
                   S.documentTypeList('city')
@@ -164,7 +164,7 @@ export const structure = (S: StructureBuilder) =>
             .items([
               // Categorías
               S.listItem()
-                .title('🏷️ Categorías')
+                .title('Categorías')
                 .icon(() => '🏷️')
                 .child(
                   S.list()

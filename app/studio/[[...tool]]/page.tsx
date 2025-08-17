@@ -1,28 +1,19 @@
-"use client";
-
 /**
- * Sanity Studio embebido.
- * Para evitar errores de compilación con dependencias cliente (p.ej. framer-motion en Next 15),
- * evitamos imports estáticos en producción y cargamos dinámicamente sólo en desarrollo.
+ * This route is responsible for the built-in authoring environment using Sanity Studio.
+ * All routes under your studio path is handled by this file using Next.js' catch-all routes:
+ * https://nextjs.org/docs/routing/dynamic-routes#catch-all-routes
+ *
+ * You can learn more about the next-sanity package here:
+ * https://github.com/sanity-io/next-sanity
  */
 
-import nextDynamic from 'next/dynamic';
+import { NextStudio } from 'next-sanity/studio'
+import config from '../../../sanity.config'
 
-// Usar la exportación aceptada por Next para controlar el modo de la página
-export const dynamic = 'force-static';
+export const dynamic = 'force-static'
+
+export { metadata, viewport } from 'next-sanity/studio'
 
 export default function StudioPage() {
-  if (process.env.NODE_ENV === 'production') {
-    return null;
-  }
-
-  const Studio = nextDynamic(async () => {
-    const { NextStudio } = await import('next-sanity/studio');
-    const config = (await import('../../../sanity.config')).default;
-    return function StudioWrapper() {
-      return <NextStudio config={config} />;
-    };
-  }, { ssr: false });
-
-  return <Studio />;
+  return <NextStudio config={config} />
 }
