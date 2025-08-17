@@ -39,7 +39,7 @@ const heroReviews = [
   }
 ];
 
-interface HeroSectionProps {}
+type HeroSectionProps = object;
 
 export function HeroSection({}: HeroSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);

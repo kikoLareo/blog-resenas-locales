@@ -206,7 +206,27 @@ export function ReviewDetail({ slug, onBack, review: reviewFromSanity }: ReviewD
     );
   }
 
-  const review = (reviewData as Record<string, any>)[slug as string];
+  const review = (reviewData as Record<string, unknown>)[slug as string] as {
+    id: string;
+    title: string;
+    subtitle: string;
+    category: string;
+    city: string;
+    location: string;
+    address: string;
+    rating: number;
+    readTime: string;
+    publishDate: string;
+    author: string;
+    authorImage: string;
+    heroImage: string;
+    images: string[];
+    tags: string[];
+    content: string;
+    verdict: { food: number; service: number; atmosphere: number; value: number; overall: number };
+    pros: string[];
+    cons: string[];
+  } | undefined;
 
   if (!review) {
     return (
