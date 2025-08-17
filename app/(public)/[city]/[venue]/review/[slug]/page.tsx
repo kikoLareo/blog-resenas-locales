@@ -29,7 +29,7 @@ type ReviewPageProps = {
 // Generate metadata
 export async function generateMetadata({ params }: ReviewPageProps): Promise<Metadata> {
   const { city, venue, slug } = await params;
-  const review = await sanityFetch<Review | null>({ query: reviewQuery, params: { slug } });
+  const review = await sanityFetch<Review | null>({ query: reviewQuery, params: { slug }, tags: ['reviews'], revalidate: 0 });
   const venueData = review?.venue as unknown as Venue | undefined;
   
   if (!review || !venueData) {

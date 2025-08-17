@@ -199,8 +199,8 @@ function VenueReviewCard({ review }: { review: Review }) {
 
 export default async function VenuePage({ params }: VenuePageProps) {
   const { venue: venueSlug } = await params;
-  const venue = await sanityFetch<Venue | null>({ query: venueQuery, params: { slug: venueSlug } });
-  const reviews = await sanityFetch<Review[]>({ query: reviewsByVenueQuery, params: { venueSlug } });
+  const venue = await sanityFetch<Venue | null>({ query: venueQuery, params: { slug: venueSlug }, tags: ['venues'], revalidate: 0 });
+  const reviews = await sanityFetch<Review[]>({ query: reviewsByVenueQuery, params: { venueSlug }, tags: ['reviews'], revalidate: 0 });
 
   if (!venue) {
     notFound();

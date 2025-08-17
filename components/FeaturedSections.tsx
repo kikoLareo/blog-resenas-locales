@@ -14,6 +14,7 @@ type ReviewItem = {
   readTime: string;
   tags: string[];
   description: string;
+  href?: string;
 };
 
 const trendingReviews: ReviewItem[] = [
@@ -78,7 +79,7 @@ export function FeaturedSections({ onReviewClick, trending, topRated }: Featured
               <ReviewCard
                 key={review.id}
                 {...review}
-                href={`/madrid/restaurant-x/review/${slugify(review.title)}`}
+                href={review.href || `/madrid/restaurant-x/review/${slugify(review.title)}`}
                 onClick={() => onReviewClick?.(review.id)}
               />
             ))}
@@ -101,7 +102,7 @@ export function FeaturedSections({ onReviewClick, trending, topRated }: Featured
               <ReviewCard
                 key={review.id}
                 {...review}
-                href={`/madrid/restaurant-x/review/${slugify(review.title)}`}
+                href={review.href || `/madrid/restaurant-x/review/${slugify(review.title)}`}
                 onClick={() => onReviewClick?.(review.id)}
               />
             ))}

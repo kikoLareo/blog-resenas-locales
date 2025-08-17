@@ -17,10 +17,10 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   // Obtener contenido destacado desde Sanity
-  const data = await sanityFetch<{ featuredReviews: any[]; featuredPosts: any[]; featuredCities: any[]; featuredCategories: any[] }>({
+  const data = await sanityFetch<{ featuredReviews: any[]; trendingReviews: any[]; topReviews: any[]; featuredPosts: any[]; featuredCities: any[]; featuredCategories: any[] }>({
     query: homepageQuery,
-    revalidate: 900,
-    tags: ['homepage'],
+    revalidate: 0,
+    tags: ['homepage','reviews'],
   });
 
   // Mapear reviews para Hero y Featured
@@ -33,10 +33,32 @@ export default async function HomePage() {
     readTime: '5 min',
     tags: [],
     description: r.tldr ?? '',
+    href: `/${r.venue?.citySlug}/${r.venue?.slug?.current}/review/${r.slug?.current}`,
   }));
 
-  const trending = heroItems;
-  const topRated = heroItems;
+  const trending = (data?.trendingReviews || []).map((r) => ({
+    id: r._id,
+    title: r.title,
+    image: r.gallery?.asset?.url ?? r.gallery?.url ?? '',
+    rating: (r.ratings?.food ?? 9),
+    location: r.venue?.city ?? '',
+    readTime: '5 min',
+    tags: [],
+    description: r.tldr ?? '',
+    href: `/${r.venue?.citySlug}/${r.venue?.slug?.current}/review/${r.slug?.current}`,
+  }));
+
+  const topRated = (data?.topReviews || []).map((r) => ({
+    id: r._id,
+    title: r.title,
+    image: r.gallery?.asset?.url ?? r.gallery?.url ?? '',
+    rating: (r.ratings?.food ?? 9),
+    location: r.venue?.city ?? '',
+    readTime: '5 min',
+    tags: [],
+    description: r.tldr ?? '',
+    href: `/${r.venue?.citySlug}/${r.venue?.slug?.current}/review/${r.slug?.current}`,
+  }));
 
   return (
     <div className="min-h-screen bg-white">

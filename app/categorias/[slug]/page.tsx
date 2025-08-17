@@ -23,7 +23,7 @@ type CategoryPageProps = {
 // Generate metadata
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const category = await sanityFetch<Category | null>({ query: categoryQuery, params: { categorySlug: slug } });
+  const category = await sanityFetch<Category | null>({ query: categoryQuery, params: { categorySlug: slug }, tags: ['categories'], revalidate: 0 });
   
   if (!category) {
     return {
@@ -156,8 +156,8 @@ function VenueCard({ venue }: { venue: Venue }) {
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
-  const category = await sanityFetch<Category | null>({ query: categoryQuery, params: { categorySlug: slug } });
-  const venues = await sanityFetch<Venue[]>({ query: venuesByCategoryQuery, params: { categorySlug: slug, $offset: 0, $limit: 12 } as any });
+  const category = await sanityFetch<Category | null>({ query: categoryQuery, params: { categorySlug: slug }, tags: ['categories'], revalidate: 0 });
+  const venues = await sanityFetch<Venue[]>({ query: venuesByCategoryQuery, params: { categorySlug: slug, $offset: 0, $limit: 12 } as any, tags: ['venues'], revalidate: 0 });
 
   if (!category) {
     notFound();

@@ -44,7 +44,7 @@ function generateRevalidationPaths(payload: SanityWebhookPayload): string[] {
       
     case 'review':
       if (payload.venue?.slug?.current && payload.venue?.city?.slug?.current && payload.slug?.current) {
-        paths.push(`/${payload.venue.city.slug.current}/${payload.venue.slug.current}/${payload.slug.current}`);
+        paths.push(`/${payload.venue.city.slug.current}/${payload.venue.slug.current}/review/${payload.slug.current}`);
         paths.push(`/${payload.venue.city.slug.current}/${payload.venue.slug.current}`);
         paths.push(`/${payload.venue.city.slug.current}`);
       }

@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight, Star, MapPin, Clock } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { Button } from "./ui/button";
 import { slugify } from "@/lib/slug";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
@@ -15,6 +16,7 @@ type HeroItem = {
   readTime: string;
   tags: string[];
   description: string;
+  href?: string;
 };
 
 const defaultHeroReviews: HeroItem[] = [
@@ -113,12 +115,12 @@ export function HeroSection({ reviews }: HeroSectionProps) {
                   <span>{heroReviews[currentIndex].readTime}</span>
                 </div>
               </div>
-              <a
-                href={`/madrid/restaurant-x/review/${slugify(heroReviews[currentIndex].title)}`}
+              <Link
+                href={heroReviews[currentIndex].href || `/madrid/restaurant-x/review/${slugify(heroReviews[currentIndex].title)}`}
                 className="inline-flex items-center justify-center bg-white text-black hover:bg-white/90 font-medium px-6 py-3 sm:px-8 sm:py-3 text-sm sm:text-base transition-all duration-300 hover:scale-105 transform rounded-md"
               >
                 Leer reseña completa
-              </a>
+              </Link>
             </div>
           </div>
         </div>

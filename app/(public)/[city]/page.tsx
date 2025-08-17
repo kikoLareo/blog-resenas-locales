@@ -28,7 +28,7 @@ const reviewsByCityQuery = `
     publishedAt,
     ratings,
     author,
-    gallery[0],
+    gallery[0]{..., "asset": asset->{url, metadata}},
     venue->{
       title,
       slug,
@@ -40,7 +40,7 @@ const reviewsByCityQuery = `
 // Generate metadata
 export async function generateMetadata({ params }: CityPageProps): Promise<Metadata> {
   const { city: citySlug } = await params;
-  const city = await sanityFetch<City | null>({ query: cityQuery, params: { citySlug } });
+  const city = await sanityFetch<City | null>({ query: cityQuery, params: { citySlug }, tags: ['cities'], revalidate: 0 });
   
   if (!city) {
     return {
@@ -262,9 +262,9 @@ function VenueCard({ venue }: { venue: Venue }) {
 
 export default async function CityPage({ params }: CityPageProps) {
   const { city: citySlug } = await params;
-  const city = await sanityFetch<City | null>({ query: cityQuery, params: { citySlug } });
-  const venues = await sanityFetch<Venue[]>({ query: venuesByCityQuery, params: { citySlug, $offset: 0, $limit: 12 } as any });
-  const reviews = await sanityFetch<Review[]>({ query: reviewsByCityQuery, params: { citySlug } });
+  const city = await sanityFetch<City | null>({ query: cityQuery, params: { citySlug }, tags: ['cities'], revalidate: 0 });
+  const venues = await sanityFetch<Venue[]>({ query: venuesByCityQuery, params: { citySlug, $offset: 0, $limit: 12 } as any, tags: ['venues'], revalidate: 0 });
+  const reviews = await sanityFetch<Review[]>({ query: reviewsByCityQuery, params: { citySlug }, tags: ['reviews'], revalidate: 0 });
 
   if (!city) {
     notFound();
