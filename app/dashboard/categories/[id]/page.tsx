@@ -14,7 +14,7 @@ import { notFound } from "next/navigation";
 import { useState } from "react";
 
 interface CategoryDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 interface CategoryWithDetails extends Category {
@@ -367,7 +367,8 @@ function CategoryDetailClient({ category }: { category: CategoryWithDetails }) {
 }
 
 export default async function CategoryDetailPage({ params }: CategoryDetailPageProps) {
-  const category = await adminSanityClient.fetch<CategoryWithDetails>(categoryByIdQuery, { id: params.id });
+  const resolvedParams = await params;
+  const category = await adminSanityClient.fetch<CategoryWithDetails>(categoryByIdQuery, { id: resolvedParams.id });
   
   if (!category) {
     notFound();
