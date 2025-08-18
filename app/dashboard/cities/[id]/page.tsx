@@ -13,7 +13,7 @@ import { notFound } from "next/navigation";
 import { useState } from "react";
 
 interface CityDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 interface CityWithDetails extends City {
@@ -289,7 +289,8 @@ function CityDetailClient({ city }: { city: CityWithDetails }) {
 }
 
 export default async function CityDetailPage({ params }: CityDetailPageProps) {
-  const city = await adminSanityClient.fetch<CityWithDetails>(cityByIdQuery, { id: params.id });
+  const resolvedParams = await params;
+  const city = await adminSanityClient.fetch<CityWithDetails>(cityByIdQuery, { id: resolvedParams.id });
   
   if (!city) {
     notFound();
