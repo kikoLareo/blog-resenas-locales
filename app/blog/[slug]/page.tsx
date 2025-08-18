@@ -85,7 +85,6 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   // En producción, obtener datos reales de Sanity basado en params.slug
   // const post = await getPostData(params.slug);
