@@ -1,11 +1,24 @@
 import { adminSanityClient } from "@/lib/admin-sanity";
-import { dashboardOverviewQuery } from "@/lib/admin-queries";
+import { dashboardStatsQuery } from "@/lib/admin-queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, FileText, MapPin, Users } from "lucide-react";
+import Link from "next/link";
 
 export default async function DashboardPage() {
-  const data = await adminSanityClient.fetch(dashboardOverviewQuery);
-  const { stats, recentActivity } = data;
+  const data = await adminSanityClient.fetch(dashboardStatsQuery);
+
+  if (!data) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600">Cargando datos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const { totalReviews, totalVenues, totalCities, totalPosts, recentReviews, recentVenues } = data;
 
   return (
     <div className="space-y-6">
@@ -22,7 +35,7 @@ export default async function DashboardPage() {
             <FileText className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalReviews}</div>
+            <div className="text-2xl font-bold">{totalReviews || 0}</div>
           </CardContent>
         </Card>
 
@@ -32,7 +45,7 @@ export default async function DashboardPage() {
             <MapPin className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalVenues}</div>
+            <div className="text-2xl font-bold">{totalVenues || 0}</div>
           </CardContent>
         </Card>
 
@@ -42,7 +55,7 @@ export default async function DashboardPage() {
             <BarChart3 className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalCities}</div>
+            <div className="text-2xl font-bold">{totalCities || 0}</div>
           </CardContent>
         </Card>
 
@@ -52,7 +65,7 @@ export default async function DashboardPage() {
             <Users className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalPosts}</div>
+            <div className="text-2xl font-bold">{totalPosts || 0}</div>
           </CardContent>
         </Card>
       </div>
@@ -65,12 +78,12 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentActivity.reviews.map((review: any) => (
+              {recentReviews?.map((review: any) => (
                 <div key={review._id} className="flex items-center space-x-4">
                   <div className="flex-1 space-y-1">
                     <p className="text-sm font-medium leading-none">{review.title}</p>
                     <p className="text-sm text-gray-500">
-                      {review.venue.name} ({review.venue.city})
+                      {review.venue?.title} ({review.venue?.city?.title})
                     </p>
                   </div>
                   <div className="text-sm text-gray-500">
@@ -88,7 +101,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentActivity.venues.map((venue: any) => (
+              {recentVenues?.map((venue: any) => (
                 <div key={venue._id} className="flex items-center space-x-4">
                   <div className="flex-1 space-y-1">
                     <p className="text-sm font-medium leading-none">{venue.name}</p>

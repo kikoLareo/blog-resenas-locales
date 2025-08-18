@@ -1,41 +1,99 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
 
 const ERROR_IMG_SRC =
   'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODgiIGhlaWdodD0iODgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgc3Ryb2tlPSIjMDAwIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBvcGFjaXR5PSIuMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIzLjciPjxyZWN0IHg9IjE2IiB5PSIxNiIgd2lkdGg9IjU2IiBoZWlnaHQ9IjU2IiByeD0iNiIvPjxwYXRoIGQ9Im0xNiA1OCAxNi0xOCAzMiAzMiIvPjxjaXJjbGUgY3g9IjUzIiBjeT0iMzUiIHI9IjciLz48L3N2Zz4KCg==';
 
-export function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElement>) {
-  const { src, alt, style, className, ...rest } = props;
-  const [currentSrc, setCurrentSrc] = useState<string | undefined>(src);
-  const [isHydrated, setIsHydrated] = useState(false);
-  const pendingErrorRef = useRef(false);
+interface ImageWithFallbackProps {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  priority?: boolean;
+  sizes?: string;
+  className?: string;
+  fill?: boolean;
+  quality?: number;
+  placeholder?: 'blur' | 'empty';
+  blurDataURL?: string;
+}
+
+export function ImageWithFallback({
+  src,
+  alt,
+  width,
+  height,
+  priority = false,
+  sizes = '100vw',
+  className,
+  fill = false,
+  quality = 75,
+  placeholder = 'empty',
+  blurDataURL,
+  ...rest
+}: ImageWithFallbackProps) {
+  const [currentSrc, setCurrentSrc] = useState<string>(src);
+  const [hasError, setHasError] = useState(false);
 
   const handleError = () => {
-    // Si ocurre antes de que la app esté hidratada, difiere el cambio de src
-    if (!isHydrated) {
-      pendingErrorRef.current = true;
-      return;
+    if (!hasError) {
+      setHasError(true);
+      setCurrentSrc(ERROR_IMG_SRC);
     }
-    setCurrentSrc(ERROR_IMG_SRC);
   };
 
-  useEffect(() => {
-    setIsHydrated(true);
-    if (pendingErrorRef.current) {
-      setCurrentSrc(ERROR_IMG_SRC);
-      pendingErrorRef.current = false;
-    }
-  }, []);
+  // Si es una imagen de error, usar img normal
+  if (hasError || currentSrc === ERROR_IMG_SRC) {
+    return (
+      <img
+        src={currentSrc}
+        alt={alt}
+        className={className}
+        style={{ objectFit: 'cover' }}
+        {...rest}
+      />
+    );
+  }
 
+  // Para imágenes de Sanity, usar next/image con optimización
+  if (src.includes('cdn.sanity.io')) {
+    return (
+      <Image
+        src={currentSrc}
+        alt={alt}
+        width={width}
+        height={height}
+        priority={priority}
+        sizes={sizes}
+        className={className}
+        fill={fill}
+        quality={quality}
+        placeholder={placeholder}
+        blurDataURL={blurDataURL}
+        onError={handleError}
+        {...rest}
+      />
+    );
+  }
+
+  // Para URLs externas (Unsplash, etc.), usar next/image con dominio configurado
   return (
-    <img
+    <Image
       src={currentSrc}
       alt={alt}
+      width={width}
+      height={height}
+      priority={priority}
+      sizes={sizes}
       className={className}
-      style={style}
+      fill={fill}
+      quality={quality}
+      placeholder={placeholder}
+      blurDataURL={blurDataURL}
       onError={handleError}
-      data-original-url={src}
+      unoptimized={!src.includes('cdn.sanity.io')} // No optimizar URLs externas por ahora
       {...rest}
     />
   );

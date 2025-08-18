@@ -2,25 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  BarChart3, 
-  FileText, 
-  MapPin, 
-  Settings, 
-  Users,
-  Home
-} from "lucide-react";
+import { BarChart3, FileText, MapPin, Settings, Users, Home, BookOpen, Tag } from "lucide-react";
 
 const navigation = [
-  { name: "Dashboard", href: "/admin", icon: Home },
-  { name: "Reseñas", href: "/admin/reviews", icon: FileText },
-  { name: "Locales", href: "/admin/venues", icon: MapPin },
-  { name: "Ciudades", href: "/admin/cities", icon: MapPin },
-  { name: "Categorías", href: "/admin/categories", icon: FileText },
-  { name: "Blog", href: "/admin/blog", icon: FileText },
-  { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-  { name: "Usuarios", href: "/admin/users", icon: Users },
-  { name: "Configuración", href: "/admin/settings", icon: Settings },
+  { name: "Dashboard", href: "/dashboard", icon: Home },
+  { name: "Reseñas", href: "/dashboard/reviews", icon: FileText },
+  { name: "Locales", href: "/dashboard/venues", icon: MapPin },
+  { name: "Ciudades", href: "/dashboard/cities", icon: BarChart3 },
+  { name: "Categorías", href: "/dashboard/categories", icon: Tag },
+  { name: "Blog", href: "/dashboard/blog", icon: BookOpen },
+  { name: "Configuración", href: "/dashboard/settings", icon: Settings },
 ];
 
 export function AdminNav() {

@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { Star, MapPin, Clock } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
@@ -16,14 +14,21 @@ interface ReviewCardProps {
   description: string;
   featured?: boolean;
   href?: string;
-  onClick?: () => void;
 }
 
-export function ReviewCard({ title, image, rating, location, readTime, tags, description, featured = false, href, onClick }: ReviewCardProps) {
+export function ReviewCard({ title, image, rating, location, readTime, tags, description, featured = false, href }: ReviewCardProps) {
   const content = (
     <Card className={`group overflow-hidden border-0 bg-white shadow-sm hover:shadow-md transition-all duration-300 ${featured ? 'shadow-md' : ''}`}>
       <div className="relative overflow-hidden">
-        <ImageWithFallback src={image} alt={title} className={`w-full object-cover transition-transform duration-500 group-hover:scale-[1.02] ${featured ? 'h-64' : 'h-52'}`} />
+        <ImageWithFallback 
+          src={image} 
+          alt={title} 
+          width={400}
+          height={featured ? 256 : 208}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          quality={75}
+          className={`w-full object-cover transition-transform duration-500 group-hover:scale-[1.02] ${featured ? 'h-64' : 'h-52'}`} 
+        />
         {featured && (
           <div className="absolute top-3 left-3">
             <div className="bg-black/80 text-white px-2 py-1 rounded text-xs font-medium">Destacado</div>
@@ -59,17 +64,13 @@ export function ReviewCard({ title, image, rating, location, readTime, tags, des
 
   if (href) {
     return (
-      <Link href={href} className="block" onClick={onClick ? () => { onClick(); } : undefined}>
+      <Link href={href} className="block">
         {content}
       </Link>
     );
   }
 
-  return (
-    <div className="cursor-pointer" onClick={onClick}>
-      {content}
-    </div>
-  );
+  return content;
 }
 
 

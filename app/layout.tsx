@@ -5,11 +5,18 @@ import './globals.css';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { AuthProvider } from '@/components/providers/AuthProvider';
+import { PerformanceMonitor } from '@/components/PerformanceMonitor';
 import { SITE_CONFIG, SEO_DEFAULTS } from '@/lib/constants';
 import { websiteJsonLd, organizationJsonLd } from '@/lib/schema';
 import ConsentBanner from '@/components/ConsentBanner';
 
-const inter = Inter({ subsets: ['latin'] });
+// Optimización de fuentes con display=swap para evitar CLS
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'arial'],
+});
 
 export const metadata: Metadata = {
   title: {
@@ -47,6 +54,10 @@ export const metadata: Metadata = {
   verification: {
     google: 'your-google-verification-code',
   },
+  // Optimizaciones de rendimiento
+  other: {
+    'X-DNS-Prefetch-Control': 'on',
+  },
 };
 
 export default function RootLayout({
@@ -71,10 +82,21 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         
+        {/* DNS Prefetch para dominios externos */}
+        <link rel="dns-prefetch" href="//cdn.sanity.io" />
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="//www.google-analytics.com" />
+        
         {/* Preconnect to external domains */}
-        <link rel="preconnect" href="https://cdn.sanity.io" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link rel="preconnect" href="https://cdn.sanity.io" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
+        {/* Preload recursos críticos */}
+        <link rel="preload" href="/favicon.ico" as="image" type="image/x-icon" />
+        <link rel="preload" href="/apple-touch-icon.png" as="image" type="image/png" />
         
         {/* Favicon and app icons */}
         <link rel="icon" href="/favicon.ico" />
@@ -86,10 +108,14 @@ export default function RootLayout({
         
         {/* Prevent zoom on mobile form inputs */}
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        
+        {/* Performance optimizations */}
+        <meta httpEquiv="X-DNS-Prefetch-Control" content="on" />
       </head>
       <body className={`${inter.className} antialiased`}>
         <AuthProvider>
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-XSLBYXBEZJ'} />
+          <PerformanceMonitor />
           {/* Skip link for accessibility */}
           <a href="#main-content" className="skip-link">
             Saltar al contenido principal

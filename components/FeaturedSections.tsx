@@ -1,5 +1,3 @@
-"use client";
-
 import { TrendingUp, Star, MapPin, ChevronRight } from "lucide-react";
 import { Button } from "./ui/button";
 import { slugify } from "@/lib/slug";
@@ -54,12 +52,14 @@ const topRatedReviews: ReviewItem[] = [
 ];
 
 interface FeaturedSectionsProps {
-  onReviewClick?: (reviewId: string) => void;
   trending?: ReviewItem[];
   topRated?: ReviewItem[];
 }
 
-export function FeaturedSections({ onReviewClick, trending, topRated }: FeaturedSectionsProps) {
+export function FeaturedSections({ trending, topRated }: FeaturedSectionsProps) {
+  const trendingData = trending && trending.length > 0 ? trending : trendingReviews;
+  const topRatedData = topRated && topRated.length > 0 ? topRated : topRatedReviews;
+
   return (
     <section className="py-12 sm:py-16 bg-white">
       <div className="container mx-auto px-4 space-y-12 sm:space-y-16">
@@ -75,12 +75,11 @@ export function FeaturedSections({ onReviewClick, trending, topRated }: Featured
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-            {(trending && trending.length > 0 ? trending : trendingReviews).map((review) => (
+            {trendingData.map((review) => (
               <ReviewCard
                 key={review.id}
                 {...review}
                 href={review.href || `/madrid/restaurant-x/review/${slugify(review.title)}`}
-                onClick={() => onReviewClick?.(review.id)}
               />
             ))}
           </div>
@@ -98,12 +97,11 @@ export function FeaturedSections({ onReviewClick, trending, topRated }: Featured
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            {(topRated && topRated.length > 0 ? topRated : topRatedReviews).map((review) => (
+            {topRatedData.map((review) => (
               <ReviewCard
                 key={review.id}
                 {...review}
                 href={review.href || `/madrid/restaurant-x/review/${slugify(review.title)}`}
-                onClick={() => onReviewClick?.(review.id)}
               />
             ))}
             <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg p-6 sm:p-8 flex items-center justify-center min-h-[250px] sm:min-h-[300px]">

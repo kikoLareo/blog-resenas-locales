@@ -161,6 +161,90 @@ export const venueQuery = `
   }
 `;
 
+// Query temporal con datos mock para desarrollo
+export const venueQueryMock = `
+  {
+    "_id": "venue-madrid-cafe-encanto",
+    "title": "Café con Encanto",
+    "slug": {
+      "current": "cafe-con-encanto"
+    },
+    "description": "Un acogedor café en el corazón de Madrid, perfecto para disfrutar de un buen café y pastelería artesanal. Ambiente relajado y terraza exterior.",
+    "address": "Plaza Mayor 3, Madrid",
+    "postalCode": "28012",
+    "phone": "+34 91 123 45 67",
+    "website": "https://cafeconencanto.es",
+    "openingHours": ["Lu-Vi 8:00-22:00", "Sa-Do 9:00-23:00"],
+    "priceRange": "€",
+    "schemaType": "CafeOrCoffeeShop",
+    "images": [
+      {
+        "_type": "image",
+        "asset": {
+          "_ref": "image-123",
+          "_type": "reference"
+        },
+        "alt": "Café con Encanto - Interior"
+      }
+    ],
+    "geo": {
+      "lat": 40.4155,
+      "lng": -3.7074
+    },
+    "social": {
+      "instagram": "https://instagram.com/cafeconencanto",
+      "facebook": "https://facebook.com/cafeconencanto",
+      "maps": "https://maps.google.com/?q=Plaza+Mayor+3+Madrid"
+    },
+    "city": {
+      "_id": "city-madrid",
+      "title": "Madrid",
+      "slug": {
+        "current": "madrid"
+      },
+      "region": "Madrid"
+    },
+    "categories": [
+      {
+        "_id": "cat-cafe",
+        "title": "Café y Brunch",
+        "slug": {
+          "current": "cafe-brunch"
+        },
+        "icon": "coffee",
+        "color": "brown"
+      }
+    ],
+    "reviews": [
+      {
+        "_id": "review-cafe-encanto-brunch",
+        "title": "Brunch de fin de semana en Café con Encanto",
+        "slug": {
+          "current": "brunch-cafe-encanto-madrid"
+        },
+        "visitDate": "2025-07-27",
+        "ratings": {
+          "food": 8,
+          "service": 8,
+          "ambience": 9,
+          "value": 8
+        },
+        "tldr": "Brunch sencillo pero bien resuelto con buen café en el centro.",
+        "author": "Equipo",
+        "gallery": [
+          {
+            "_type": "image",
+            "asset": {
+              "_ref": "image-456",
+              "_type": "reference"
+            }
+          }
+        ]
+      }
+    ]
+  }
+`;
+
 // ===== QUERIES DE RESEÑAS =====
 
 // Obtener reseñas recientes

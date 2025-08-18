@@ -1,17 +1,14 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
-import { authConfig } from "./auth.config";
 
 if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("NEXTAUTH_SECRET must be set");
 }
 
-// Debug: Mostrar configuración cargada
-console.log("DEBUG CONFIG:", {
-  email: authConfig.adminEmail,
-  hashPreview: authConfig.adminPasswordHash.substring(0, 7) + "..."
-});
+if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD_HASH) {
+  throw new Error("ADMIN_EMAIL and ADMIN_PASSWORD_HASH must be set");
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -29,31 +26,15 @@ export const authOptions: NextAuthOptions = {
 
         const email = credentials.email.toLowerCase();
         
-        // Debug: Comparar emails
-        console.log("DEBUG Compare:", {
-          input: email,
-          configured: authConfig.adminEmail,
-          match: email === authConfig.adminEmail
-        });
-
-        if (email !== authConfig.adminEmail) {
+        if (email !== process.env.ADMIN_EMAIL) {
           console.log(`❌ Email no autorizado: ${email}`);
           return null;
         }
 
-        // Debug: Mostrar información de la contraseña
-        console.log("DEBUG Password:", {
-          inputLength: credentials.password.length,
-          hashLength: authConfig.adminPasswordHash.length,
-          hashStart: authConfig.adminPasswordHash.substring(0, 7)
-        });
-
         const isValidPassword = await bcrypt.compare(
           credentials.password,
-          authConfig.adminPasswordHash
+          process.env.ADMIN_PASSWORD_HASH || ""
         );
-
-        console.log("DEBUG bcrypt result:", isValidPassword);
 
         if (!isValidPassword) {
           console.log(`❌ Contraseña incorrecta para: ${email}`);
@@ -71,8 +52,8 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: "/dashboard/acceso",
-    error: "/dashboard/acceso",
+    signIn: "/acceso",
+    error: "/acceso",
   },
   callbacks: {
     async jwt({ token, user }) {
