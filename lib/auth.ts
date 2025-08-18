@@ -20,14 +20,12 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          console.log("❌ Credenciales incompletas");
           return null;
         }
 
         const email = credentials.email.toLowerCase();
         
         if (email !== process.env.ADMIN_EMAIL) {
-          console.log(`❌ Email no autorizado: ${email}`);
           return null;
         }
 
@@ -37,11 +35,9 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isValidPassword) {
-          console.log(`❌ Contraseña incorrecta para: ${email}`);
           return null;
         }
 
-        console.log(`✅ Login exitoso para: ${email}`);
         return {
           id: "admin",
           email,
