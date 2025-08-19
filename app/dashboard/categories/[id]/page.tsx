@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import ImageManager from "@/components/ImageManager";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { ArrowLeft, Edit, Eye, Tag, Building2, FileText, X, Save, Coffee, Utensils, Pizza, IceCream, Cake, Wine } from "lucide-react";
@@ -17,7 +18,16 @@ interface CategoryDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
-interface CategoryWithDetails extends Category {
+interface CategoryWithDetails {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  description?: string;
+  icon?: string;
+  color?: string;
+  featured?: boolean;
+  _createdAt: string;
+  _updatedAt: string;
   venues: {
     _id: string;
     title: string;
@@ -64,10 +74,11 @@ const iconOptions = [
 function CategoryDetailClient({ category }: { category: CategoryWithDetails }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [formData, setFormData] = useState(category);
+  const [images, setImages] = useState<any[]>([]);
 
   const publicCategoryUrl = category.slug?.current ? `/category/${category.slug.current}` : '#';
 
-  const avgRating = category.reviews.length > 0
+  const avgRating = category.reviews && category.reviews.length > 0
     ? category.reviews.reduce((acc, review) => acc + review.ratings.overall, 0) / category.reviews.length
     : 0;
 
@@ -127,29 +138,40 @@ function CategoryDetailClient({ category }: { category: CategoryWithDetails }) {
                     <div className="flex items-center space-x-4 text-sm text-gray-600">
                       <div className="flex items-center">
                         <Building2 className="h-4 w-4 mr-1" />
-                        {category.venues.length} locales
+                        {category.venues?.length || 0} locales
                       </div>
                       <div className="flex items-center">
                         <FileText className="h-4 w-4 mr-1" />
-                        {category.reviews.length} reseñas
+                        {category.reviews?.length || 0} reseñas
                       </div>
                     </div>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600 mb-4">{category.description}</p>
+                <p className="text-gray-600 mb-4">{category.description || 'Sin descripción'}</p>
               </CardContent>
             </Card>
+
+            {/* Gestión de Imágenes */}
+            <ImageManager
+              entityId={category._id}
+              entityType="category"
+              currentImages={images}
+              onImagesChange={setImages}
+              maxImages={5}
+              title="Imágenes de la Categoría"
+            />
 
             {/* Locales */}
             <Card>
               <CardHeader>
-                <CardTitle>Locales ({category.venues.length})</CardTitle>
+                <CardTitle>Locales ({category.venues?.length || 0})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {category.venues.map((venue) => (
+                  {category.venues && category.venues.length > 0 ? (
+                    category.venues.map((venue) => (
                     <div key={venue._id} className="border-b border-gray-200 pb-4 last:border-b-0">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
@@ -161,14 +183,14 @@ function CategoryDetailClient({ category }: { category: CategoryWithDetails }) {
                           </Link>
                           <p className="text-sm text-gray-600">{venue.address}</p>
                           <div className="flex items-center space-x-4 mt-1">
-                            <span className="text-xs text-gray-500">{venue.city.title}</span>
+                            <span className="text-xs text-gray-500">{venue.city?.title || 'Sin ciudad'}</span>
                             {venue.phone && (
                               <span className="text-xs text-gray-500">{venue.phone}</span>
                             )}
                             {venue.priceRange && (
                               <span className="text-xs text-gray-500">{venue.priceRange}</span>
                             )}
-                            <span className="text-xs text-gray-500">{venue.reviewCount} reseñas</span>
+                            <span className="text-xs text-gray-500">{venue.reviewCount || 0} reseñas</span>
                           </div>
                         </div>
                         <div className="text-right text-sm text-gray-500">
@@ -176,7 +198,10 @@ function CategoryDetailClient({ category }: { category: CategoryWithDetails }) {
                         </div>
                       </div>
                     </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No hay locales en esta categoría</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -184,31 +209,37 @@ function CategoryDetailClient({ category }: { category: CategoryWithDetails }) {
             {/* Reseñas */}
             <Card>
               <CardHeader>
-                <CardTitle>Reseñas ({category.reviews.length})</CardTitle>
+                <CardTitle>Reseñas ({category.reviews?.length || 0})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {category.reviews.map((review) => (
-                    <div key={review._id} className="border-b border-gray-200 pb-4 last:border-b-0">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <h4 className="font-medium">{review.title}</h4>
-                          <p className="text-sm text-gray-600">
-                            En {review.venue.title} • {review.venue.city.title}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {new Date(review._createdAt).toLocaleDateString('es-ES')}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-lg font-bold">
-                            {review.ratings.overall.toFixed(1)}
+                                    {category.reviews && category.reviews.length > 0 ? (
+                    category.reviews.map((review) => (
+                      <div key={review._id} className="border-b border-gray-200 pb-4 last:border-b-0">
+                        <Link href={`/dashboard/reviews/${review._id}`} className="block hover:bg-gray-50 p-2 -m-2 rounded transition-colors">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h4 className="font-medium">{review.title}</h4>
+                              <p className="text-sm text-gray-600">
+                                En {review.venue?.title || 'Sin local'} • {review.venue?.city?.title || 'Sin ciudad'}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {new Date(review._createdAt).toLocaleDateString('es-ES')}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-lg font-bold">
+                                {review.ratings.overall.toFixed(1)}
+                              </div>
+                              <div className="text-xs text-gray-500">/ 5.0</div>
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-500">/ 5.0</div>
-                        </div>
+                        </Link>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No hay reseñas en esta categoría</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -227,11 +258,11 @@ function CategoryDetailClient({ category }: { category: CategoryWithDetails }) {
                 </div>
                 <div className="flex justify-between">
                   <span>Total locales:</span>
-                  <span className="font-bold">{category.venues.length}</span>
+                  <span className="font-bold">{category.venues?.length || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Total reseñas:</span>
-                  <span className="font-bold">{category.reviews.length}</span>
+                  <span className="font-bold">{category.reviews?.length || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Creado:</span>
@@ -294,10 +325,10 @@ function CategoryDetailClient({ category }: { category: CategoryWithDetails }) {
                     <Label htmlFor="slug">Slug *</Label>
                     <Input
                       id="slug"
-                      value={formData.slug?.current}
+                      value={formData.slug?.current || ''}
                       onChange={(e) => setFormData({
                         ...formData, 
-                        slug: { ...formData.slug, current: e.target.value }
+                        slug: { current: e.target.value }
                       })}
                     />
                   </div>
@@ -306,7 +337,7 @@ function CategoryDetailClient({ category }: { category: CategoryWithDetails }) {
                   <Label htmlFor="description">Descripción</Label>
                   <Textarea
                     id="description"
-                    value={formData.description}
+                    value={formData.description || ''}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     rows={4}
                   />
@@ -319,7 +350,7 @@ function CategoryDetailClient({ category }: { category: CategoryWithDetails }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="icon">Icono</Label>
-                    <Select value={formData.icon} onValueChange={(value) => setFormData({...formData, icon: value})}>
+                    <Select value={formData.icon || ''} onValueChange={(value) => setFormData({...formData, icon: value})}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecciona un icono" />
                       </SelectTrigger>
@@ -340,7 +371,7 @@ function CategoryDetailClient({ category }: { category: CategoryWithDetails }) {
                     <Input
                       id="color"
                       type="color"
-                      value={formData.color}
+                      value={formData.color || '#6B7280'}
                       onChange={(e) => setFormData({...formData, color: e.target.value})}
                       className="h-10"
                     />

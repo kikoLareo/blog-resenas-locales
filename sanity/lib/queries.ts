@@ -544,3 +544,64 @@ export const reviewJsonLdQuery = `
     }
   }
 `;
+
+// ===== QUERIES PARA CÓDIGOS QR =====
+
+// Obtener todos los códigos QR
+export const qrCodesListQuery = `
+  *[_type == "qrCode"] {
+    _id,
+    title,
+    code,
+    isActive,
+    expiresAt,
+    maxUses,
+    currentUses,
+    lastUsedAt,
+    description,
+    venue->{
+      _id,
+      title,
+      slug
+    }
+  } | order(_createdAt desc)
+`;
+
+// Obtener código QR por código único
+export const qrCodeByCodeQuery = `
+  *[_type == "qrCode" && code == $code][0] {
+    _id,
+    title,
+    code,
+    isActive,
+    expiresAt,
+    maxUses,
+    currentUses,
+    lastUsedAt,
+    description,
+    venue->{
+      _id,
+      title,
+      slug,
+      city->{
+        title,
+        slug
+      }
+    }
+  }
+`;
+
+// Obtener códigos QR por local
+export const qrCodesByVenueQuery = `
+  *[_type == "qrCode" && venue._ref == $venueId] {
+    _id,
+    title,
+    code,
+    isActive,
+    expiresAt,
+    maxUses,
+    currentUses,
+    lastUsedAt,
+    description
+  } | order(_createdAt desc)
+`;

@@ -2,16 +2,20 @@
 
 > **Un blog ultra-rápido y escalable para reseñas gastronómicas optimizado para SEO y AEO**
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-blue)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
 [![Sanity](https://img.shields.io/badge/Sanity-v3-red)](https://www.sanity.io/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-cyan)](https://tailwindcss.com/)
 
 ## 🚀 Características
 
-- ⚡ **Next.js 14** con App Router y Server Components
+- ⚡ **Next.js 15** con App Router y Server Components
 - 🎨 **Sanity CMS** v3 para gestión de contenido
-- 📱 **Responsive** y optimizado para móviles
+- 📱 **Sistema QR** completo para acceso a locales
+- 🖼️ **Gestión avanzada de imágenes** con optimización automática
+- 🔐 **Autenticación robusta** con Auth.js v5
+- 📊 **Dashboard administrativo** completo
 - 🔍 **SEO/AEO** completo con JSON-LD schema.org
 - 🚀 **ISR** (Incremental Static Regeneration) con webhooks
 - 📊 **Zero CLS** en carga de anuncios
@@ -27,16 +31,46 @@
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Next.js 14    │────│   Sanity CMS    │────│    Vercel       │
+│   Next.js 15    │────│   Sanity CMS    │────│    Vercel       │
 │   (Frontend)    │    │   (Headless)    │    │   (Deploy)      │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
          │                       │                       │
          ▼                       ▼                       ▼
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  TailwindCSS    │    │   Webhooks      │    │   Analytics     │
-│  (Styling)      │    │   (ISR)         │    │   (Tracking)    │
+│  Auth.js v5     │    │   Webhooks      │    │   Analytics     │
+│  (OAuth)        │    │   (ISR)         │    │   (Tracking)    │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
+
+## 🆕 Nuevas Funcionalidades
+
+### 📱 Sistema QR Avanzado
+- **Generación automática** de códigos QR únicos
+- **Acceso temporal** con fechas de expiración
+- **Límites de uso** configurables
+- **Formularios personalizados** para clientes
+- **Estadísticas de uso** en tiempo real
+
+### 🖼️ Gestión de Imágenes
+- **Subida múltiple** con drag & drop
+- **Optimización automática** con Sanity CDN
+- **Reordenamiento visual** de imágenes
+- **Metadatos completos** (alt, caption)
+- **Límites configurables** por entidad
+
+### 🔐 Autenticación Robusta
+- **OAuth social** (Google, GitHub)
+- **Magic links** por email
+- **TOTP/2FA** para máxima seguridad
+- **Roles y permisos** granulares
+- **Sesiones seguras** con Auth.js
+
+### 📊 Dashboard Administrativo
+- **Interfaz intuitiva** con filtros avanzados
+- **Búsqueda en tiempo real** en todas las entidades
+- **Estadísticas visuales** y métricas
+- **Gestión de usuarios** y permisos
+- **Configuraciones avanzadas**
 
 ## 📦 Instalación
 
@@ -87,6 +121,14 @@ NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
 SANITY_API_READ_TOKEN=tu-read-token
 SANITY_WEBHOOK_SECRET=tu-webhook-secret
 
+# Auth.js Configuration
+AUTH_SECRET=tu-auth-secret
+GOOGLE_CLIENT_ID=tu-google-client-id
+GOOGLE_CLIENT_SECRET=tu-google-client-secret
+
+# Database (PostgreSQL)
+DATABASE_URL=tu-database-url
+
 # Ads Configuration
 NEXT_PUBLIC_ADS_ENABLED=false
 ADS_PROVIDER=gam
@@ -100,15 +142,6 @@ NEXT_PUBLIC_GOOGLE_MAPS_KEY=tu-maps-key
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 NEXT_PUBLIC_PLAUSIBLE_DOMAIN=tu-dominio.com
 ```
-
-#### Configuración de Anuncios
-
-El sistema de anuncios está controlado por la variable `NEXT_PUBLIC_ADS_ENABLED`:
-
-- `false`: Los anuncios no se renderizarán (recomendado para desarrollo)
-- `true`: Los anuncios se mostrarán respetando el consentimiento del usuario
-
-**Importante**: Los anuncios solo se cargan después de que el usuario dé su consentimiento para cookies publicitarias, cumpliendo con GDPR.
 
 ### 4. Ejecutar en desarrollo
 
@@ -145,21 +178,34 @@ npm run type-check   # TypeScript check
 
 ```
 ├── app/                    # Next.js App Router
+│   ├── (auth)/            # Rutas de autenticación
 │   ├── (public)/          # Rutas públicas
 │   │   └── [city]/        # Páginas dinámicas por ciudad
+│   ├── admin/             # Dashboard administrativo
 │   ├── api/               # API Routes
+│   │   ├── auth/          # Auth.js endpoints
+│   │   ├── qr/            # Sistema QR
+│   │   ├── upload-image/  # Subida de imágenes
 │   │   ├── revalidate/    # Webhook ISR
 │   │   └── sitemap/       # Sitemaps dinámicos
+│   ├── dashboard/         # Dashboard principal
+│   ├── qr/                # Sistema QR público
 │   ├── blog/              # Crónicas/artículos
 │   ├── layout.tsx         # Layout principal
 │   └── page.tsx           # Homepage
 ├── components/            # Componentes React
+│   ├── ui/                # Componentes base (shadcn/ui)
+│   ├── admin/             # Componentes del dashboard
+│   ├── ImageManager.tsx   # Gestión de imágenes
+│   ├── QRVenueForm.tsx    # Formulario QR
 │   ├── AdSlot.tsx         # Anuncios sin CLS
 │   ├── FAQ.tsx            # Preguntas frecuentes
 │   ├── TLDR.tsx           # Resúmenes AEO
 │   ├── ScoreBar.tsx       # Puntuaciones visuales
 │   └── Breadcrumbs.tsx    # Navegación + JSON-LD
 ├── lib/                   # Utilidades
+│   ├── auth.ts            # Configuración Auth.js
+│   ├── qr-utils.ts        # Utilidades QR
 │   ├── sanity.client.ts   # Cliente Sanity
 │   ├── groq.ts            # Queries GROQ
 │   ├── schema.ts          # Generadores JSON-LD
@@ -167,6 +213,9 @@ npm run type-check   # TypeScript check
 │   └── types.ts           # Tipos TypeScript
 ├── sanity/                # Configuración CMS
 │   ├── schemas/           # Esquemas de contenido
+│   │   ├── qr-code.ts     # Esquema QR
+│   │   ├── qr-feedback.ts # Esquema feedback QR
+│   │   └── ...            # Otros esquemas
 │   └── desk/              # Estructura del Studio
 ├── tests/                 # Tests
 │   ├── e2e/               # Playwright
@@ -190,6 +239,20 @@ npm run type-check   # TypeScript check
 - Pros/contras y platos destacados
 - Galería de imágenes
 
+### QR Code (Código QR)
+- Código único generado automáticamente
+- Local asociado
+- Fecha de expiración opcional
+- Límite de usos opcional
+- Estadísticas de uso
+
+### QR Feedback (Feedback QR)
+- Información del visitante
+- Detalles de la visita
+- Solicitudes especiales
+- Comentarios y sugerencias
+- Estado de procesamiento
+
 ### Post (Crónica)
 - Artículos largos estilo blog
 - FAQ opcional
@@ -200,6 +263,135 @@ npm run type-check   # TypeScript check
 - Organización geográfica y temática
 - Conteos automáticos
 - Imágenes representativas
+
+## 📱 Sistema QR
+
+### Funcionalidades
+
+```typescript
+// Generar código QR para un local
+const qrCode = await createQRCode({
+  venueId: 'local-id',
+  title: 'Acceso VIP - Mesa 5',
+  expiresAt: '2025-12-31',
+  maxUses: 100
+});
+
+// URL de acceso: /qr/ABC123XYZ
+```
+
+### Flujo de Uso
+
+1. **Admin crea código QR** para un local específico
+2. **Sistema valida** el código al acceder
+3. **Se registra el uso** automáticamente
+4. **Usuario completa formulario** con información de visita
+5. **Feedback se almacena** en Sanity para análisis
+
+### Validaciones
+
+- ✅ Código activo/inactivo
+- ✅ Fecha de expiración
+- ✅ Límite de usos
+- ✅ Registro de IP y User Agent
+
+## 🖼️ Gestión de Imágenes
+
+### Componente ImageManager
+
+```typescript
+// Componente reutilizable para todas las entidades
+<ImageManager
+  entityId="venue-id"
+  entityType="venue"
+  currentImages={images}
+  onImagesChange={setImages}
+  maxImages={10}
+  title="Imágenes del Local"
+/>
+```
+
+### Características
+
+- **Subida múltiple** con drag & drop
+- **Validación automática** de formatos y tamaños
+- **Reordenamiento visual** con botones ↑↓
+- **Edición de metadatos** (alt, caption)
+- **Imagen destacada** automática (primera posición)
+- **Eliminación individual** con confirmación
+
+### Límites por Entidad
+
+- **Locales**: 10 imágenes máximo
+- **Reseñas**: 20 imágenes máximo
+- **Ciudades**: 5 imágenes máximo
+- **Categorías**: 5 imágenes máximo
+
+## 🔐 Autenticación
+
+### Configuración Auth.js
+
+```typescript
+// lib/auth.ts
+export const authConfig = {
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    Email({
+      server: { /* configuración SMTP */ },
+      from: process.env.EMAIL_FROM,
+    }),
+  ],
+  callbacks: {
+    authorized({ auth, request: { nextUrl } }) {
+      const isLoggedIn = !!auth?.user;
+      const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
+      
+      if (isOnDashboard) {
+        if (isLoggedIn) return true;
+        return false;
+      }
+      
+      return true;
+    },
+  },
+};
+```
+
+### Roles de Usuario
+
+- **Admin**: Acceso completo a todas las funciones
+- **Editor**: Puede crear y editar contenido
+- **Member**: Solo puede ver contenido
+- **Guest**: Acceso limitado
+
+## 📊 Dashboard Administrativo
+
+### Funcionalidades
+
+- **Gestión completa** de locales, reseñas, ciudades y categorías
+- **Filtros avanzados** por estado, ciudad, categoría
+- **Búsqueda en tiempo real** en todas las entidades
+- **Estadísticas visuales** y métricas
+- **Sistema QR** integrado
+- **Gestión de imágenes** avanzada
+
+### Navegación
+
+```
+📊 Dashboard
+├── 🏪 Locales
+├── ⭐ Reseñas
+├── 🏙️ Ciudades
+├── 🏷️ Categorías
+├── 📱 Códigos QR
+├── 📝 Blog
+├── 📈 Analytics
+├── ⚙️ Configuración
+└── 👤 Usuarios
+```
 
 ## ✍️ Guía Editorial
 
@@ -238,7 +430,12 @@ npm run type-check   # TypeScript check
    - FAQ útiles
    - Pros/contras equilibrados
 
-3. **Publicar y Promocionar**
+3. **Configurar QR** (opcional)
+   - Generar código para el local
+   - Configurar límites y expiración
+   - Imprimir para uso físico
+
+4. **Publicar y Promocionar**
    - Revisar preview
    - Compartir en redes
    - Monitorear métricas
@@ -252,7 +449,7 @@ npm run type-check   # TypeScript check
    - **URL**: `https://tu-dominio.com/api/revalidate`
    - **Dataset**: production
    - **Trigger on**: Create, Update, Delete
-   - **Filter**: `_type in ["venue", "review", "post", "city", "category"]`
+   - **Filter**: `_type in ["venue", "review", "post", "city", "category", "qrCode", "qrFeedback"]`
    - **Secret**: Tu `SANITY_WEBHOOK_SECRET`
 
 ### Analytics
@@ -333,6 +530,14 @@ NEXT_PUBLIC_SANITY_DATASET=production
 SANITY_API_READ_TOKEN=sk...
 SANITY_WEBHOOK_SECRET=super-secret-key
 
+# Auth.js
+AUTH_SECRET=tu-auth-secret
+GOOGLE_CLIENT_ID=tu-google-client-id
+GOOGLE_CLIENT_SECRET=tu-google-client-secret
+
+# Database
+DATABASE_URL=tu-database-url
+
 # Analytics (opcional)
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
@@ -409,6 +614,14 @@ IndexNow (dry-run): { "host": "...", "urlList": [...] }
 - ✅ Estructura de preguntas naturales
 - ✅ Contenido escaneble
 
+## 📚 Documentación
+
+### Guías Disponibles
+- **[Documentación Técnica](docs/TECHNICAL_DOCUMENTATION.md)** - Arquitectura, APIs, componentes
+- **[Guía de Usuario](docs/USER_GUIDE.md)** - Manual completo del dashboard
+- **[TODO](TODO.md)** - Lista de tareas y estado del proyecto
+- **[Memory Bank](MEMORY_BANK.md)** - Decisiones técnicas y contexto
+
 ## 🐛 Troubleshooting
 
 ### Problemas Comunes
@@ -434,6 +647,16 @@ npm install sanity@latest
 - Comprobar secret de webhook
 - Revisar logs en Vercel
 
+#### Error al subir imágenes
+- Verificar formato de archivo (JPG, PNG, WebP)
+- Comprobar tamaño (máximo 5MB)
+- Verificar permisos de Sanity
+
+#### Código QR no funciona
+- Verificar si está activo
+- Comprobar fecha de expiración
+- Verificar límite de usos
+
 ## 🤝 Contribución
 
 1. Fork del proyecto
@@ -449,7 +672,9 @@ Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
 ## 🙏 Créditos
 
 - **Next.js** - Framework React
+- **React 19** - Biblioteca de UI
 - **Sanity** - Headless CMS
+- **Auth.js** - Autenticación
 - **Tailwind CSS** - Framework CSS
 - **Vercel** - Platform de deploy
 - **Heroicons** - Iconos

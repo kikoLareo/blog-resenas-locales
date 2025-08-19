@@ -30,22 +30,29 @@ const mockVenue: Venue = {
   phone: '+34 91 123 45 67',
   website: 'https://cafeconencanto.com',
   openingHours: [
-    { day: 'Lunes', hours: '08:00 - 22:00' },
-    { day: 'Martes', hours: '08:00 - 22:00' },
-    { day: 'Miércoles', hours: '08:00 - 22:00' },
-    { day: 'Jueves', hours: '08:00 - 23:00' },
-    { day: 'Viernes', hours: '08:00 - 23:00' },
-    { day: 'Sábado', hours: '09:00 - 23:00' },
-    { day: 'Domingo', hours: '09:00 - 21:00' }
+    'Lunes 08:00-22:00',
+    'Martes 08:00-22:00',
+    'Miércoles 08:00-22:00',
+    'Jueves 08:00-23:00',
+    'Viernes 08:00-23:00',
+    'Sábado 09:00-23:00',
+    'Domingo 09:00-21:00'
   ],
   priceRange: '€€',
   schemaType: 'CafeOrCoffeeShop',
   images: [
     {
-      _key: '1',
+      _type: 'image',
       asset: {
-        _ref: 'image-1',
-        _type: 'reference'
+        _id: 'image-1',
+        url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop',
+        metadata: {
+          dimensions: {
+            width: 800,
+            height: 600,
+            aspectRatio: 1.33
+          }
+        }
       },
       alt: 'Interior del café'
     }
@@ -56,8 +63,7 @@ const mockVenue: Venue = {
   },
   social: {
     instagram: '@cafeconencanto',
-    facebook: 'cafeconencanto',
-    twitter: '@cafeconencanto'
+    facebook: 'cafeconencanto'
   },
   city: {
     _id: 'city-madrid',
@@ -81,35 +87,7 @@ const mockVenue: Venue = {
       color: '#FFD700'
     }
   ],
-  reviews: [
-    {
-      _id: 'review-1',
-      title: 'Excelente café y ambiente',
-      slug: { current: 'excelente-cafe-ambiente' },
-      visitDate: '2024-01-15',
-      ratings: {
-        overall: 4.5,
-        food: 4.0,
-        service: 5.0,
-        atmosphere: 4.5,
-        value: 4.0
-      },
-      tldr: 'Un lugar perfecto para tomar un café y trabajar',
-      author: 'María García',
-      gallery: [
-        {
-          _key: '1',
-          asset: {
-            _ref: 'image-review-1',
-            _type: 'reference'
-          },
-          alt: 'Café con leche'
-        }
-      ]
-    }
-  ],
-  _createdAt: '2024-01-01T00:00:00Z',
-  _updatedAt: '2024-01-15T00:00:00Z'
+  reviews: []
 };
 
 export async function generateMetadata({ params }: VenuePageProps): Promise<Metadata> {

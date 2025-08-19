@@ -5,12 +5,33 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ImageManager from "@/components/ImageManager";
 import Link from "next/link";
 import { ArrowLeft, Edit, Eye, FileText, Star, Calendar, User, X, Save, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import type { Review } from "@/types/sanity";
 
-interface ReviewWithDetails extends Omit<Review, 'venue'> {
+interface ReviewWithDetails {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  content?: string;
+  tldr?: string;
+  visitDate?: string;
+  publishedAt: string | null;
+  ratings: {
+    food: number;
+    service: number;
+    ambience: number;
+    value: number;
+  };
+  avgTicket?: number;
+  pros?: string[];
+  cons?: string[];
+  author?: string;
+  tags?: string[];
+  _createdAt: string;
+  _updatedAt: string;
   venue: {
     _id: string;
     title: string;
@@ -20,12 +41,12 @@ interface ReviewWithDetails extends Omit<Review, 'venue'> {
       slug: { current: string };
     };
   };
-  content?: string;
 }
 
 export default function ReviewDetailClient({ review }: { review: ReviewWithDetails }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [formData, setFormData] = useState(review);
+  const [images, setImages] = useState<any[]>([]);
 
   const publicReviewUrl = review.venue?.city?.slug?.current && review.slug?.current
     ? `/${review.venue.city.slug.current}/review/${review.slug.current}`
@@ -87,15 +108,15 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                 <div className="flex items-center space-x-4 text-sm text-gray-600">
                   <div className="flex items-center">
                     <FileText className="h-4 w-4 mr-1" />
-                    {review.venue.title}
+                    {review.venue?.title || 'Sin local'}
                   </div>
                   <div className="flex items-center">
                     <Calendar className="h-4 w-4 mr-1" />
-                    {review.visitDate && new Date(review.visitDate).toLocaleDateString('es-ES')}
+                    {review.visitDate ? new Date(review.visitDate).toLocaleDateString('es-ES') : 'Sin fecha'}
                   </div>
                   <div className="flex items-center">
                     <User className="h-4 w-4 mr-1" />
-                    {review.author}
+                    {review.author || 'Sin autor'}
                   </div>
                 </div>
               </CardHeader>
@@ -111,6 +132,12 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                   <div className="mb-4">
                     <h4 className="font-semibold text-gray-900 mb-2">Contenido</h4>
                     <p className="text-gray-600">{review.content}</p>
+                  </div>
+                )}
+                
+                {!review.tldr && !review.content && (
+                  <div className="mb-4">
+                    <p className="text-gray-500 italic">Sin contenido disponible</p>
                   </div>
                 )}
 
@@ -140,6 +167,12 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                           </li>
                         ))}
                       </ul>
+                    </div>
+                  )}
+                  
+                  {(!review.pros || review.pros.length === 0) && (!review.cons || review.cons.length === 0) && (
+                    <div className="col-span-2">
+                      <p className="text-gray-500 italic text-center">Sin pros y contras definidos</p>
                     </div>
                   )}
                 </div>
@@ -195,6 +228,16 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                 </div>
               </CardContent>
             </Card>
+
+            {/* Gestión de Imágenes */}
+            <ImageManager
+              entityId={review._id}
+              entityType="review"
+              currentImages={images}
+              onImagesChange={setImages}
+              maxImages={20}
+              title="Galería de Fotos"
+            />
           </div>
 
           {/* Sidebar */}
@@ -240,9 +283,9 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                   href={`/dashboard/venues/${review.venue._id}`}
                   className="text-blue-600 hover:text-blue-800 font-medium"
                 >
-                  {review.venue.title}
+                  {review.venue?.title || 'Sin título'}
                 </Link>
-                <p className="text-sm text-gray-600 mt-1">{review.venue.city.title}</p>
+                <p className="text-sm text-gray-600 mt-1">{review.venue?.city?.title || 'Sin ciudad'}</p>
               </CardContent>
             </Card>
           </div>
@@ -277,10 +320,10 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                     <Label htmlFor="slug">Slug *</Label>
                     <Input
                       id="slug"
-                      value={formData.slug?.current}
+                      value={formData.slug?.current || ''}
                       onChange={(e) => setFormData({
                         ...formData, 
-                        slug: { ...formData.slug, current: e.target.value }
+                        slug: { current: e.target.value }
                       })}
                     />
                   </div>
@@ -289,7 +332,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                   <Label htmlFor="tldr">Resumen (TL;DR)</Label>
                   <Input
                     id="tldr"
-                    value={formData.tldr}
+                    value={formData.tldr || ''}
                     onChange={(e) => setFormData({...formData, tldr: e.target.value})}
                   />
                 </div>
@@ -297,7 +340,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                   <Label htmlFor="content">Contenido</Label>
                   <Textarea
                     id="content"
-                    value={formData.content}
+                    value={formData.content || ''}
                     onChange={(e) => setFormData({...formData, content: e.target.value})}
                     rows={6}
                   />

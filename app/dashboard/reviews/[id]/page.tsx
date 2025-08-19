@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import ReviewDetailClient from "./ReviewDetailClient";
 
 interface ReviewDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 interface ReviewWithDetails extends Omit<Review, 'venue'> {
@@ -22,7 +22,8 @@ interface ReviewWithDetails extends Omit<Review, 'venue'> {
 }
 
 export default async function ReviewDetailPage({ params }: ReviewDetailPageProps) {
-  const review = await adminSanityClient.fetch<ReviewWithDetails>(reviewByIdQuery, { id: params.id });
+  const { id } = await params;
+  const review = await adminSanityClient.fetch<ReviewWithDetails>(reviewByIdQuery, { id });
   
   if (!review) {
     notFound();

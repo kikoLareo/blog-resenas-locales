@@ -6,7 +6,7 @@ import { LogOut, User } from "lucide-react";
 import Link from "next/link";
 
 interface AdminHeaderProps {
-  user: {
+  user?: {
     name?: string | null;
     email?: string | null;
     role?: string;
@@ -29,12 +29,14 @@ export function AdminHeader({ user }: AdminHeaderProps) {
           </Link>
         </div>
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <User className="h-4 w-4" />
-            <span>{user.name || user.email}</span>
-            <span className="text-gray-400">•</span>
-            <span className="capitalize">{user.role?.toLowerCase()}</span>
-          </div>
+          {user && (
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <User className="h-4 w-4" />
+              <span>{user.name || user.email}</span>
+              <span className="text-gray-400">•</span>
+              <span className="capitalize">{user.role?.toLowerCase()}</span>
+            </div>
+          )}
           <Button
             variant="outline"
             size="sm"

@@ -42,10 +42,17 @@ const mockVenue: Venue = {
   schemaType: 'CafeOrCoffeeShop',
   images: [
     {
-      _key: '1',
+      _type: 'image',
       asset: {
-        _ref: 'image-1',
-        _type: 'reference'
+        _id: 'image-1',
+        url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop',
+        metadata: {
+          dimensions: {
+            width: 800,
+            height: 600,
+            aspectRatio: 1.33
+          }
+        }
       },
       alt: 'Interior del café'
     }
@@ -56,8 +63,7 @@ const mockVenue: Venue = {
   },
   social: {
     instagram: '@cafeconencanto',
-    facebook: 'cafeconencanto',
-    twitter: '@cafeconencanto'
+    facebook: 'cafeconencanto'
   },
   city: {
     _id: 'city-madrid',
@@ -81,60 +87,7 @@ const mockVenue: Venue = {
       color: '#FFD700'
     }
   ],
-  reviews: [
-    {
-      _id: 'review-1',
-      title: 'Excelente café y ambiente',
-      slug: { current: 'excelente-cafe-ambiente' },
-      visitDate: '2024-01-15',
-      ratings: {
-        overall: 4.5,
-        food: 4.0,
-        service: 5.0,
-        atmosphere: 4.5,
-        value: 4.0
-      },
-      tldr: 'Un lugar perfecto para tomar un café y trabajar',
-      author: 'María García',
-      gallery: [
-        {
-          _key: '1',
-          asset: {
-            _ref: 'image-review-1',
-            _type: 'reference'
-          },
-          alt: 'Café con leche'
-        }
-      ]
-    },
-    {
-      _id: 'review-2',
-      title: 'Brunch de fin de semana espectacular',
-      slug: { current: 'brunch-fin-semana' },
-      visitDate: '2024-01-20',
-      ratings: {
-        overall: 4.8,
-        food: 5.0,
-        service: 4.5,
-        atmosphere: 5.0,
-        value: 4.5
-      },
-      tldr: 'El brunch de los domingos es una experiencia única',
-      author: 'Carlos López',
-      gallery: [
-        {
-          _key: '1',
-          asset: {
-            _ref: 'image-review-2',
-            _type: 'reference'
-          },
-          alt: 'Plato de brunch'
-        }
-      ]
-    }
-  ],
-  _createdAt: '2024-01-01T00:00:00Z',
-  _updatedAt: '2024-01-15T00:00:00Z'
+  reviews: []
 };
 
 export default async function VenuePage({ params }: VenuePageProps) {
@@ -205,7 +158,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
               <section className="mb-8">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-gray-900">
-                    Reseñas ({venueData.reviews.length})
+                    Reseñas ({venueData.reviews?.length || 0})
                   </h2>
                   <Link
                     href={`/${venueData.city.slug.current}/reviews`}
@@ -216,7 +169,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
                 </div>
 
                 <div className="space-y-6">
-                  {venueData.reviews.map((review) => (
+                  {venueData.reviews?.map((review) => (
                     <div key={review._id} className="bg-white rounded-lg border border-gray-200 p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div>
@@ -230,7 +183,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
                           </h3>
                           <p className="text-gray-600">{review.tldr}</p>
                         </div>
-                        <CompactScore rating={review.ratings.overall} />
+                        <CompactScore score={(review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4} />
                       </div>
                       
                       <div className="flex items-center justify-between text-sm text-gray-500">
@@ -262,15 +215,15 @@ export default async function VenuePage({ params }: VenuePageProps) {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Puntuación media:</span>
                     <span className="font-semibold">
-                      {venueData.reviews.length > 0 
-                        ? (venueData.reviews.reduce((sum, r) => sum + r.ratings.overall, 0) / venueData.reviews.length).toFixed(1)
+                      {venueData.reviews && venueData.reviews.length > 0 
+                        ? (venueData.reviews.reduce((sum, r) => sum + (r.ratings.food + r.ratings.service + r.ratings.ambience + r.ratings.value) / 4, 0) / venueData.reviews.length).toFixed(1)
                         : 'N/A'
                       }
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Reseñas:</span>
-                    <span className="font-semibold">{venueData.reviews.length}</span>
+                    <span className="font-semibold">{venueData.reviews?.length || 0}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Precio:</span>
@@ -317,7 +270,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
                   Horarios
                 </h3>
                 <div className="space-y-2">
-                  {venueData.openingHours.map((day, index) => {
+                  {venueData.openingHours?.map((day, index) => {
                     const [dayName, hours] = day.split(' ');
                     const daysMap: { [key: string]: string } = {
                       'Monday': 'Lunes',

@@ -9,6 +9,8 @@ import category from './category';
 import venue from './venue';
 import review from './review';
 import post from './post';
+import qrCode from './qr-code';
+import qrFeedback from './qr-feedback';
 
 // Export schema types in logical order
 export const schemaTypes = [
@@ -22,6 +24,8 @@ export const schemaTypes = [
   venue,       // Locales/restaurantes
   review,      // Reseñas de locales
   post,        // Crónicas y artículos del blog
+  qrCode,      // Códigos QR para acceso a locales
+  qrFeedback,  // Feedback de códigos QR
 ];
 
 // Configuración adicional para validaciones y referencias

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import ImageManager from "@/components/ImageManager";
 import Link from "next/link";
 import { ArrowLeft, Edit, Eye, MapPin, Building2, FileText, X, Save } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -16,7 +17,14 @@ interface CityDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
-interface CityWithDetails extends City {
+interface CityWithDetails {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  region?: string;
+  description?: string;
+  _createdAt: string;
+  _updatedAt: string;
   venues: {
     _id: string;
     title: string;
@@ -46,10 +54,11 @@ interface CityWithDetails extends City {
 function CityDetailClient({ city }: { city: CityWithDetails }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [formData, setFormData] = useState(city);
+  const [images, setImages] = useState<any[]>([]);
 
   const publicCityUrl = city.slug?.current ? `/${city.slug.current}` : '#';
 
-  const avgRating = city.reviews.length > 0
+  const avgRating = city.reviews && city.reviews.length > 0
     ? city.reviews.reduce((acc, review) => acc + review.ratings.overall, 0) / city.reviews.length
     : 0;
 
@@ -94,31 +103,32 @@ function CityDetailClient({ city }: { city: CityWithDetails }) {
                 <div className="flex items-center space-x-4 text-sm text-gray-600">
                   <div className="flex items-center">
                     <Building2 className="h-4 w-4 mr-1" />
-                    {city.region}
+                    {city.region || 'Sin región'}
                   </div>
                   <div className="flex items-center">
                     <MapPin className="h-4 w-4 mr-1" />
-                    {city.venues.length} locales
+                    {city.venues?.length || 0} locales
                   </div>
                   <div className="flex items-center">
                     <FileText className="h-4 w-4 mr-1" />
-                    {city.reviews.length} reseñas
+                    {city.reviews?.length || 0} reseñas
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600 mb-4">{city.description}</p>
+                <p className="text-gray-600 mb-4">{city.description || 'Sin descripción'}</p>
               </CardContent>
             </Card>
 
             {/* Locales */}
             <Card>
               <CardHeader>
-                <CardTitle>Locales ({city.venues.length})</CardTitle>
+                <CardTitle>Locales ({city.venues?.length || 0})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {city.venues.map((venue) => (
+                  {city.venues && city.venues.length > 0 ? (
+                    city.venues.map((venue) => (
                     <div key={venue._id} className="border-b border-gray-200 pb-4 last:border-b-0">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
@@ -144,39 +154,58 @@ function CityDetailClient({ city }: { city: CityWithDetails }) {
                         </div>
                       </div>
                     </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No hay locales en esta ciudad</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
 
+            {/* Gestión de Imágenes */}
+            <ImageManager
+              entityId={city._id}
+              entityType="city"
+              currentImages={images}
+              onImagesChange={setImages}
+              maxImages={5}
+              title="Imágenes de la Ciudad"
+            />
+
             {/* Reseñas */}
             <Card>
               <CardHeader>
-                <CardTitle>Reseñas ({city.reviews.length})</CardTitle>
+                <CardTitle>Reseñas ({city.reviews?.length || 0})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {city.reviews.map((review) => (
-                    <div key={review._id} className="border-b border-gray-200 pb-4 last:border-b-0">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <h4 className="font-medium">{review.title}</h4>
-                          <p className="text-sm text-gray-600">
-                            En {review.venue.title}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {new Date(review._createdAt).toLocaleDateString('es-ES')}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-lg font-bold">
-                            {review.ratings.overall.toFixed(1)}
+                                    {city.reviews && city.reviews.length > 0 ? (
+                    city.reviews.map((review) => (
+                      <div key={review._id} className="border-b border-gray-200 pb-4 last:border-b-0">
+                        <Link href={`/dashboard/reviews/${review._id}`} className="block hover:bg-gray-50 p-2 -m-2 rounded transition-colors">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h4 className="font-medium">{review.title}</h4>
+                              <p className="text-sm text-gray-600">
+                                En {review.venue.title}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {new Date(review._createdAt).toLocaleDateString('es-ES')}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-lg font-bold">
+                                {review.ratings.overall.toFixed(1)}
+                              </div>
+                              <div className="text-xs text-gray-500">/ 5.0</div>
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-500">/ 5.0</div>
-                        </div>
+                        </Link>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No hay reseñas en esta ciudad</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -195,11 +224,11 @@ function CityDetailClient({ city }: { city: CityWithDetails }) {
                 </div>
                 <div className="flex justify-between">
                   <span>Total locales:</span>
-                  <span className="font-bold">{city.venues.length}</span>
+                  <span className="font-bold">{city.venues?.length || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Total reseñas:</span>
-                  <span className="font-bold">{city.reviews.length}</span>
+                  <span className="font-bold">{city.reviews?.length || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Creado:</span>
@@ -243,10 +272,10 @@ function CityDetailClient({ city }: { city: CityWithDetails }) {
                     <Label htmlFor="slug">Slug *</Label>
                     <Input
                       id="slug"
-                      value={formData.slug?.current}
+                      value={formData.slug?.current || ''}
                       onChange={(e) => setFormData({
                         ...formData, 
-                        slug: { ...formData.slug, current: e.target.value }
+                        slug: { current: e.target.value }
                       })}
                     />
                   </div>
@@ -255,7 +284,7 @@ function CityDetailClient({ city }: { city: CityWithDetails }) {
                   <Label htmlFor="region">Región</Label>
                   <Input
                     id="region"
-                    value={formData.region}
+                    value={formData.region || ''}
                     onChange={(e) => setFormData({...formData, region: e.target.value})}
                   />
                 </div>
@@ -263,7 +292,7 @@ function CityDetailClient({ city }: { city: CityWithDetails }) {
                   <Label htmlFor="description">Descripción</Label>
                   <Textarea
                     id="description"
-                    value={formData.description}
+                    value={formData.description || ''}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     rows={4}
                   />

@@ -8,16 +8,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ImageManager from "@/components/ImageManager";
 import Link from "next/link";
 import { ArrowLeft, Edit, Eye, MapPin, Phone, Globe, Clock, Euro, Tag, Building2, X, Save } from "lucide-react";
 import { notFound } from "next/navigation";
 import { useState } from "react";
 
 interface VenueDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-interface VenueWithDetails extends Venue {
+interface VenueWithDetails {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  description: string;
+  address: string;
+  phone?: string;
+  website?: string;
+  priceRange: string;
+  schemaType?: string;
+  _createdAt: string;
+  _updatedAt: string;
   city: {
     _id: string;
     title: string;
@@ -44,12 +56,13 @@ interface VenueWithDetails extends Venue {
 function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [formData, setFormData] = useState(venue);
+  const [images, setImages] = useState<any[]>([]);
 
   const publicVenueUrl = venue.slug?.current && venue.city?.slug?.current
     ? `/${venue.city.slug.current}/venue/${venue.slug.current}`
     : '#';
 
-  const avgRating = venue.reviews.length > 0
+  const avgRating = venue.reviews && venue.reviews.length > 0
     ? venue.reviews.reduce((acc, review) => {
         const avg = (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4;
         return acc + avg;
@@ -97,25 +110,25 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
                 <div className="flex items-center space-x-4 text-sm text-gray-600">
                   <div className="flex items-center">
                     <Building2 className="h-4 w-4 mr-1" />
-                    {venue.city?.title}
+                    {venue.city?.title || 'Sin ciudad'}
                   </div>
                   <div className="flex items-center">
                     <Euro className="h-4 w-4 mr-1" />
-                    {venue.priceRange}
+                    {venue.priceRange || 'Sin precio'}
                   </div>
                   <div className="flex items-center">
                     <Tag className="h-4 w-4 mr-1" />
-                    {venue.schemaType}
+                    {venue.schemaType || 'Sin tipo'}
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600 mb-4">{venue.description}</p>
+                <p className="text-gray-600 mb-4">{venue.description || 'Sin descripción'}</p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center space-x-2">
                     <MapPin className="h-4 w-4 text-gray-400" />
-                    <span>{venue.address}</span>
+                    <span>{venue.address || 'Sin dirección'}</span>
                   </div>
                   {venue.phone && (
                     <div className="flex items-center space-x-2">
@@ -135,31 +148,47 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
               </CardContent>
             </Card>
 
+            {/* Gestión de Imágenes */}
+            <ImageManager
+              entityId={venue._id}
+              entityType="venue"
+              currentImages={images}
+              onImagesChange={setImages}
+              maxImages={10}
+              title="Imágenes del Local"
+            />
+
             {/* Reseñas */}
             <Card>
               <CardHeader>
-                <CardTitle>Reseñas ({venue.reviews.length})</CardTitle>
+                <CardTitle>Reseñas ({venue.reviews?.length || 0})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {venue.reviews.map((review) => (
-                    <div key={review._id} className="border-b border-gray-200 pb-4 last:border-b-0">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-medium">{review.title}</h4>
-                          <p className="text-sm text-gray-600">
-                            {new Date(review._createdAt).toLocaleDateString('es-ES')}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-lg font-bold">
-                            {((review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4).toFixed(1)}
+                  {venue.reviews && venue.reviews.length > 0 ? (
+                    venue.reviews.map((review) => (
+                      <div key={review._id} className="border-b border-gray-200 pb-4 last:border-b-0">
+                        <Link href={`/dashboard/reviews/${review._id}`} className="block hover:bg-gray-50 p-2 -m-2 rounded transition-colors">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h4 className="font-medium">{review.title}</h4>
+                              <p className="text-sm text-gray-600">
+                                {new Date(review._createdAt).toLocaleDateString('es-ES')}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-lg font-bold">
+                                {((review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4).toFixed(1)}
+                              </div>
+                              <div className="text-xs text-gray-500">/ 5.0</div>
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-500">/ 5.0</div>
-                        </div>
+                        </Link>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">No hay reseñas para este local</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -178,7 +207,7 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
                 </div>
                 <div className="flex justify-between">
                   <span>Total reseñas:</span>
-                  <span className="font-bold">{venue.reviews.length}</span>
+                  <span className="font-bold">{venue.reviews?.length || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Creado:</span>
@@ -222,10 +251,10 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
                     <Label htmlFor="slug">Slug *</Label>
                     <Input
                       id="slug"
-                      value={formData.slug?.current}
+                      value={formData.slug?.current || ''}
                       onChange={(e) => setFormData({
                         ...formData, 
-                        slug: { ...formData.slug, current: e.target.value }
+                        slug: { current: e.target.value }
                       })}
                     />
                   </div>
@@ -257,7 +286,7 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
                     <Label htmlFor="phone">Teléfono</Label>
                     <Input
                       id="phone"
-                      value={formData.phone}
+                      value={formData.phone || ''}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     />
                   </div>
@@ -265,7 +294,7 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
                     <Label htmlFor="website">Sitio Web</Label>
                     <Input
                       id="website"
-                      value={formData.website}
+                      value={formData.website || ''}
                       onChange={(e) => setFormData({...formData, website: e.target.value})}
                     />
                   </div>
@@ -291,7 +320,8 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
 }
 
 export default async function VenueDetailPage({ params }: VenueDetailPageProps) {
-  const venue = await adminSanityClient.fetch<VenueWithDetails>(venueByIdQuery, { id: params.id });
+  const { id } = await params;
+  const venue = await adminSanityClient.fetch<VenueWithDetails>(venueByIdQuery, { id });
   
   if (!venue) {
     notFound();
