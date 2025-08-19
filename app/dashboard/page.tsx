@@ -1,21 +1,27 @@
 import { adminSanityClient } from "@/lib/admin-sanity";
 import { dashboardStatsQuery } from "@/lib/admin-queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3, FileText, MapPin, Users } from "lucide-react";
+import { BarChart3, FileText, MapPin, Users, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 
 export default async function DashboardPage() {
-  const data = await adminSanityClient.fetch(dashboardStatsQuery);
+  let data: any = null;
+  let sanityError = false;
 
-  if (!data) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Cargando datos...</p>
-        </div>
-      </div>
-    );
+  try {
+    data = await adminSanityClient.fetch(dashboardStatsQuery);
+  } catch (error) {
+    console.error('Error fetching Sanity data:', error);
+    sanityError = true;
+    // Datos por defecto cuando Sanity falla
+    data = {
+      totalReviews: 0,
+      totalVenues: 0,
+      totalCities: 0,
+      totalPosts: 0,
+      recentReviews: [],
+      recentVenues: []
+    };
   }
 
   const { totalReviews, totalVenues, totalCities, totalPosts, recentReviews, recentVenues } = data;
@@ -26,6 +32,26 @@ export default async function DashboardPage() {
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-600">Bienvenido al panel de administración</p>
       </div>
+
+      {sanityError && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="h-5 w-5 text-yellow-600" />
+            <h3 className="text-sm font-medium text-yellow-800">Sanity no configurado</h3>
+          </div>
+          <p className="mt-2 text-sm text-yellow-700">
+            Para ver datos reales, configura las variables de entorno de Sanity en tu archivo .env.local
+          </p>
+          <div className="mt-3 text-xs text-yellow-600">
+            <p>Variables necesarias:</p>
+            <code className="block mt-1 bg-yellow-100 p-2 rounded">
+              NEXT_PUBLIC_SANITY_PROJECT_ID=tu-project-id<br/>
+              NEXT_PUBLIC_SANITY_DATASET=production<br/>
+              SANITY_API_READ_TOKEN=tu-read-token
+            </code>
+          </div>
+        </div>
+      )}
 
       {/* Estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

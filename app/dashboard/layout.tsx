@@ -10,14 +10,10 @@ export default async function DashboardLayout({
 }) {
   const session = await getServerSession(authOptions);
 
-  // La página de acceso se maneja en su propio layout
-  if (!session?.user) {
-    return children;
-  }
-
+  // El middleware ya maneja la autenticación, solo renderizar el layout
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminHeader user={session.user} />
+      <AdminHeader user={session?.user} />
       <div className="flex">
         <AdminNav />
         <main className="flex-1 p-6">

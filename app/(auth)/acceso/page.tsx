@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,23 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data: session, status } = useSession();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const errorParam = searchParams.get("error");
+
+  // Si ya está autenticado, redirigir al dashboard
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      router.push(callbackUrl);
+    }
+  }, [status, session, router, callbackUrl]);
+
+  // Mostrar error si viene como parámetro
+  useEffect(() => {
+    if (errorParam === "unauthorized") {
+      setError("No tienes permisos para acceder al panel de administración");
+    }
+  }, [errorParam]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,8 +49,9 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError("Credenciales incorrectas");
-      } else {
-        window.location.href = callbackUrl;
+      } else if (result?.ok) {
+        // Usar router.push en lugar de window.location.href para mejor UX
+        router.push(callbackUrl);
       }
     } catch (err) {
       setError("Error de conexión");
