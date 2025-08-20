@@ -511,41 +511,64 @@ npm run test -- --coverage
 
 ## 🚀 Deploy
 
-### Vercel (Recomendado)
+### Variables de Entorno Requeridas
 
-1. Conecta tu repositorio a Vercel
-2. Configura variables de entorno
-3. Deploy automático en cada push
+Antes de desplegar, necesitas configurar las siguientes variables de entorno:
 
-### Variables de Entorno en Vercel
+#### 🔐 Autenticación (Obligatorio)
+```bash
+NEXTAUTH_URL=https://tu-dominio.vercel.app
+NEXTAUTH_SECRET=7cce0f4acf16c22f449dfa846c1f8c9bc478e24bb8c9ed9fff4589d142791fb4
+```
+
+#### 🏢 Sanity CMS (Obligatorio)
+```bash
+NEXT_PUBLIC_SANITY_PROJECT_ID=tu-project-id
+NEXT_PUBLIC_SANITY_DATASET=production
+NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
+SANITY_API_READ_TOKEN=tu-read-token
+```
+
+### Pasos para Desplegar
+
+1. **Generar NEXTAUTH_SECRET**:
+   ```bash
+   npm run generate-secret
+   ```
+
+2. **Verificar variables de entorno**:
+   ```bash
+   npm run check-env
+   ```
+
+3. **Configurar en Vercel**:
+   - Ve a tu proyecto en Vercel Dashboard
+   - Settings > Environment Variables
+   - Agrega todas las variables requeridas
+
+4. **Desplegar**:
+   - Conecta tu repositorio a Vercel
+   - El despliegue se ejecutará automáticamente
+
+### Variables Opcionales
 
 ```bash
-# Site
-NEXT_PUBLIC_SITE_URL=https://tu-app.vercel.app
-NEXT_PUBLIC_SITE_NAME="Tu Blog"
+# Database (PostgreSQL)
+DATABASE_URL=postgresql://user:pass@host:port/db
 
-# Sanity
-NEXT_PUBLIC_SANITY_PROJECT_ID=abc123
-NEXT_PUBLIC_SANITY_DATASET=production
-SANITY_API_READ_TOKEN=sk...
-SANITY_WEBHOOK_SECRET=super-secret-key
+# Admin Dashboard
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD_HASH=$2b$10$...
 
-# Auth.js
-AUTH_SECRET=tu-auth-secret
-GOOGLE_CLIENT_ID=tu-google-client-id
-GOOGLE_CLIENT_SECRET=tu-google-client-secret
-
-# Database
-DATABASE_URL=tu-database-url
-
-# Analytics (opcional)
+# Analytics
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
-# IndexNow (opcional)
+# IndexNow
 INDEXNOW_HOST=tu-dominio.com
 INDEXNOW_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-INDEXNOW_KEY_LOCATION=https://tu-dominio.com/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.txt
 ```
+
+Ver `DEPLOYMENT.md` para instrucciones detalladas.
 
 ## 🔍 IndexNow Integration
 

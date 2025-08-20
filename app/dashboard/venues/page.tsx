@@ -2,36 +2,50 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { adminSanityClient } from "@/lib/admin-sanity";
-import { venuesListQuery } from "@/lib/admin-queries";
-import type { Venue } from "@/types/sanity";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
+// Tipos específicos para los datos que devuelve la query
+interface VenueWithDetails {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  _createdAt: string;
+  _updatedAt: string;
+  city: { title: string; slug: { current: string } };
+  address: string;
+  phone?: string;
+  website?: string;
+  priceRange: string;
+  reviewCount: number;
+}
+
 export default function VenuesPage() {
-  const [venues, setVenues] = useState<(Venue & {
-    city: { title: string; slug: { current: string } };
-    reviewCount: number;
-  })[]>([]);
-  const [filteredVenues, setFilteredVenues] = useState<(Venue & {
-    city: { title: string; slug: { current: string } };
-    reviewCount: number;
-  })[]>([]);
+  const [venues, setVenues] = useState<VenueWithDetails[]>([]);
+  const [filteredVenues, setFilteredVenues] = useState<VenueWithDetails[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [cityFilter, setCityFilter] = useState<string>("all");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchVenues = async () => {
       try {
-        const data = await adminSanityClient.fetch<(Venue & {
-          city: { title: string; slug: { current: string } };
-          reviewCount: number;
-        })[]>(venuesListQuery);
-        setVenues(data);
-        setFilteredVenues(data);
+        setLoading(true);
+        setError(null);
+        
+        // Importación dinámica para evitar problemas de SSR
+        const { adminSanityClient } = await import("@/lib/admin-sanity");
+        const { venuesListQuery } = await import("@/lib/admin-queries");
+        
+        const data = await adminSanityClient.fetch<VenueWithDetails[]>(venuesListQuery);
+        setVenues(data || []);
+        setFilteredVenues(data || []);
       } catch (error) {
         console.error('Error fetching venues:', error);
+        setError('Error al cargar los locales');
+        setVenues([]);
+        setFilteredVenues([]);
       } finally {
         setLoading(false);
       }
@@ -77,6 +91,34 @@ export default function VenuesPage() {
         </div>
         <div className="text-center py-8">
           <p className="text-gray-500">Cargando locales...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Locales</h1>
+            <p className="text-gray-600">Gestiona los locales disponibles</p>
+          </div>
+          <Link 
+            href="/dashboard/venues/new"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Nuevo Local
+          </Link>
+        </div>
+        <div className="text-center py-8">
+          <p className="text-red-500">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Reintentar
+          </button>
         </div>
       </div>
     );
@@ -150,7 +192,7 @@ export default function VenuesPage() {
               </div>
             ) : (
               filteredVenues.map((venue) => (
-                              <div
+                <div
                   key={venue._id}
                   className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                 >
@@ -170,26 +212,26 @@ export default function VenuesPage() {
                       {new Date(venue._updatedAt).toLocaleDateString()}
                     </div>
                   </div>
-                <div className="ml-4 flex items-center space-x-3">
-                  <Link
-                    href={`/dashboard/venues/${venue._id}`}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                  >
-                    Editar
-                  </Link>
-                  {venue.city?.slug?.current && venue.slug?.current && (
-                    <>
-                      <span className="text-gray-300">|</span>
-                      <Link
-                        href={`/${venue.city.slug.current}/venue/${venue.slug.current}`}
-                        className="text-gray-600 hover:text-gray-800 text-sm"
-                        target="_blank"
-                      >
-                        Ver
-                      </Link>
-                    </>
-                  )}
-                                  </div>
+                  <div className="ml-4 flex items-center space-x-3">
+                    <Link
+                      href={`/dashboard/venues/${venue._id}`}
+                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    >
+                      Editar
+                    </Link>
+                    {venue.city?.slug?.current && venue.slug?.current && (
+                      <>
+                        <span className="text-gray-300">|</span>
+                        <Link
+                          href={`/${venue.city.slug.current}/venue/${venue.slug.current}`}
+                          className="text-gray-600 hover:text-gray-800 text-sm"
+                          target="_blank"
+                        >
+                          Ver
+                        </Link>
+                      </>
+                    )}
+                  </div>
                 </div>
               ))
             )}
