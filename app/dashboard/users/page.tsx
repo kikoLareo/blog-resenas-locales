@@ -1,7 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import dynamic from 'next/dynamic';
-
-const CreateUserForm = dynamic(() => import('@/components/admin/CreateUserForm'), { ssr: false });
+import CreateUserForm from '@/components/admin/CreateUserForm';
 
 export default async function AdminUsersPage() {
   return (
