@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
+import prisma from './prisma';
 
 if (!process.env.NEXTAUTH_SECRET) {
   throw new Error("NEXTAUTH_SECRET must be set");
@@ -24,38 +25,59 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         console.log("🔐 Intentando autenticar:", { email: credentials?.email });
-        
+
         if (!credentials?.email || !credentials?.password) {
           console.log("❌ Credenciales faltantes");
           return null;
         }
 
         const email = credentials.email.toLowerCase();
-        
+        const password = credentials.password;
+
+        // 1) Try DB user first (admin users stored in prisma)
+        try {
+          const userRecord = await prisma.user.findUnique({ where: { email } });
+          if (userRecord) {
+            console.log('ℹ️ Usuario encontrado en DB:', { email, id: userRecord.id });
+            if (userRecord.passwordHash) {
+              const ok = await bcrypt.compare(password, userRecord.passwordHash);
+              if (ok) {
+                console.log('✅ Autenticación vía DB exitosa para', email);
+                return {
+                  id: String(userRecord.id),
+                  email,
+                  name: userRecord.email,
+                  role: userRecord.role ?? 'ADMIN',
+                };
+              }
+              console.log('❌ Contraseña inválida para usuario en DB:', email);
+              return null;
+            }
+            console.log('⚠️ Usuario en DB no tiene passwordHash, no se puede autenticar via DB');
+          }
+        } catch (dbErr) {
+          console.error('Error comprobando usuario en DB:', dbErr);
+          // proceed to fallback
+        }
+
+        // 2) Fallback: check environment-stored admin credentials
         if (email !== ADMIN_EMAIL) {
-          console.log("❌ Email no coincide:", { provided: email, expected: ADMIN_EMAIL });
+          console.log('❌ Email no coincide con ADMIN_EMAIL env:', { provided: email, expected: ADMIN_EMAIL });
           return null;
         }
 
-        console.log("🔐 Contraseña:", credentials.password);
-        console.log("🔐 Hash de la contraseña:", ADMIN_PASSWORD_HASH);
-
-        const isValidPassword = await bcrypt.compare(
-          credentials.password,
-          ADMIN_PASSWORD_HASH
-        );
-
+        const isValidPassword = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
         if (!isValidPassword) {
-          console.log("❌ Contraseña incorrecta");
+          console.log('❌ Contraseña incorrecta para ADMIN_EMAIL');
           return null;
         }
 
-        console.log("✅ Autenticación exitosa para:", email);
+        console.log('✅ Autenticación exitosa vía env para:', email);
         return {
-          id: "admin",
+          id: 'admin',
           email,
-          name: "Administrador",
-          role: "ADMIN"
+          name: 'Administrador',
+          role: 'ADMIN',
         };
       }
     }),
