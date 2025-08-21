@@ -111,13 +111,13 @@ Edita `.env.local` con tus valores:
 
 ```env
 # Site Configuration
-NEXT_PUBLIC_SITE_URL=https://tu-dominio.com
-NEXT_PUBLIC_SITE_NAME="Tu Blog de Reseñas"
+SITE_URL=https://tu-dominio.com
+SITE_NAME="Tu Blog de Reseñas"
 
 # Sanity Configuration
-NEXT_PUBLIC_SANITY_PROJECT_ID=tu-project-id
-NEXT_PUBLIC_SANITY_DATASET=production
-NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
+SANITY_PROJECT_ID=tu-project-id
+SANITY_DATASET=production
+SANITY_API_VERSION=2024-01-01
 SANITY_API_READ_TOKEN=tu-read-token
 SANITY_WEBHOOK_SECRET=tu-webhook-secret
 
@@ -136,11 +136,11 @@ ADS_SCRIPT_URL=https://securepubads.g.doubleclick.net/tag/js/gpt.js
 
 # Maps Configuration
 MAPS_PROVIDER=google
-NEXT_PUBLIC_GOOGLE_MAPS_KEY=tu-maps-key
+GOOGLE_MAPS_KEY=tu-maps-key
 
 # Analytics
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-NEXT_PUBLIC_PLAUSIBLE_DOMAIN=tu-dominio.com
+GA_MEASUREMENT_ID=G-XXXXXXXXXX
+PLAUSIBLE_DOMAIN=tu-dominio.com
 ```
 
 ### 4. Ejecutar en desarrollo
@@ -456,12 +456,12 @@ export const authConfig = {
 
 #### Google Analytics 4
 ```env
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
 #### Plausible (alternativa)
 ```env
-NEXT_PUBLIC_PLAUSIBLE_DOMAIN=tu-dominio.com
+PLAUSIBLE_DOMAIN=tu-dominio.com
 ```
 
 ### Anuncios
@@ -517,15 +517,14 @@ Antes de desplegar, necesitas configurar las siguientes variables de entorno:
 
 #### 🔐 Autenticación (Obligatorio)
 ```bash
-NEXTAUTH_URL=https://tu-dominio.vercel.app
 NEXTAUTH_SECRET=7cce0f4acf16c22f449dfa846c1f8c9bc478e24bb8c9ed9fff4589d142791fb4
 ```
 
 #### 🏢 Sanity CMS (Obligatorio)
 ```bash
-NEXT_PUBLIC_SANITY_PROJECT_ID=tu-project-id
-NEXT_PUBLIC_SANITY_DATASET=production
-NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
+SANITY_PROJECT_ID=tu-project-id
+SANITY_DATASET=production
+SANITY_API_VERSION=2024-01-01
 SANITY_API_READ_TOKEN=tu-read-token
 ```
 
@@ -561,10 +560,9 @@ ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD_HASH=$2b$10$...
 
 # Analytics
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
 # IndexNow
-INDEXNOW_HOST=tu-dominio.com
 INDEXNOW_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
@@ -582,9 +580,7 @@ IndexNow permite notificar automáticamente a los motores de búsqueda (Bing, Ya
 
 2. **Configurar variables de entorno**:
    ```bash
-   INDEXNOW_HOST=tu-dominio.com
    INDEXNOW_KEY=abcdef1234567890abcdef1234567890
-   INDEXNOW_KEY_LOCATION=https://tu-dominio.com/abcdef1234567890abcdef1234567890.txt
    ```
 
 3. **Generar archivo de verificación**:
@@ -658,8 +654,8 @@ npm run type-check
 #### Sanity Studio no carga
 ```bash
 # Verificar variables de entorno
-echo $NEXT_PUBLIC_SANITY_PROJECT_ID
-echo $NEXT_PUBLIC_SANITY_DATASET
+echo $SANITY_PROJECT_ID
+echo $SANITY_DATASET
 
 # Reinstalar Sanity
 npm install sanity@latest

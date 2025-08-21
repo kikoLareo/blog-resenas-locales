@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+  "prebuild": "tsx scripts/indexnow-verify.ts",
     "generate-admin": "node scripts/generate-admin-password.js",
     "build": "next build",
     "start": "next start",

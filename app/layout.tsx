@@ -114,7 +114,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} antialiased`}>
         <AuthProvider>
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-XSLBYXBEZJ'} />
+          <GoogleAnalytics gaId={process.env.GA_MEASUREMENT_ID || 'G-XSLBYXBEZJ'} />
           <PerformanceMonitor />
           {/* Skip link for accessibility */}
           <a href="#main-content" className="skip-link">

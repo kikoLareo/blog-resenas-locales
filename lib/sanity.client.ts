@@ -12,13 +12,13 @@ export const REVALIDATE_TAGS = {
 } as const;
 
 function getClientConfig(): ClientConfig | null {
-  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-  const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
+  const projectId = process.env.SANITY_PROJECT_ID;
+  const dataset = process.env.SANITY_DATASET;
   if (!projectId || !dataset) return null;
   return {
     projectId,
     dataset,
-    apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
+    apiVersion: process.env.SANITY_API_VERSION || '2024-01-01',
     useCdn: process.env.NODE_ENV === 'production',
     token: process.env.SANITY_API_READ_TOKEN,
     perspective: 'published',
@@ -33,7 +33,7 @@ function getClientInstance() {
 export function urlFor(source: SanityImageSource) {
   const client = getClientInstance();
   if (!client) {
-    throw new Error('Sanity client not configured: set NEXT_PUBLIC_SANITY_PROJECT_ID and NEXT_PUBLIC_SANITY_DATASET');
+    throw new Error('Sanity client not configured: set SANITY_PROJECT_ID and SANITY_DATASET');
   }
   return imageUrlBuilder(client).image(source);
 }

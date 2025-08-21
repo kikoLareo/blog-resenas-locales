@@ -52,7 +52,6 @@
 ```env
 # Auth.js
 NEXTAUTH_SECRET=super-secret-key-change-in-production
-NEXTAUTH_URL=http://localhost:3001
 
 # Allowlist de emails autorizados
 ADMIN_EMAILS=admin@example.com,tu-email@gmail.com,editor@ejemplo.com
@@ -64,9 +63,9 @@ GITHUB_ID=tu-github-client-id
 GITHUB_SECRET=tu-github-client-secret
 
 # Sanity (para datos del admin)
-NEXT_PUBLIC_SANITY_PROJECT_ID=xaenlpyp
-NEXT_PUBLIC_SANITY_DATASET=production
-NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
+SANITY_PROJECT_ID=xaenlpyp
+SANITY_DATASET=production
+SANITY_API_VERSION=2024-01-01
 SANITY_API_READ_TOKEN=sk...  # Token con permisos de lectura
 SANITY_API_WRITE_TOKEN=sk... # Token con permisos de escritura (opcional)
 ```

@@ -123,9 +123,9 @@ El archivo `lib/queries.ts` incluye queries optimizadas para:
 
 ### Variables de Entorno
 ```env
-NEXT_PUBLIC_SANITY_PROJECT_ID=tu_project_id
-NEXT_PUBLIC_SANITY_DATASET=production
-NEXT_PUBLIC_SITE_URL=https://tu-dominio.com
+SANITY_PROJECT_ID=tu_project_id
+SANITY_DATASET=production
+SITE_URL=https://tu-dominio.com
 ```
 
 ### Dependencias Adicionales

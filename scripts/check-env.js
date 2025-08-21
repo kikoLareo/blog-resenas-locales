@@ -7,19 +7,14 @@ const requiredEnvVars = {
     description: 'Secret para NextAuth.js',
     example: '7cce0f4acf16c22f449dfa846c1f8c9bc478e24bb8c9ed9fff4589d142791fb4'
   },
-  NEXTAUTH_URL: {
-    required: true,
-    description: 'URL de la aplicación',
-    example: 'https://tu-dominio.vercel.app'
-  },
-  
+
   // Sanity CMS
-  NEXT_PUBLIC_SANITY_PROJECT_ID: {
+  SANITY_PROJECT_ID: {
     required: true,
     description: 'ID del proyecto de Sanity',
     example: 'xaenlpyp'
   },
-  NEXT_PUBLIC_SANITY_DATASET: {
+  SANITY_DATASET: {
     required: true,
     description: 'Dataset de Sanity',
     example: 'production'

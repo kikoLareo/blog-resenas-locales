@@ -1,7 +1,7 @@
 // Site configuration constants
 export const SITE_CONFIG = {
-  name: process.env.NEXT_PUBLIC_SITE_NAME || 'Blog de Reseñas',
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com',
+  name: process.env.SITE_NAME || 'Blog de Reseñas',
+  url: process.env.SITE_URL || 'https://example.com',
   description: 'Descubre los mejores locales y restaurantes con nuestras reseñas detalladas y honestas.',
   author: 'Blog de Reseñas Team',
   locale: 'es-ES',
@@ -10,9 +10,9 @@ export const SITE_CONFIG = {
 
 // Sanity configuration
 export const SANITY_CONFIG = {
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '',
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
+  projectId: process.env.SANITY_PROJECT_ID || '',
+  dataset: process.env.SANITY_DATASET || 'production',
+  apiVersion: process.env.SANITY_API_VERSION || '2024-01-01',
   useCdn: process.env.NODE_ENV === 'production',
   token: process.env.SANITY_API_READ_TOKEN,
 } as const;
@@ -87,7 +87,7 @@ export const ADS_CONFIG = {
 // Maps configuration
 export const MAPS_CONFIG = {
   provider: process.env.MAPS_PROVIDER || 'google',
-  googleMapsKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '',
+  googleMapsKey: process.env.GOOGLE_MAPS_KEY || '',
   defaultZoom: 15,
   defaultCenter: {
     lat: 42.8782, // Santiago de Compostela
@@ -97,12 +97,12 @@ export const MAPS_CONFIG = {
 
 // Analytics configuration
 export const ANALYTICS_CONFIG = {
-  provider: process.env.NEXT_PUBLIC_ANALYTICS || 'none',
+  provider: process.env.ANALYTICS || 'none',
   googleAnalytics: {
-    measurementId: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || '',
+    measurementId: process.env.GA_MEASUREMENT_ID || '',
   },
   plausible: {
-    domain: process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN || '',
+    domain: process.env.PLAUSIBLE_DOMAIN || '',
   },
 } as const;
 

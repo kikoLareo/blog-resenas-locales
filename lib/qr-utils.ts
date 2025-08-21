@@ -32,7 +32,7 @@ export function generateUniqueCode(): string {
  * Genera un código QR como imagen base64
  */
 export async function generateQRCode(data: QRCodeData): Promise<string> {
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/qr/${data.code}`;
+  const url = `${process.env.SITE_URL || 'http://localhost:3000'}/qr/${data.code}`;
   
   try {
     const qrCodeDataURL = await QRCode.toDataURL(url, {
@@ -104,7 +104,7 @@ export async function recordQRUsage(code: string, venueId: string, request?: Req
  * Genera la URL para acceder a través del QR
  */
 export function generateQRAccessURL(code: string): string {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const baseUrl = process.env.SITE_URL || 'http://localhost:3000';
   return `${baseUrl}/qr/${code}`;
 }
 
@@ -112,7 +112,7 @@ export function generateQRAccessURL(code: string): string {
  * Genera la URL para descargar el QR como imagen
  */
 export function generateQRDownloadURL(code: string): string {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const baseUrl = process.env.SITE_URL || 'http://localhost:3000';
   return `${baseUrl}/api/qr/download/${code}`;
 }
 

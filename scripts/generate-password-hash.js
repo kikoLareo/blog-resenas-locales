@@ -18,5 +18,4 @@ bcrypt.hash(password, saltRounds, function(err, hash) {
   console.log('ADMIN_EMAIL=admin@example.com');
   console.log(`ADMIN_PASSWORD_HASH=${hash}`);
   console.log('NEXTAUTH_SECRET=tu-secret-key-muy-largo');
-  console.log('NEXTAUTH_URL=https://tu-dominio.vercel.app');
 });

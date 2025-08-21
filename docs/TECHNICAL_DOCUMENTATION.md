@@ -836,8 +836,8 @@ test('should load homepage within 3 seconds', async ({ page }) => {
   "outputDirectory": ".next",
   "framework": "nextjs",
   "env": {
-    "NEXT_PUBLIC_SANITY_PROJECT_ID": "@sanity-project-id",
-    "NEXT_PUBLIC_SANITY_DATASET": "@sanity-dataset",
+    "SANITY_PROJECT_ID": "@sanity-project-id",
+    "SANITY_DATASET": "@sanity-dataset",
     "SANITY_API_TOKEN": "@sanity-api-token"
   }
 }
@@ -847,9 +847,9 @@ test('should load homepage within 3 seconds', async ({ page }) => {
 
 ```bash
 # .env.local
-NEXT_PUBLIC_SITE_URL=https://tu-dominio.com
-NEXT_PUBLIC_SANITY_PROJECT_ID=tu-project-id
-NEXT_PUBLIC_SANITY_DATASET=production
+SITE_URL=https://tu-dominio.com
+SANITY_PROJECT_ID=tu-project-id
+SANITY_DATASET=production
 SANITY_API_TOKEN=tu-api-token
 
 # Auth.js
@@ -1012,8 +1012,8 @@ export const logger = {
 ```typescript
 // lib/sanity.client.ts
 export const sanityClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,
+  projectId: process.env.SANITY_PROJECT_ID!,
+  dataset: process.env.SANITY_DATASET!,
   apiVersion: '2024-01-01',
   useCdn: process.env.NODE_ENV === 'production',
   logger: process.env.NODE_ENV === 'development' ? console : undefined,

@@ -127,8 +127,8 @@ export default defineConfig({
     // Environment variables for tests
     env: {
       NODE_ENV: 'test',
-      NEXT_PUBLIC_SANITY_PROJECT_ID: 'test-project',
-      NEXT_PUBLIC_SANITY_DATASET: 'test',
+      SANITY_PROJECT_ID: 'test-project',
+      SANITY_DATASET: 'test',
     },
   },
 

@@ -2,7 +2,7 @@
 
 ### Cliente (ya integrado)
 
-- `app/layout.tsx` usa `@next/third-parties/google` con `NEXT_PUBLIC_GA_MEASUREMENT_ID`.
+- `app/layout.tsx` usa `@next/third-parties/google` con `GA_MEASUREMENT_ID`.
 
 ### Data API (pendiente)
 

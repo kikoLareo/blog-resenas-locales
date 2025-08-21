@@ -4,15 +4,14 @@
 
 ### 🔐 Autenticación (Obligatorio)
 ```bash
-NEXTAUTH_URL=https://tu-dominio.vercel.app
 NEXTAUTH_SECRET=7cce0f4acf16c22f449dfa846c1f8c9bc478e24bb8c9ed9fff4589d142791fb4
 ```
 
 ### 🏢 Sanity CMS (Obligatorio)
 ```bash
-NEXT_PUBLIC_SANITY_PROJECT_ID=tu-project-id
-NEXT_PUBLIC_SANITY_DATASET=production
-NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
+SANITY_PROJECT_ID=tu-project-id
+SANITY_DATASET=production
+SANITY_API_VERSION=2024-01-01
 SANITY_API_READ_TOKEN=tu-read-token
 ```
 
@@ -29,7 +28,7 @@ ADMIN_PASSWORD_HASH=$2b$10$nqdaPIhyOycDi1Ze18PkqOygPVAQaBUijDno6vknoF0JmEkl7Zgki
 
 ### 📊 Analytics (Opcional)
 ```bash
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
 ## 🛠️ Configuración en Vercel
@@ -56,8 +55,8 @@ node scripts/generate-password-hash.js
 Las siguientes variables son **OBLIGATORIAS** para que la aplicación funcione:
 
 - ✅ `NEXTAUTH_SECRET` - Para autenticación
-- ✅ `NEXT_PUBLIC_SANITY_PROJECT_ID` - Para el CMS
-- ✅ `NEXT_PUBLIC_SANITY_DATASET` - Para el CMS
+- ✅ `SANITY_PROJECT_ID` - Para el CMS
+- ✅ `SANITY_DATASET` - Para el CMS
 - ✅ `SANITY_API_READ_TOKEN` - Para leer datos del CMS
 
 ## 🔍 Verificación

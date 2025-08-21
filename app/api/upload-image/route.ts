@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Obtener la URL de la imagen
-    const imageUrl = `https://cdn.sanity.io/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/${result._id}.${result.extension}`;
+    const imageUrl = `https://cdn.sanity.io/images/${process.env.SANITY_PROJECT_ID}/${process.env.SANITY_DATASET}/${result._id}.${result.extension}`;
 
     return NextResponse.json({
       _id: result._id,

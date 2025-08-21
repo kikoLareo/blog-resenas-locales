@@ -8,8 +8,8 @@ function required(name: string, v: string | undefined) {
   return v;
 }
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_STUDIO_PROJECT_ID;
-const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_STUDIO_DATASET || 'production';
+const projectId = process.env.SANITY_PROJECT_ID || process.env.SANITY_STUDIO_PROJECT_ID;
+const dataset = process.env.SANITY_DATASET || process.env.SANITY_STUDIO_DATASET || 'production';
 const token = process.env.SANITY_AUTH_TOKEN || process.env.SANITY_API_TOKEN;
 
 const client = createClient({ projectId: required('projectId', projectId), dataset: required('dataset', dataset), apiVersion: '2024-01-01', token, useCdn: false });

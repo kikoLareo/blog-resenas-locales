@@ -29,17 +29,15 @@ export function buildIndexNowPayload(
 /**
  * Submits URLs to IndexNow API
  * Reads configuration from environment variables:
- * - INDEXNOW_HOST: Domain without protocol
  * - INDEXNOW_KEY: IndexNow API key
- * - INDEXNOW_KEY_LOCATION: URL where the key verification file is served
  * 
  * If any required environment variable is missing, the function does nothing.
  * Errors are logged but not thrown to avoid blocking the calling flow.
  */
 export async function submitToIndexNow(urls: string[]): Promise<number> {
-  const host = process.env.INDEXNOW_HOST;
+  const host = process.env.SITE_URL;
   const key = process.env.INDEXNOW_KEY;
-  const keyLocation = process.env.INDEXNOW_KEY_LOCATION;
+  const keyLocation = `${host}/${key}.txt`
 
   // Skip if configuration is incomplete
   if (!host || !key || !keyLocation) {

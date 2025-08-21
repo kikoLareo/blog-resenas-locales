@@ -45,8 +45,8 @@ export default async function DashboardPage() {
           <div className="mt-3 text-xs text-yellow-600">
             <p>Variables necesarias:</p>
             <code className="block mt-1 bg-yellow-100 p-2 rounded">
-              NEXT_PUBLIC_SANITY_PROJECT_ID=tu-project-id<br/>
-              NEXT_PUBLIC_SANITY_DATASET=production<br/>
+              SANITY_PROJECT_ID=tu-project-id<br/>
+              SANITY_DATASET=production<br/>
               SANITY_API_READ_TOKEN=tu-read-token
             </code>
           </div>

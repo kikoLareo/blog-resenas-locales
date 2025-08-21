@@ -14,7 +14,6 @@ const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '$2b$10$...';
 ```env
 # Autenticación
 NEXTAUTH_SECRET=super-secret-key-change-in-production
-NEXTAUTH_URL=http://localhost:3000
 
 # Usuario único
 ADMIN_EMAIL=admin@example.com
@@ -88,7 +87,6 @@ export default withAuth(
 ```env
 # PRODUCCIÓN - Cambiar TODOS estos valores
 NEXTAUTH_SECRET=tu-secret-super-seguro-y-unico-de-64-caracteres
-NEXTAUTH_URL=https://tu-dominio.com
 
 # Usuario de producción
 ADMIN_EMAIL=tu-email-real@gmail.com
@@ -108,15 +106,6 @@ openssl rand -base64 64
 npm run generate-password tu-email@gmail.com "TuContraseñaSuperSegura123!"
 ```
 
-### 4. Configuración de Dominio
-```env
-# Para producción
-NEXTAUTH_URL=https://tu-dominio.com
-# Para staging
-NEXTAUTH_URL=https://staging.tu-dominio.com
-```
-
----
 
 ## 🔧 Scripts y Herramientas Disponibles
 
@@ -186,7 +175,6 @@ console.log(`✅ Login exitoso para: ${email}`);
 - [ ] Cambiar `NEXTAUTH_SECRET` por uno seguro
 - [ ] Cambiar `ADMIN_EMAIL` por email real
 - [ ] Generar nueva contraseña fuerte
-- [ ] Configurar `NEXTAUTH_URL` correcto
 - [ ] Verificar HTTPS en producción
 - [ ] Configurar logs de seguridad
 

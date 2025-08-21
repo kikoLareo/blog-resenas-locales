@@ -11,13 +11,13 @@
 Crear `.env.local` con:
 
 ```
-NEXT_PUBLIC_SANITY_PROJECT_ID=...
-NEXT_PUBLIC_SANITY_DATASET=production
-NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
+SANITY_PROJECT_ID=...
+SANITY_DATASET=production
+SANITY_API_VERSION=2024-01-01
 
 SANITY_API_READ_TOKEN=... # opcional si necesitas leer drafts/preview
 
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXX # GA4 (opcional)
+GA_MEASUREMENT_ID=G-XXXXXXX # GA4 (opcional)
 
 SITE_URL=https://tu-dominio.com
 ```
