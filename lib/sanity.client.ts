@@ -89,6 +89,24 @@ export async function sanityFetch<T = unknown>({
   revalidate?: number | false;
   preview?: boolean;
 }): Promise<T> {
+  // If we're running in a browser environment, route requests through the server proxy
+  if (typeof window !== 'undefined') {
+    const url = new URL('/api/sanity/proxy', window.location.origin)
+    url.searchParams.set('query', query)
+    if (params && Object.keys(params).length > 0) {
+      url.searchParams.set('params', JSON.stringify(params))
+    }
+
+    const res = await fetch(url.toString())
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new Error(`Sanity proxy error: ${res.status} ${text}`)
+    }
+    const json = await res.json()
+    return json as T
+  }
+
+  // Server-side: use the real client (supports Next.js caching and preview)
   const clientInstance = getClient(preview);
 
   return clientInstance.fetch(query, params, {
