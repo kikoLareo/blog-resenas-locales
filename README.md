@@ -638,6 +638,8 @@ IndexNow (dry-run): { "host": "...", "urlList": [...] }
 ### Guías Disponibles
 - **[Documentación Técnica](docs/TECHNICAL_DOCUMENTATION.md)** - Arquitectura, APIs, componentes
 - **[Guía de Usuario](docs/USER_GUIDE.md)** - Manual completo del dashboard
+- **[Directrices de Código](CODE_GUIDELINES.md)** - Estándares y mejores prácticas para el código
+- **[Reglas para IA](AI_MODEL_RULES.md)** - Guía para asistentes de IA trabajando con el proyecto
 - **[TODO](TODO.md)** - Lista de tareas y estado del proyecto
 - **[Memory Bank](MEMORY_BANK.md)** - Decisiones técnicas y contexto
 
@@ -682,7 +684,9 @@ npm install sanity@latest
 2. Crear feature branch (`git checkout -b feature/nueva-funcionalidad`)
 3. Commit cambios (`git commit -am 'Add: nueva funcionalidad'`)
 4. Push a la branch (`git push origin feature/nueva-funcionalidad`)
-5. Crear Pull Request
+5. Crear Pull Request siguiendo la plantilla
+
+> 📝 Por favor, revisa nuestras [Directrices de Código](CODE_GUIDELINES.md) antes de contribuir. Esto asegura que el código mantenga altos estándares de calidad, SEO y accesibilidad.
 
 ## 📄 Licencia
 

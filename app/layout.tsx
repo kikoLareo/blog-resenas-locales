@@ -112,7 +112,7 @@ export default function RootLayout({
         {/* Performance optimizations */}
         <meta httpEquiv="X-DNS-Prefetch-Control" content="on" />
       </head>
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.className} antialiased  bg-black`}>
         <AuthProvider>
           <GoogleAnalytics gaId={process.env.GA_MEASUREMENT_ID || 'G-XSLBYXBEZJ'} />
           <PerformanceMonitor />

@@ -1,0 +1,64 @@
+/* Hero Carousel Specific Styles */
+
+/* Navigation button styles */
+.nav-button {
+  opacity: 0.7;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.nav-button:hover {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* Only show navigation buttons when hovering the carousel on desktop */
+@media (min-width: 768px) {
+  .hero-carousel .nav-button {
+    opacity: 0;
+  }
+  
+  .hero-carousel:hover .nav-button {
+    opacity: 0.7;
+  }
+}
+
+/* Card animation effects */
+.stack-card {
+  transition: all 0.4s ease-out;
+  will-change: transform;
+}
+
+.stack-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Card stacking effect */
+.stack-card-prev {
+  transform: translateX(-10%) scale(0.9) rotate(-3deg);
+  filter: brightness(0.8);
+  pointer-events: none;
+}
+
+.stack-card-next {
+  transform: translateX(10%) scale(0.9) rotate(3deg);
+  filter: brightness(0.8);
+  pointer-events: none;
+}
+
+.stack-card-current {
+  z-index: 30;
+  transform: translateY(0) scale(1);
+  filter: brightness(1);
+}
+
+/* Progress indicator dots animation */
+@keyframes expandDot {
+  from { width: 6px; }
+  to { width: 24px; }
+}
+
+.dot-indicator-active {
+  animation: expandDot 0.3s forwards;
+}

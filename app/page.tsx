@@ -62,7 +62,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <HeroSection reviews={heroItems} />
+      <HeroSection />
       <FeaturedSections trending={trending} topRated={topRated} />
       <NewsletterCTA />
     </div>
