@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { buildIndexNowPayload, submitToIndexNow, buildAbsoluteUrls } from '@/lib/indexnow';
+import { buildIndexNowPayload, submitToIndexNow, buildAbsoluteUrls } from '../../../lib/indexnow';
 
 // Mock fetch global
 const mockFetch = vi.fn();
@@ -156,9 +156,9 @@ describe('IndexNow', () => {
 
     it('should successfully submit URLs to IndexNow API', async () => {
       process.env.NODE_ENV = 'production';
-      process.env.INDEXNOW_HOST = 'example.com';
+      process.env.SITE_URL = 'example.com';
       process.env.INDEXNOW_KEY = 'abcdef1234567890abcdef1234567890';
-      process.env.INDEXNOW_KEY_LOCATION = 'https://example.com/abcdef1234567890abcdef1234567890.txt';
+      process.env.INDEXNOW_DRY_RUN = 'false';
 
       const urls = ['https://example.com/page1', 'https://example.com/page2'];
       
@@ -180,7 +180,7 @@ describe('IndexNow', () => {
         body: JSON.stringify({
           host: 'example.com',
           key: 'abcdef1234567890abcdef1234567890',
-          keyLocation: 'https://example.com/abcdef1234567890abcdef1234567890.txt',
+          keyLocation: 'example.com/abcdef1234567890abcdef1234567890.txt',
           urlList: urls
         })
       });
@@ -189,9 +189,9 @@ describe('IndexNow', () => {
 
     it('should handle API errors gracefully', async () => {
       process.env.NODE_ENV = 'production';
-      process.env.INDEXNOW_HOST = 'example.com';
+      process.env.SITE_URL = 'example.com';
       process.env.INDEXNOW_KEY = 'abcdef1234567890abcdef1234567890';
-      process.env.INDEXNOW_KEY_LOCATION = 'https://example.com/abcdef1234567890abcdef1234567890.txt';
+      process.env.INDEXNOW_DRY_RUN = 'false';
 
       const urls = ['https://example.com/page1'];
       
@@ -209,9 +209,9 @@ describe('IndexNow', () => {
 
     it('should handle network errors gracefully', async () => {
       process.env.NODE_ENV = 'production';
-      process.env.INDEXNOW_HOST = 'example.com';
+      process.env.SITE_URL = 'example.com';
       process.env.INDEXNOW_KEY = 'abcdef1234567890abcdef1234567890';
-      process.env.INDEXNOW_KEY_LOCATION = 'https://example.com/abcdef1234567890abcdef1234567890.txt';
+      process.env.INDEXNOW_DRY_RUN = 'false';
 
       const urls = ['https://example.com/page1'];
       const networkError = new Error('Network error');
