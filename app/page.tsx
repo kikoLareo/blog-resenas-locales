@@ -5,6 +5,7 @@ import { FeaturedSections } from '@/components/FeaturedSections';
 import { NewsletterCTA } from '@/components/NewsletterCTA';
 import { sanityFetch } from '@/lib/sanity.client';
 import { homepageQuery } from '@/sanity/lib/queries';
+import { getAllFeaturedItems } from '@/lib/featured-admin';
 
 export const metadata: Metadata = {
   title: 'Inicio',
@@ -22,6 +23,14 @@ export default async function HomePage() {
     revalidate: 0,
     tags: ['homepage','reviews'],
   });
+
+  // Obtener featured items para el carousel dinámico
+  let featuredItems: any[] = [];
+  try {
+    featuredItems = await getAllFeaturedItems();
+  } catch (error) {
+    console.error('Error loading featured items:', error);
+  }
 
   // Mapear reviews para Hero y Featured
   const heroItems = (data?.featuredReviews || []).slice(0, 3).map((r) => ({
@@ -62,7 +71,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <HeroSection />
+      <HeroSection featuredItems={featuredItems} />
       <FeaturedSections trending={trending} topRated={topRated} />
       <NewsletterCTA />
     </div>

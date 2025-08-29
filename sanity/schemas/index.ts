@@ -12,6 +12,9 @@ import post from './post';
 import qrCode from './qr-code';
 import qrFeedback from './qr-feedback';
 
+// Featured content
+import featuredItem from './featured-item';
+
 // Export schema types in logical order
 export const schemaTypes = [
   // ===== CONFIGURACIÓN BASE =====
@@ -26,6 +29,10 @@ export const schemaTypes = [
   post,        // Crónicas y artículos del blog
   qrCode,      // Códigos QR para acceso a locales
   qrFeedback,  // Feedback de códigos QR
+  
+  // ===== CONTENIDO DESTACADO =====
+  // Gestión de elementos destacados en homepage
+  featuredItem, // Items del carrusel principal
 ];
 
 // Configuración adicional para validaciones y referencias

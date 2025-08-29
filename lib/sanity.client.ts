@@ -9,6 +9,7 @@ export const REVALIDATE_TAGS = {
   post: 'posts',
   city: 'cities',
   category: 'categories',
+  featuredItem: 'featured-items',
 } as const;
 
 function getClientConfig(): ClientConfig | null {
