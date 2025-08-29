@@ -67,7 +67,7 @@ jobs:
         env:
           SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
           SANITY_DATASET: ${{ secrets.SANITY_DATASET }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_SECRET: 0096b622bf845f20d5047205a0ccca9ed916e1cc4772efa654504e8d3927a124
           
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
