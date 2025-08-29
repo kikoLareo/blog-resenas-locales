@@ -79,6 +79,78 @@ const heroReviews = [
       atmosphere: "Decoración bohemia con plantas por doquier. El sonido de la máquina de café y las conversaciones crean una banda sonora urbana perfecta.",
       recommendation: "Ideal para una pausa matutina o una tarde de trabajo. Los domingos el brunch está espectacular, especialmente las tostadas de aguacate."
     }
+  },
+  {
+    id: "4",
+    title: "Tapas gourmet en Chamberí",
+    subtitle: "Reinterpretación moderna de tapas tradicionales en un ambiente acogedor.",
+    image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0YXBhcyUyMHNwYW5pc2h8ZW58MHx8fHwxNzE0NzA4MjgyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+    rating: 4.7,
+    location: "Chamberí, Madrid",
+    readTime: "4 min",
+    tags: ["Tapas", "Gourmet", "Vino"],
+    description: "Tapas clásicas reinventadas con toques modernos y una extensa carta de vinos españoles en el elegante barrio de Chamberí.",
+    ctaText: "Ver carta completa",
+    seoKeywords: "tapas gourmet Madrid, mejor bar tapas Chamberí, vinos españoles Madrid",
+    content: {
+      summary: "Un local que ha conseguido elevar las tapas tradicionales a la categoría de alta cocina sin perder la esencia del tapeo español.",
+      highlights: [
+        "Tapas tradicionales con presentaciones innovadoras",
+        "Más de 50 referencias de vinos españoles",
+        "Ingredientes de proximidad y temporada",
+        "Barra donde ver la preparación de platos"
+      ],
+      atmosphere: "Elegante pero informal, con una decoración que combina elementos tradicionales y modernos. La barra es el centro neurálgico donde se aprecia la maestría de los cocineros.",
+      recommendation: "No te pierdas su versión de la tortilla española y las croquetas de jamón ibérico. Ideal para compartir múltiples platos."
+    }
+  },
+  {
+    id: "5",
+    title: "Cocina asiática fusión en Chueca",
+    subtitle: "Un viaje culinario por Asia con influencias mediterráneas en pleno centro de Madrid.",
+    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxhc2lhbiUyMGZ1c2lvbiUyMHJlc3RhdXJhbnR8ZW58MHx8fHwxNzE0NzA4NTU0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+    rating: 4.5,
+    location: "Chueca, Madrid",
+    readTime: "5 min",
+    tags: ["Asiático", "Fusión", "Cocktails"],
+    description: "Sabores de Japón, Tailandia y China fusionados con técnicas mediterráneas en un espacio moderno y vibrante.",
+    ctaText: "Explorar el menú",
+    seoKeywords: "restaurante asiático fusión Madrid, cocina japonesa Chueca, mejor restaurante asiático Madrid",
+    content: {
+      summary: "Un espacio gastronómico que rompe las fronteras entre la cocina asiática tradicional y los sabores mediterráneos.",
+      highlights: [
+        "Sushi con toques mediterráneos único en Madrid",
+        "Dim sum artesanal de autor",
+        "Cocktails inspirados en la ruta de la seda",
+        "Menú degustación con maridaje incluido"
+      ],
+      atmosphere: "Decoración minimalista con influencias japonesas y toques de color. La música electrónica suave y la iluminación indirecta crean un ambiente contemporáneo y dinámico.",
+      recommendation: "Imprescindible probar su gyoza de gambas al ajillo y el tartar de atún con aguacate y mango. La experiencia del menú degustación completo vale cada céntimo."
+    }
+  },
+  {
+    id: "6",
+    title: "Mercado gastronómico en Lavapiés",
+    subtitle: "Un espacio multicultural con puestos de comida internacional en el barrio más diverso de Madrid.",
+    image: "https://images.unsplash.com/photo-1568031813264-d394c5d474b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYXJrZXQlMjBmb29kJTIwaGFsbHxlbnwwfHx8fDE3MTQ3MDkxNjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    rating: 4.4,
+    location: "Lavapiés, Madrid",
+    readTime: "6 min",
+    tags: ["Mercado", "Internacional", "Street Food"],
+    description: "Un viaje gastronómico alrededor del mundo sin salir de Madrid, con más de 20 puestos de comida de diferentes culturas.",
+    ctaText: "Descubrir puestos y horarios",
+    seoKeywords: "mercado gastronómico Lavapiés, food market Madrid, comida internacional Madrid",
+    content: {
+      summary: "La diversidad cultural de Lavapiés concentrada en un espacio donde disfrutar de la mejor comida callejera internacional.",
+      highlights: [
+        "Más de 20 puestos gastronómicos de 5 continentes",
+        "Eventos musicales y culturales semanales",
+        "Talleres de cocina internacional",
+        "Zona común con capacidad para 200 personas"
+      ],
+      atmosphere: "Bullicioso y cosmopolita, con una energía vibrante típica de los mercados internacionales. Mesas compartidas que fomentan la socialización entre desconocidos.",
+      recommendation: "Ideal para grupos con diferentes gustos culinarios. No te pierdas los puestos de comida venezolana, coreana y etíope que son difíciles de encontrar en otros lugares de Madrid."
+    }
   }
 ];
 
@@ -376,7 +448,7 @@ export function HeroSection({ onReviewClick, reviews }: HeroSectionProps) {
         </div>
 
         {/* Thumbnail container with scroll - showing only 3 visible items */}
-        <div className="absolute bottom-10 md:bottom-20 right-1/2 transform translate-x-1/2 md:right-8 md:translate-x-0 z-20">
+        <div className="absolute bottom-24 sm:bottom-16 md:bottom-20 right-1/2 transform translate-x-1/2 md:right-8 md:translate-x-0 z-20">
           <div className="relative">
             {/* Container for thumbnails with dynamic width based on number of items (max 3) */}
             <div 
