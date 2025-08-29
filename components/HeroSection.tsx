@@ -207,13 +207,22 @@ export function HeroSection({ onReviewClick, reviews }: HeroSectionProps) {
       setTimeout(() => {
         // Finalmente terminamos la transición
         setIsTransitioning(false);
+        
+        // Asegurarnos de centrar la miniatura después de que la transición ha terminado
+        centerThumbnail(newIndex);
       }, 150);
     }, 300);
     
+    // Centramos inmediatamente también para mejor respuesta
+    centerThumbnail(newIndex);
+  }, [currentIndex, isTransitioning]);
+  
+  // Función separada para centrar la miniatura por índice
+  const centerThumbnail = useCallback((index: number) => {
     // Centra automáticamente la miniatura seleccionada
-    if (thumbnailsContainerRef.current && thumbnailsRefs.current[newIndex]) {
+    if (thumbnailsContainerRef.current && thumbnailsRefs.current[index]) {
       const container = thumbnailsContainerRef.current;
-      const thumbnail = thumbnailsRefs.current[newIndex];
+      const thumbnail = thumbnailsRefs.current[index];
       const containerWidth = container.offsetWidth;
       const thumbnailLeft = thumbnail.offsetLeft;
       const thumbnailWidth = thumbnail.offsetWidth;
@@ -226,7 +235,7 @@ export function HeroSection({ onReviewClick, reviews }: HeroSectionProps) {
         behavior: 'smooth'
       });
     }
-  }, [currentIndex, isTransitioning]);
+  }, []);
 
   const nextSlide = useCallback(() => {
     const newIndex = (currentIndex + 1) % displayReviews.length;
@@ -285,6 +294,16 @@ export function HeroSection({ onReviewClick, reviews }: HeroSectionProps) {
   useEffect(() => {
     setDisplayedTextIndex(currentIndex);
   }, [currentIndex]);
+  
+  // Efecto para centrar la miniatura activa cuando se monta el componente
+  useEffect(() => {
+    // Pequeño timeout para asegurar que los elementos se han renderizado correctamente
+    const timer = setTimeout(() => {
+      centerThumbnail(currentIndex);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [currentIndex, centerThumbnail]);
 
   // Auto-advance slides every 7 seconds
   useEffect(() => {
@@ -448,7 +467,7 @@ export function HeroSection({ onReviewClick, reviews }: HeroSectionProps) {
         </div>
 
         {/* Thumbnail container with scroll - showing only 3 visible items */}
-        <div className="absolute bottom-24 sm:bottom-16 md:bottom-20 right-1/2 transform translate-x-1/2 md:right-8 md:translate-x-0 z-20">
+        <div className="absolute bottom-24 sm:bottom-4 md:bottom-20 right-1/2 transform translate-x-1/2 md:right-8 md:translate-x-0 z-20">
           <div className="relative">
             {/* Container for thumbnails with dynamic width based on number of items (max 3) */}
             <div 
@@ -521,12 +540,9 @@ export function HeroSection({ onReviewClick, reviews }: HeroSectionProps) {
                   aria-label="Ver miniaturas anteriores"
                   onClick={() => {
                     // Ir a la miniatura anterior
-                    if (currentIndex > 0) {
-                      setCurrentIndex(currentIndex - 1);
-                    } else {
-                      // Si estamos en la primera, ir a la última
-                      setCurrentIndex(displayReviews.length - 1);
-                    }
+                    const newIndex = currentIndex > 0 ? currentIndex - 1 : displayReviews.length - 1;
+                    // Usar goToSlide en lugar de setCurrentIndex para aprovechar la lógica de centrado
+                    goToSlide(newIndex);
                   }}
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -537,12 +553,9 @@ export function HeroSection({ onReviewClick, reviews }: HeroSectionProps) {
                   aria-label="Ver miniaturas siguientes"
                   onClick={() => {
                     // Ir a la miniatura siguiente
-                    if (currentIndex < displayReviews.length - 1) {
-                      setCurrentIndex(currentIndex + 1);
-                    } else {
-                      // Si estamos en la última, ir a la primera
-                      setCurrentIndex(0);
-                    }
+                    const newIndex = currentIndex < displayReviews.length - 1 ? currentIndex + 1 : 0;
+                    // Usar goToSlide en lugar de setCurrentIndex para aprovechar la lógica de centrado
+                    goToSlide(newIndex);
                   }}
                 >
                   <ChevronRight className="w-4 h-4" />
