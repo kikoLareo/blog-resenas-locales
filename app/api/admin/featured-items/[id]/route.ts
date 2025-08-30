@@ -9,10 +9,11 @@ import {
 // GET - Obtener featured item por ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const item = await getFeaturedItemById(params.id);
+    const { id } = await params;
+    const item = await getFeaturedItemById(id);
     
     if (!item) {
       return NextResponse.json(
@@ -34,11 +35,12 @@ export async function GET(
 // PUT - Actualizar featured item
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
-    const updateData = { ...body, _id: params.id };
+    const updateData = { ...body, _id: id };
     
     const result = await updateFeaturedItem(updateData);
     
@@ -62,10 +64,11 @@ export async function PUT(
 // DELETE - Eliminar featured item
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const success = await deleteFeaturedItem(params.id);
+    const { id } = await params;
+    const success = await deleteFeaturedItem(id);
     
     if (!success) {
       return NextResponse.json(
@@ -87,9 +90,10 @@ export async function DELETE(
 // PATCH - Toggle status activo/inactivo
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { isActive } = await request.json();
     
     if (typeof isActive !== 'boolean') {
@@ -99,7 +103,7 @@ export async function PATCH(
       );
     }
 
-    const success = await toggleFeaturedItemStatus(params.id, isActive);
+    const success = await toggleFeaturedItemStatus(id, isActive);
     
     if (!success) {
       return NextResponse.json(

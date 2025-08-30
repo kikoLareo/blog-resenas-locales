@@ -16,76 +16,17 @@ async function fetchFeaturedItems() {
     if (response.ok) {
       return await response.json();
     }
-    console.error('Error fetching featured items:', response.statusText);
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching featured items:', response.statusText);
+    }
     return [];
   } catch (error) {
-    console.error('Error fetching featured items:', error);
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching featured items:', error);
+    }
     return [];
-  }
-}
-
-async function fetchStats() {
-  try {
-    const response = await fetch('/api/admin/featured-items?action=stats');
-    if (response.ok) {
-      return await response.json();
-    }
-    console.error('Error fetching stats:', response.statusText);
-    return { total: 0, active: 0, inactive: 0, byType: [] };
-  } catch (error) {
-    console.error('Error fetching stats:', error);
-    return { total: 0, active: 0, inactive: 0, byType: [] };
-  }
-}
-
-async function createFeaturedItem(data: any) {
-  try {
-    const response = await fetch('/api/admin/featured-items', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    
-    if (response.ok) {
-      return await response.json();
-    }
-    console.error('Error creating featured item:', response.statusText);
-    return null;
-  } catch (error) {
-    console.error('Error creating featured item:', error);
-    return null;
-  }
-}
-
-async function updateFeaturedItem(id: string, data: any) {
-  try {
-    const response = await fetch(`/api/admin/featured-items/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    
-    if (response.ok) {
-      return await response.json();
-    }
-    console.error('Error updating featured item:', response.statusText);
-    return null;
-  } catch (error) {
-    console.error('Error updating featured item:', error);
-    return null;
-  }
-}
-
-async function deleteFeaturedItem(id: string) {
-  try {
-    const response = await fetch(`/api/admin/featured-items/${id}`, {
-      method: 'DELETE'
-    });
-    
-    return response.ok;
-  } catch (error) {
-    console.error('Error deleting featured item:', error);
-    return false;
   }
 }
 
@@ -93,29 +34,125 @@ async function toggleFeaturedItemStatus(id: string, isActive: boolean) {
   try {
     const response = await fetch(`/api/admin/featured-items/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ isActive })
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ isActive }),
     });
-    
-    return response.ok;
+    if (response.ok) {
+      return await response.json();
+    }
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Error toggling featured item status:', response.statusText);
+    }
+    return null;
   } catch (error) {
-    console.error('Error toggling featured item status:', error);
-    return false;
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Error toggling featured item status:', error);
+    }
+    return null;
   }
 }
 
-async function updateItemsOrder(items: { _id: string; order: number }[]) {
+async function createFeaturedItem(item: any) {
   try {
     const response = await fetch('/api/admin/featured-items', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items })
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(item),
     });
-    
-    return response.ok;
+    if (response.ok) {
+      return await response.json();
+    }
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Error creating featured item:', response.statusText);
+    }
+    return null;
   } catch (error) {
-    console.error('Error updating items order:', error);
-    return false;
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Error creating featured item:', error);
+    }
+    return null;
+  }
+}
+
+async function updateFeaturedItem(id: string, item: any) {
+  try {
+    const response = await fetch(`/api/admin/featured-items/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(item),
+    });
+    if (response.ok) {
+      return await response.json();
+    }
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Error updating featured item:', response.statusText);
+    }
+    return null;
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Error updating featured item:', error);
+    }
+    return null;
+  }
+}
+
+async function deleteFeaturedItem(id: string) {
+  try {
+    const response = await fetch(`/api/admin/featured-items/${id}`, {
+      method: 'DELETE',
+    });
+    if (response.ok) {
+      return await response.json();
+    }
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Error deleting featured item:', response.statusText);
+    }
+    return null;
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Error deleting featured item:', error);
+    }
+    return null;
+  }
+}
+
+async function reorderFeaturedItems(items: any[]) {
+  try {
+    const response = await fetch('/api/admin/featured-items/reorder', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ items }),
+    });
+    if (response.ok) {
+      return await response.json();
+    }
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Error reordering featured items:', response.statusText);
+    }
+    return null;
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Error reordering featured items:', error);
+    }
+    return null;
   }
 }
 
@@ -134,7 +171,7 @@ interface FeaturedItem {
   _updatedAt: string;
 }
 
-export function FeaturedItemsManager() {
+function FeaturedItemsManager() {
   const [featuredItems, setFeaturedItems] = useState<FeaturedItem[]>([]);
   const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, byType: [] });
   const [isLoading, setIsLoading] = useState(true);
@@ -143,79 +180,65 @@ export function FeaturedItemsManager() {
   const [previewItem, setPreviewItem] = useState<FeaturedItem | null>(null);
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
 
-  // Cargar datos iniciales
+  // Load featured items
   useEffect(() => {
+    const loadData = async () => {
+      const [itemsData] = await Promise.all([
+        fetchFeaturedItems(),
+      ]);
+      setFeaturedItems(itemsData);
+      setIsLoading(false);
+    };
     loadData();
   }, []);
 
-  const loadData = async () => {
-    setIsLoading(true);
-    const [itemsData, statsData] = await Promise.all([
-      fetchFeaturedItems(),
-      fetchStats()
-    ]);
-    
-    setFeaturedItems(itemsData);
-    setStats(statsData);
-    setIsLoading(false);
-  };
-
-  const handleCreateNew = () => {
-    setEditingItem(null);
-    setIsFormOpen(true);
-  };
-
-  const handleEdit = (item: FeaturedItem) => {
-    setEditingItem(item);
-    setIsFormOpen(true);
+  const handleSave = async (item: FeaturedItem) => {
+    if (editingItem) {
+      const updated = await updateFeaturedItem(editingItem._id, item);
+      if (updated) {
+        setFeaturedItems(prev => 
+          prev.map(i => i._id === editingItem._id ? updated : i)
+        );
+        setEditingItem(null);
+        setIsFormOpen(false);
+      }
+    } else {
+      const created = await createFeaturedItem(item);
+      if (created) {
+        setFeaturedItems(prev => [...prev, created]);
+        setIsFormOpen(false);
+      }
+    }
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('¿Estás seguro de que quieres eliminar este elemento?')) {
-      const success = await deleteFeaturedItem(id);
-      if (success) {
-        await loadData();
-      } else {
-        alert('Error al eliminar el elemento');
+    if (window.confirm('¿Estás seguro de que quieres eliminar este elemento?')) {
+      const result = await deleteFeaturedItem(id);
+      if (result) {
+        setFeaturedItems(prev => prev.filter(item => item._id !== id));
       }
     }
   };
 
   const handleToggleStatus = async (id: string, currentStatus: boolean) => {
-    const success = await toggleFeaturedItemStatus(id, !currentStatus);
-    if (success) {
-      await loadData();
-    } else {
-      alert('Error al cambiar el estado');
-    }
-  };
-
-  const handleSave = async (itemData: any) => {
-    let success = false;
-    
-    if (editingItem) {
-      const result = await updateFeaturedItem(editingItem._id, itemData);
-      success = !!result;
-    } else {
-      const result = await createFeaturedItem(itemData);
-      success = !!result;
-    }
-    
-    if (success) {
-      await loadData();
-      setIsFormOpen(false);
-      setEditingItem(null);
-    } else {
-      alert('Error al guardar el elemento');
+    const result = await toggleFeaturedItemStatus(id, !currentStatus);
+    if (result) {
+      setFeaturedItems(prev => 
+        prev.map(item => 
+          item._id === id ? { ...item, isActive: !currentStatus } : item
+        )
+      );
     }
   };
 
   const handleDragStart = (e: React.DragEvent, itemId: string) => {
     setDraggedItem(itemId);
+    e.dataTransfer.effectAllowed = 'move';
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
   };
 
   const handleDrop = async (e: React.DragEvent, targetId: string) => {
@@ -228,239 +251,270 @@ export function FeaturedItemsManager() {
 
     const draggedIndex = featuredItems.findIndex(item => item._id === draggedItem);
     const targetIndex = featuredItems.findIndex(item => item._id === targetId);
-    
-    if (draggedIndex === -1 || targetIndex === -1) return;
+
+    if (draggedIndex === -1 || targetIndex === -1) {
+      setDraggedItem(null);
+      return;
+    }
 
     const newItems = [...featuredItems];
     const [draggedElement] = newItems.splice(draggedIndex, 1);
     newItems.splice(targetIndex, 0, draggedElement);
 
+    // Update order property
     const updatedItems = newItems.map((item, index) => ({
-      _id: item._id,
+      ...item,
       order: index + 1
     }));
 
-    const success = await updateItemsOrder(updatedItems);
-    if (success) {
-      await loadData();
-    } else {
-      alert('Error al reordenar elementos');
-    }
-    
+    setFeaturedItems(updatedItems);
     setDraggedItem(null);
+
+    // Update order in backend
+    await reorderFeaturedItems(updatedItems.map(item => ({
+      _id: item._id,
+      order: item.order
+    })));
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'review': return '⭐';
-      case 'venue': return '🏪';
-      case 'category': return '🏷️';
-      case 'collection': return '📚';
-      case 'guide': return '🗺️';
-      default: return '📄';
-    }
+  const openEditForm = (item: FeaturedItem) => {
+    setEditingItem(item);
+    setIsFormOpen(true);
   };
 
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case 'review': return 'Reseña';
-      case 'venue': return 'Local';
-      case 'category': return 'Categoría';
-      case 'collection': return 'Colección';
-      case 'guide': return 'Guía';
-      default: return 'Desconocido';
+  const openCreateForm = () => {
+    setEditingItem(null);
+    setIsFormOpen(true);
+  };
+
+  const closeForm = () => {
+    setEditingItem(null);
+    setIsFormOpen(false);
+  };
+
+  const getTypeColor = (type: string) => {
+    const colors = {
+      review: 'bg-blue-100 text-blue-800',
+      venue: 'bg-green-100 text-green-800',
+      category: 'bg-purple-100 text-purple-800',
+      collection: 'bg-orange-100 text-orange-800',
+      guide: 'bg-pink-100 text-pink-800'
+    };
+    return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getItemLink = (item: FeaturedItem) => {
+    switch (item.type) {
+      case 'review':
+        if (item.reviewRef?.venue?.slug?.current) {
+          return `/${item.reviewRef.venue.slug.current}`;
+        }
+        break;
+      case 'venue':
+        if (item.venueRef?.slug?.current) {
+          return `/${item.venueRef.slug.current}`;
+        }
+        break;
+      case 'category':
+        if (item.categoryRef?.slug?.current) {
+          return `/categorias/${item.categoryRef.slug.current}`;
+        }
+        break;
     }
+    return '#';
   };
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Elementos Destacados</h1>
-          <RefreshCw className="h-6 w-6 animate-spin" />
-        </div>
-        <div className="text-center py-12">
-          <p className="text-gray-500">Cargando elementos destacados...</p>
-        </div>
+      <div className="flex items-center justify-center py-8">
+        <RefreshCw className="w-6 h-6 animate-spin" />
+        <span className="ml-2">Cargando elementos destacados...</span>
       </div>
     );
   }
 
-  const sortedItems = [...featuredItems].sort((a, b) => a.order - b.order);
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Elementos Destacados</h1>
-        <div className="flex space-x-3">
-          <Button onClick={loadData} variant="outline">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Actualizar
-          </Button>
-          <Button onClick={handleCreateNew}>
-            <Plus className="h-4 w-4 mr-2" />
-            Nuevo Elemento
-          </Button>
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Gestión de Elementos Destacados</h2>
+          <p className="text-gray-600">Administra los elementos que aparecen en el carousel principal</p>
         </div>
+        <Button onClick={openCreateForm} className="flex items-center gap-2">
+          <Plus className="w-4 h-4" />
+          Nuevo Elemento
+        </Button>
       </div>
 
-      {/* Estadísticas */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total</CardTitle>
-            <span className="text-2xl">📊</span>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">elementos configurados</p>
+            <div className="text-2xl font-bold">{featuredItems.length}</div>
           </CardContent>
         </Card>
-        
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Activos</CardTitle>
-            <span className="text-2xl">✅</span>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
-            <p className="text-xs text-muted-foreground">visibles en carrusel</p>
+            <div className="text-2xl font-bold text-green-600">
+              {featuredItems.filter(item => item.isActive).length}
+            </div>
           </CardContent>
         </Card>
-        
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Inactivos</CardTitle>
-            <span className="text-2xl">⏸️</span>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-500">{stats.inactive}</div>
-            <p className="text-xs text-muted-foreground">ocultos temporalmente</p>
+            <div className="text-2xl font-bold text-red-600">
+              {featuredItems.filter(item => !item.isActive).length}
+            </div>
           </CardContent>
         </Card>
-        
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">En Carrusel</CardTitle>
-            <span className="text-2xl">🎠</span>
+            <CardTitle className="text-sm font-medium">Reseñas</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{Math.min(stats.active, 5)}</div>
-            <p className="text-xs text-muted-foreground">máximo 5 elementos</p>
+            <div className="text-2xl font-bold text-blue-600">
+              {featuredItems.filter(item => item.type === 'review').length}
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Lista de elementos */}
+      {/* Featured Items List */}
       <Card>
         <CardHeader>
-          <CardTitle>Gestión de Elementos</CardTitle>
+          <CardTitle>Elementos Destacados</CardTitle>
         </CardHeader>
         <CardContent>
-          {sortedItems.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 mb-4">No hay elementos destacados configurados</p>
-              <Button onClick={handleCreateNew}>
-                <Plus className="h-4 w-4 mr-2" />
-                Crear Primer Elemento
+          {featuredItems.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No hay elementos destacados configurados</p>
+              <Button onClick={openCreateForm} className="mt-4">
+                <Plus className="w-4 h-4 mr-2" />
+                Crear primer elemento
               </Button>
             </div>
           ) : (
-            <div className="space-y-3">
-              {sortedItems.map((item, index) => (
-                <div
-                  key={item._id}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, item._id)}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, item._id)}
-                  className={`p-4 border rounded-lg transition-all hover:shadow-md ${
-                    draggedItem === item._id ? 'opacity-50' : ''
-                  } ${item.isActive ? 'border-green-200 bg-green-50' : 'border-gray-200'}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="cursor-move">
-                        <GripVertical className="h-4 w-4 text-gray-400" />
-                      </div>
-                      
-                      <div className="flex items-center space-x-3">
-                        <span className="text-xl">{getTypeIcon(item.type)}</span>
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <h3 className="font-medium">{item.title}</h3>
-                            <Badge variant={item.isActive ? 'default' : 'secondary'}>
-                              {getTypeLabel(item.type)}
+            <div className="space-y-2">
+              {featuredItems
+                .sort((a, b) => a.order - b.order)
+                .map((item) => (
+                  <div
+                    key={item._id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, item._id)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, item._id)}
+                    className={`p-4 border rounded-lg hover:bg-gray-50 transition-colors ${
+                      draggedItem === item._id ? 'opacity-50' : ''
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <GripVertical className="w-4 h-4 text-gray-400 cursor-grab active:cursor-grabbing" />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium">
+                              {item.customTitle || item.title}
+                            </h3>
+                            <Badge className={getTypeColor(item.type)}>
+                              {item.type}
                             </Badge>
-                            <Badge variant="outline">#{item.order}</Badge>
+                            <Badge variant={item.isActive ? 'default' : 'secondary'}>
+                              {item.isActive ? 'Activo' : 'Inactivo'}
+                            </Badge>
                           </div>
-                          {item.customTitle && (
-                            <p className="text-sm text-gray-600 mt-1">
-                              Título personalizado: "{item.customTitle}"
+                          <p className="text-sm text-gray-600 mt-1">
+                            {item.customDescription || 'Sin descripción personalizada'}
+                          </p>
+                          {item.type === 'review' && item.reviewRef && (
+                            <p className="text-xs text-gray-500">
+                              Reseña: {item.reviewRef.title}
+                              {item.reviewRef.venue && ` • Venue: ${item.reviewRef.venue.title}`}
+                            </p>
+                          )}
+                          {item.type === 'venue' && item.venueRef && (
+                            <p className="text-xs text-gray-500">
+                              Venue: {item.venueRef.title}
+                            </p>
+                          )}
+                          {item.type === 'category' && item.categoryRef && (
+                            <p className="text-xs text-gray-500">
+                              Categoría: {item.categoryRef.title}
                             </p>
                           )}
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setPreviewItem(item)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(item)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleToggleStatus(item._id, item.isActive)}
-                      >
-                        {item.isActive ? (
-                          <EyeOff className="h-4 w-4 text-orange-500" />
-                        ) : (
-                          <Eye className="h-4 w-4 text-green-500" />
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setPreviewItem(item)}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        
+                        {getItemLink(item) !== '#' && (
+                          <Link href={getItemLink(item)} target="_blank">
+                            <Button variant="outline" size="sm">
+                              <ExternalLink className="w-4 h-4" />
+                            </Button>
+                          </Link>
                         )}
-                      </Button>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(item._id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleToggleStatus(item._id, item.isActive)}
+                        >
+                          {item.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openEditForm(item)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(item._id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Modals */}
+      {/* Form Modal */}
       {isFormOpen && (
         <FeaturedItemForm
           item={editingItem}
-          onClose={() => {
-            setIsFormOpen(false);
-            setEditingItem(null);
-          }}
           onSave={handleSave}
+          onClose={closeForm}
         />
       )}
 
+      {/* Preview Modal */}
       {previewItem && (
         <FeaturedItemPreview
           item={previewItem}
@@ -470,3 +524,5 @@ export function FeaturedItemsManager() {
     </div>
   );
 }
+
+export default FeaturedItemsManager;

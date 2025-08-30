@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { FeaturedItemsManager } from '@/components/admin/FeaturedItemsManager';
+import FeaturedItemsManager from '../../../components/admin/FeaturedItemsManager';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Star, TrendingUp, Settings } from 'lucide-react';
 
