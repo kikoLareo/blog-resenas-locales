@@ -36,7 +36,7 @@ export default async function HomePage() {
   const heroItems = (data?.featuredReviews || []).slice(0, 3).map((r) => ({
     id: r._id,
     title: r.title,
-    image: r.gallery?.asset?.url ?? '',
+    image: r.gallery?.asset?.url ?? r.gallery?.url ?? '',
     rating: (r.ratings?.food ?? 9),
     location: r.venue?.city ?? '',
     readTime: '5 min',
@@ -48,7 +48,7 @@ export default async function HomePage() {
   const trending = (data?.trendingReviews || []).map((r) => ({
     id: r._id,
     title: r.title,
-    image: r.gallery?.asset?.url ?? '',
+    image: r.gallery?.asset?.url ?? r.gallery?.url ?? '',
     rating: (r.ratings?.food ?? 9),
     location: r.venue?.city ?? '',
     readTime: '5 min',
@@ -60,7 +60,7 @@ export default async function HomePage() {
   const topRated = (data?.topReviews || []).map((r) => ({
     id: r._id,
     title: r.title,
-    image: r.gallery?.asset?.url ?? '',
+    image: r.gallery?.asset?.url ?? r.gallery?.url ?? '',
     rating: (r.ratings?.food ?? 9),
     location: r.venue?.city ?? '',
     readTime: '5 min',

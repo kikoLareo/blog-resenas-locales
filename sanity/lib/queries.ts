@@ -452,12 +452,62 @@ export const venuesByCategoryCountQuery = `
 
 // Datos para homepage
 export const homepageQuery = `{
-  "featuredReviews": *[_type == "review"] | order(ratings.food desc)[0...3] {
+  "featuredReviews": *[_type == "review" && featured == true] | order(publishedAt desc)[0...3] {
     _id,
     title,
     slug,
     ratings,
-    gallery[0],
+    tldr,
+    gallery[0] {
+      asset->{
+        _id,
+        url
+      },
+      alt,
+      caption
+    },
+    "venue": venue-> {
+      title,
+      slug,
+      "city": city->title,
+      "citySlug": city->slug.current
+    }
+  },
+  "trendingReviews": *[_type == "review"] | order(ratings.food desc, publishedAt desc)[0...6] {
+    _id,
+    title,
+    slug,
+    ratings,
+    tldr,
+    gallery[0] {
+      asset->{
+        _id,
+        url
+      },
+      alt,
+      caption
+    },
+    "venue": venue-> {
+      title,
+      slug,
+      "city": city->title,
+      "citySlug": city->slug.current
+    }
+  },
+  "topReviews": *[_type == "review" && ratings.food >= 8.0] | order(ratings.food desc, publishedAt desc)[0...6] {
+    _id,
+    title,
+    slug,
+    ratings,
+    tldr,
+    gallery[0] {
+      asset->{
+        _id,
+        url
+      },
+      alt,
+      caption
+    },
     "venue": venue-> {
       title,
       slug,

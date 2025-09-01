@@ -10,7 +10,7 @@ export const dashboardStatsQuery = `
       _id,
       title,
       _createdAt,
-      "venue": venue->{name, "city": city->name},
+      "venue": venue->{title, "city": city->title},
       ratings
     },
                     "recentVenues": *[_type == "venue"] | order(_createdAt desc)[0...5] {

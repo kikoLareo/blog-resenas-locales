@@ -71,6 +71,13 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'rating',
+      title: 'Puntuación Media',
+      type: 'number',
+      readOnly: true,
+      description: 'Puntuación media calculada automáticamente',
+    }),
+    defineField({
       name: 'avgTicket',
       title: 'Ticket Medio (€)',
       type: 'number',
@@ -276,6 +283,13 @@ export default defineType({
       type: 'boolean',
       initialValue: false,
       description: 'Mostrar en homepage y secciones destacadas',
+    }),
+    defineField({
+      name: 'published',
+      title: 'Publicado',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Indica si la reseña está publicada',
     }),
     defineField({
       name: 'publishedAt',

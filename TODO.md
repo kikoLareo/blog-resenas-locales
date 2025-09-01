@@ -124,7 +124,16 @@ accesos directos a funcionalidades del dashboard (COMPLETADO: nueva interfaz con
 - [ ] Añadir loading states en las páginas del dashboard
 - [ ] Implementar caché para datos que no cambian frecuentemente
 
-### 2. Gestión de secciones de la página principal
+## ✅ COMPLETADAS RECIENTEMENTE:
+
+### Esquemas y datos de Sanity
+- [x] **Revisar esquemas de reseñas** - Añadidos campos faltantes (published, rating)
+- [x] **Corregir consultas GROQ** - Arregladas inconsistencias entre esquemas y consultas
+- [x] **Actualizar homepageQuery** - Añadidas secciones trendingReviews y topReviews
+- [x] **Corregir referencias de imágenes** - Arregladas URLs de gallery con asset.url
+- [x] **Normalizar nombres de campos** - Corregido venue.name → venue.title
+
+### Gestión de secciones de la página principal
 - [x] Crear interfaz para gestionar las secciones destacadas (COMPLETADO: página con Swapy drag&drop)
 - [x] Permitir reordenar secciones con drag & drop (COMPLETADO: integración con Swapy)
 - [x] Configurar textos y elementos de cada sección (COMPLETADO: panel de configuración)
