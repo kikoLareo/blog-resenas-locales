@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import './globals.css';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { PerformanceMonitor } from '@/components/PerformanceMonitor';
 import { SITE_CONFIG, SEO_DEFAULTS } from '@/lib/constants';
@@ -121,14 +120,11 @@ export default function RootLayout({
             Saltar al contenido principal
           </a>
           
-          <Header />
-
           {/* Main content */}
           <main id="main-content" className="min-h-screen">
             {children}
           </main>
 
-          <Footer />
 
           {/* Consent Banner */}
           <ConsentBanner />
