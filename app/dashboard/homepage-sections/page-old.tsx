@@ -236,29 +236,6 @@ export default function HomepageSectionsPage() {
   const [sections, setSections] = useState<HomepageSection[]>(defaultSections);
   const [selectedSection, setSelectedSection] = useState<HomepageSection | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  // Cargar configuración desde Sanity al montar el componente
-  useEffect(() => {
-    const loadConfiguration = async () => {
-      try {
-        const response = await fetch('/api/admin/homepage-config');
-        if (response.ok) {
-          const config = await response.json();
-          if (config && config.sections) {
-            setSections(config.sections);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading configuration:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadConfiguration();
-  }, []);
 
   // Configuración de sensores para drag & drop
   const sensors = useSensors(
@@ -316,27 +293,14 @@ export default function HomepageSectionsPage() {
   };
 
   const saveChanges = async () => {
-    setSaving(true);
     try {
-      // Enviar cambios a la API
-      const response = await fetch('/api/admin/homepage-config', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ sections }),
-      });
-
-      if (response.ok) {
-        setHasChanges(false);
-        console.log('Configuración guardada exitosamente');
-      } else {
-        console.error('Error al guardar configuración');
-      }
+      // Aquí enviarías los cambios a Sanity
+      console.log('Guardando secciones:', sections);
+      setHasChanges(false);
+      // TODO: Implementar guardado en Sanity
+      // await saveSectionsToSanity(sections);
     } catch (error) {
       console.error('Error guardando:', error);
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -376,9 +340,9 @@ export default function HomepageSectionsPage() {
             <Plus className="h-4 w-4 mr-2" />
             Nueva Sección
           </Button>
-          <Button onClick={saveChanges} disabled={!hasChanges || saving}>
+          <Button onClick={saveChanges} disabled={!hasChanges}>
             <Save className="h-4 w-4 mr-2" />
-            {saving ? 'Guardando...' : 'Guardar Cambios'}
+            Guardar Cambios
           </Button>
         </div>
       </div>

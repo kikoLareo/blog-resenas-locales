@@ -15,6 +15,7 @@ import qrFeedback from './qr-feedback';
 // Featured content
 import featuredItem from './featured-item';
 import { homepageSection } from './homepageSection';
+import { homepageConfig } from './homepage-config';
 
 // Export schema types in logical order
 export const schemaTypes = [
@@ -35,6 +36,7 @@ export const schemaTypes = [
   // Gestión de elementos destacados en homepage
   featuredItem, // Items del carrusel principal
   homepageSection, // Configuración de secciones del homepage
+  homepageConfig, // Configuración de homepage
 ];
 
 // Configuración adicional para validaciones y referencias
