@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Shield, Lock, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 function LoginForm() {
   const [email, setEmail] = useState("");
@@ -65,10 +66,13 @@ function LoginForm() {
       <div className="w-full max-w-4xl px-4">
         <div className="flex flex-col items-center mb-8">
           <Link href="/" className="mb-8">
-            <img 
+            <Image 
               src="/logo.svg" 
-              alt="SaborLocal" 
-              className="h-8"
+              alt="SaborLocal - Ir al inicio" 
+              width={120}
+              height={32}
+              className="h-8 w-auto"
+              priority
             />
           </Link>
         </div>

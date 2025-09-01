@@ -537,6 +537,92 @@ export function optimizeTitle(title: string, maxLength: number = 60): string {
 }
 
 /**
+ * Validate and optimize meta description
+ * Ensures optimal length for search engine results
+ */
+export function validateMetaDescription(description: string): {
+  description: string;
+  isValid: boolean;
+  issues: string[];
+} {
+  const issues: string[] = [];
+  let optimizedDescription = description.trim();
+
+  // Check minimum length
+  if (optimizedDescription.length < 120) {
+    issues.push('Description is too short (< 120 characters)');
+  }
+
+  // Check maximum length
+  if (optimizedDescription.length > 160) {
+    issues.push('Description is too long (> 160 characters)');
+    // Truncate at word boundary
+    const truncated = optimizedDescription.substring(0, 157);
+    const lastSpace = truncated.lastIndexOf(' ');
+    optimizedDescription = lastSpace > 0 
+      ? `${truncated.substring(0, lastSpace)}...`
+      : `${truncated}...`;
+  }
+
+  // Check for common issues - only exact matches
+  if (optimizedDescription === 'undefined' || optimizedDescription === 'null' || 
+      optimizedDescription.includes(' undefined ') || optimizedDescription.includes(' null ') ||
+      optimizedDescription.startsWith('undefined ') || optimizedDescription.startsWith('null ') ||
+      optimizedDescription.endsWith(' undefined') || optimizedDescription.endsWith(' null')) {
+    issues.push('Description contains undefined/null values');
+  }
+
+  return {
+    description: optimizedDescription,
+    isValid: issues.length === 0,
+    issues,
+  };
+}
+
+/**
+ * Validate and optimize page title
+ * Ensures optimal length for search engine results
+ */
+export function validatePageTitle(title: string): {
+  title: string;
+  isValid: boolean;
+  issues: string[];
+} {
+  const issues: string[] = [];
+  let optimizedTitle = title.trim();
+
+  // Check minimum length
+  if (optimizedTitle.length < 30) {
+    issues.push('Title is too short (< 30 characters)');
+  }
+
+  // Check maximum length
+  if (optimizedTitle.length > 60) {
+    issues.push('Title is too long (> 60 characters)');
+    // Truncate at word boundary
+    const truncated = optimizedTitle.substring(0, 57);
+    const lastSpace = truncated.lastIndexOf(' ');
+    optimizedTitle = lastSpace > 0 
+      ? truncated.substring(0, lastSpace)
+      : truncated;
+  }
+
+  // Check for common issues - only exact matches
+  if (optimizedTitle === 'undefined' || optimizedTitle === 'null' || 
+      optimizedTitle.includes(' undefined ') || optimizedTitle.includes(' null ') ||
+      optimizedTitle.startsWith('undefined ') || optimizedTitle.startsWith('null ') ||
+      optimizedTitle.endsWith(' undefined') || optimizedTitle.endsWith(' null')) {
+    issues.push('Title contains undefined/null values');
+  }
+
+  return {
+    title: optimizedTitle,
+    isValid: issues.length === 0,
+    issues,
+  };
+}
+
+/**
  * Generar configuración SEO por defecto
  */
 export function generateDefaultSEO(): SEOData {
@@ -576,4 +662,50 @@ export function generateDefaultSEO(): SEOData {
       'opiniones', 'blog', 'comida', 'España'
     ],
   });
+}
+
+/**
+ * Enhanced SEO data generation with validation
+ */
+export function generateValidatedSEOData(config: {
+  title: string;
+  description: string;
+  canonical: string;
+  type?: 'website' | 'article';
+  images?: Array<{
+    url: string;
+    width: number;
+    height: number;
+    alt: string;
+  }>;
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  tags?: string[];
+  additionalMeta?: Array<{
+    name?: string;
+    property?: string;
+    content: string;
+  }>;
+}): SEOData & { validation: { isValid: boolean; issues: string[] } } {
+  // Validate title and description
+  const titleValidation = validatePageTitle(config.title);
+  const descriptionValidation = validateMetaDescription(config.description);
+  
+  // Use validated values
+  const validatedConfig = {
+    ...config,
+    title: titleValidation.title,
+    description: descriptionValidation.description,
+  };
+  
+  const seoData = generateSEOData(validatedConfig);
+  
+  return {
+    ...seoData,
+    validation: {
+      isValid: titleValidation.isValid && descriptionValidation.isValid,
+      issues: [...titleValidation.issues, ...descriptionValidation.issues],
+    },
+  };
 }
