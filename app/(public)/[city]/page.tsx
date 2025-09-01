@@ -11,6 +11,7 @@ import { SITE_CONFIG } from '@/lib/constants';
 import { cityPageJsonLd } from '@/lib/schema';
 import { sanityFetch } from '@/lib/sanity.client';
 import { cityQuery, venuesByCityQuery } from '@/sanity/lib/queries';
+import VenueCard from '@/components/VenueCard';
 
 type CityPageProps = {
   params: Promise<{
@@ -170,104 +171,160 @@ function ReviewCard({ review }: { review: Review }) {
   );
 }
 
-// Venue Card Component
-function VenueCard({ venue }: { venue: Venue }) {
-  return (
-    <article className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
-      {/* Image */}
-      <div className="aspect-video bg-gray-100 relative">
-        {venue.images?.[0] ? (
-          <Image
-            src={(venue.images[0] as any).asset?.url || (venue.images[0] as any).url}
-            alt={(venue.images[0] as any).alt || venue.title}
-            fill
-            className="object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
-            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-        )}
+export default async function CityPage({ params }: CityPageProps) {
+  const { city: citySlug } = await params;
+  
+  try {
+    // Fetch city data
+    const city = await sanityFetch<City | null>({
+      query: cityQuery,
+      params: { citySlug },
+      tags: ['cities', `city-${citySlug}`],
+      revalidate: 3600,
+    });
+
+    if (!city) {
+      notFound();
+    }
+
+    // Fetch venues and reviews for this city
+    const [venues, reviews] = await Promise.all([
+      sanityFetch<Venue[]>({
+        query: venuesByCityQuery,
+        params: { citySlug, offset: 0, limit: 12 },
+        tags: ['venues', `city-${citySlug}`],
+        revalidate: 3600,
+      }),
+      sanityFetch<Review[]>({
+        query: reviewsByCityQuery,
+        params: { citySlug },
+        tags: ['reviews', `city-${citySlug}`],
+        revalidate: 3600,
+      }),
+    ]);
+
+    // Generate JSON-LD for SEO
+    const jsonLd = cityPageJsonLd(city, venues);
+
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         
-        {/* Rating Badge */}
-        {venue.avgRating && (
-          <div className="absolute top-4 right-4">
-            <div className="bg-white rounded-full px-3 py-1 shadow-sm">
-              <span className="text-sm font-semibold text-gray-900">
-                {venue.avgRating.toFixed(1)}
-              </span>
+        <div className="min-h-screen bg-gray-50">
+          {/* Breadcrumbs */}
+          <div className="bg-white border-b border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <Breadcrumbs
+                items={[
+                  { name: 'Inicio', url: '/' },
+                  { name: city.title, url: `/${citySlug}` },
+                ]}
+              />
             </div>
           </div>
-        )}
-      </div>
 
-      {/* Content */}
-      <div className="p-6">
-        {/* Title */}
-        <h3 className="text-xl font-bold text-gray-900 mb-2">
-          <Link 
-            href={`/${venue.city.slug.current}/${venue.slug.current}`}
-            className="hover:text-primary-600 transition-colors"
-          >
-            {venue.title}
-          </Link>
-        </h3>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Header */}
+            <div className="text-center mb-12">
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                Restaurantes en {city.title}
+              </h1>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                {city.description || `Descubre los mejores restaurantes y locales en ${city.title}. Reseñas auténticas y recomendaciones locales.`}
+              </p>
+              
+              {/* Stats */}
+              <div className="flex justify-center items-center gap-8 mt-6 text-sm text-gray-500">
+                <span className="flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  {venues.length} locales
+                </span>
+                <span className="flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                  </svg>
+                  {reviews.length} reseñas
+                </span>
+              </div>
+            </div>
 
-        {/* Address */}
-        <div className="flex items-center text-sm text-gray-600 mb-3">
-          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          {venue.address}
-        </div>
-
-        {/* Description */}
-        {venue.description && (
-          <p className="text-gray-600 mb-4 line-clamp-2">
-            {venue.description}
-          </p>
-        )}
-
-        {/* Categories and Price Range */}
-        <div className="flex items-center justify-between">
-          <div className="flex flex-wrap gap-1">
-            {venue.categories.slice(0, 2).map((category) => (
-              <span
-                key={category._id}
-                className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary-100 text-primary-800"
-              >
-                {category.title}
-              </span>
-            ))}
-          </div>
-          <div className="flex items-center">
-            <span className="text-sm font-medium text-gray-900">
-              {venue.priceRange}
-            </span>
-            {venue.reviewCount && (
-              <span className="ml-2 text-sm text-gray-500">
-                ({venue.reviewCount} reseñas)
-              </span>
+            {/* Featured Reviews Section */}
+            {reviews.length > 0 && (
+              <section className="mb-16">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900">Últimas reseñas</h2>
+                  <Link href={`/${citySlug}/reviews`} className="text-blue-600 hover:text-blue-800 font-medium">
+                    Ver todas →
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {reviews.slice(0, 6).map((review) => (
+                    <ReviewCard key={review._id} review={review} />
+                  ))}
+                </div>
+              </section>
             )}
+
+            {/* Venues Section */}
+            <section>
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-bold text-gray-900">Todos los locales</h2>
+                {venues.length >= 12 && (
+                  <Link href={`/${citySlug}/locales`} className="text-blue-600 hover:text-blue-800 font-medium">
+                    Ver todos →
+                  </Link>
+                )}
+              </div>
+
+              {venues.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {venues.map((venue) => (
+                    <VenueCard key={venue._id} venue={venue} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <div className="text-gray-400 mb-4">
+                    <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    Aún no hay locales en {city.title}
+                  </h3>
+                  <p className="text-gray-500 mb-6">
+                    Estamos trabajando para incluir más locales en esta ciudad.
+                  </p>
+                  <Link 
+                    href="/contacto" 
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                  >
+                    Sugerir un local
+                  </Link>
+                </div>
+              )}
+            </section>
+
+            {/* Ad Slots */}
+            <div className="mt-16">
+              <InArticleAd />
+            </div>
+          </div>
+
+          {/* Sidebar Ad */}
+          <div className="hidden lg:block">
+            <SidebarAd />
           </div>
         </div>
-      </div>
-    </article>
-  );
-}
-
-export default async function CityPage({ params }: { params: Promise<{ city: string }> }) {
-  const { city } = await params;
-  
-  return (
-    <div>
-      <h1>City Page Working</h1>
-      <p>City: {city}</p>
-      <p>This is a test page to verify dynamic routing works.</p>
-    </div>
-  );
+      </>
+    );
+  } catch (error) {
+    console.error('Error loading city page:', error);
+    notFound();
+  }
 }
