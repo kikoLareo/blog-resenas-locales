@@ -27,12 +27,31 @@ export default function NewVenuePage() {
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      // Aquí iría la lógica para guardar en Sanity
-      console.log('Guardando nuevo local:', formData);
-      // Redirigir a la lista de locales después de guardar
-      window.location.href = '/dashboard/venues';
+      // Validate required fields
+      if (!formData.title || !formData.address) {
+        alert('Título y dirección son campos requeridos');
+        return;
+      }
+
+      const response = await fetch('/api/admin/venues', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('Local guardado exitosamente');
+        window.location.href = '/dashboard/venues';
+      } else {
+        alert(result.error || 'Error al guardar el local');
+      }
     } catch (error) {
       console.error('Error al guardar:', error);
+      alert('Error al guardar el local');
     } finally {
       setIsLoading(false);
     }
