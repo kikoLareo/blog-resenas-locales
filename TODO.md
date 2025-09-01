@@ -103,3 +103,36 @@
 - ❌ Botones duplicados y no funcionales
 - ❌ Falta de filtros y búsqueda
 
+
+# Cosas que quiero hacer
+En general en el dashboard: 
+    - [x] La interfaz debe ser mas comoda (MEJORADO: nuevo diseño del dashboard principal)
+    - [ ] Hay que mejorar la carga de las pantallas en el dashboard
+
+Ordenar y mejorar el panel principal:
+    - [x] La pagina principal debe mostrar los datos reales, datos de los usuarios, 
+accesos directos a funcionalidades del dashboard (COMPLETADO: nueva interfaz con accesos rápidos)
+    - [x] Quitar el header del dashboard (COMPLETADO)
+    - [x] Añadir acceso a la página de destacados (/featured) en el menú (COMPLETADO)
+    - [ ] Hace falta un manera facil de gestionar la pagina principal del blog (secciones, orden de secciones, acceso a la gestion de las secciones)
+    - [ ] Cada seccion tendra su panel de configuracion para diseñarla, añadir los textos, elementos dentro de la seccion
+
+## PRÓXIMOS PASOS PRIORITARIOS:
+
+### 1. Mejorar la carga y navegación del dashboard
+- [ ] Optimizar las consultas a Sanity para reducir tiempos de carga
+- [ ] Añadir loading states en las páginas del dashboard
+- [ ] Implementar caché para datos que no cambian frecuentemente
+
+### 2. Gestión de secciones de la página principal
+- [ ] Crear interfaz para gestionar las secciones destacadas
+- [ ] Permitir reordenar secciones con drag & drop
+- [ ] Configurar textos y elementos de cada sección
+- [ ] Preview en tiempo real de los cambios
+
+### 3. Mejorar la interfaz del dashboard
+- [ ] Hacer las listas más compactas y funcionales
+- [ ] Añadir filtros y búsqueda a todas las listas
+- [ ] Mejorar los formularios de creación/edición
+- [ ] Implementar confirmaciones para acciones destructivas
+
