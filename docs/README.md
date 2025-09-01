@@ -16,4 +16,7 @@ Guía rápida:
 - 10-deploy.md: despliegue y entornos
 - 11-troubleshooting.md: incidencias comunes y soluciones
 
+## Análisis y Mejoras
+
+- [📁 Análisis de Estructura](./analysis/) - Issues identificados en la estructura del proyecto que no cumplen con las mejores prácticas de Next.js
 
