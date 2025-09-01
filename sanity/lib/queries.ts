@@ -655,3 +655,15 @@ export const qrCodesByVenueQuery = `
     description
   } | order(_createdAt desc)
 `;
+
+// ===== HOMEPAGE CONFIGURATION =====
+
+// Obtener configuración de homepage
+export const homepageConfigQuery = `
+  *[_type == "homepageConfig"][0] {
+    _id,
+    title,
+    sections,
+    lastModified
+  }
+`;
