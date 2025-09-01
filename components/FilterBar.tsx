@@ -114,14 +114,14 @@ export default function FilterBar({ initialFilters = {} }: FilterBarProps) {
             Tipo de cocina
           </label>
           <Select
-            value={filters.category || ''}
-            onValueChange={(value) => handleFilterChange('category', value || undefined)}
+            value={filters.category}
+            onValueChange={(value) => handleFilterChange('category', value === 'all' ? undefined : value)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Seleccionar" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todas</SelectItem>
+              <SelectItem value="all">Todas</SelectItem>
               {CATEGORIES.map((category) => (
                 <SelectItem key={category.value} value={category.value}>
                   {category.label}
@@ -137,14 +137,14 @@ export default function FilterBar({ initialFilters = {} }: FilterBarProps) {
             Ciudad
           </label>
           <Select
-            value={filters.city || ''}
-            onValueChange={(value) => handleFilterChange('city', value || undefined)}
+            value={filters.city}
+            onValueChange={(value) => handleFilterChange('city', value === 'all' ? undefined : value)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Seleccionar" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todas</SelectItem>
+              <SelectItem value="all">Todas</SelectItem>
               {CITIES.map((city) => (
                 <SelectItem key={city.value} value={city.value}>
                   {city.label}
@@ -160,14 +160,14 @@ export default function FilterBar({ initialFilters = {} }: FilterBarProps) {
             Precio
           </label>
           <Select
-            value={filters.priceRange || ''}
-            onValueChange={(value) => handleFilterChange('priceRange', value || undefined)}
+            value={filters.priceRange}
+            onValueChange={(value) => handleFilterChange('priceRange', value === 'all' ? undefined : value)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Seleccionar" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
               {PRICE_RANGES.map((range) => (
                 <SelectItem key={range.value} value={range.value}>
                   {range.label}
