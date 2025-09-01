@@ -1,0 +1,213 @@
+{
+  "summary": {
+    "total": 19,
+    "passed": 11,
+    "failed": 2,
+    "warnings": 6,
+    "skipped": 0
+  },
+  "results": [
+    {
+      "category": "Public Pages",
+      "name": "Search Page",
+      "status": "FAIL",
+      "message": "Page does not exist",
+      "details": [
+        "Expected path: app/(public)/buscar/page.tsx"
+      ],
+      "timestamp": "2025-09-01T21:01:00.034Z"
+    },
+    {
+      "category": "Public Pages",
+      "name": "Venue Detail Page",
+      "status": "PASS",
+      "message": "Page exists and exports default component",
+      "details": [
+        "Has metadata generation"
+      ],
+      "timestamp": "2025-09-01T21:01:00.036Z"
+    },
+    {
+      "category": "Public Pages",
+      "name": "Review Detail Page",
+      "status": "PASS",
+      "message": "Page exists and exports default component",
+      "details": [
+        "Has metadata generation"
+      ],
+      "timestamp": "2025-09-01T21:01:00.036Z"
+    },
+    {
+      "category": "Public Pages",
+      "name": "City Page",
+      "status": "PASS",
+      "message": "Page exists and exports default component",
+      "details": [
+        "Has metadata generation"
+      ],
+      "timestamp": "2025-09-01T21:01:00.036Z"
+    },
+    {
+      "category": "Key Components",
+      "name": "VenueCard",
+      "status": "PASS",
+      "message": "Component found and properly structured",
+      "details": [
+        "Path: components/VenueCard.tsx",
+        "Has TypeScript props interface",
+        "Has proper export"
+      ],
+      "timestamp": "2025-09-01T21:01:00.037Z"
+    },
+    {
+      "category": "Key Components",
+      "name": "SearchForm",
+      "status": "FAIL",
+      "message": "Component not found in any expected location",
+      "details": [
+        "Searched paths: components/SearchForm.tsx, components/search/SearchForm.tsx, components/forms/SearchForm.tsx"
+      ],
+      "timestamp": "2025-09-01T21:01:00.037Z"
+    },
+    {
+      "category": "Dashboard Forms",
+      "name": "page",
+      "status": "WARNING",
+      "message": "Dashboard page analysis completed",
+      "details": [
+        "Contains form elements",
+        "Has validation/error handling"
+      ],
+      "timestamp": "2025-09-01T21:01:00.037Z"
+    },
+    {
+      "category": "Dashboard Forms",
+      "name": "page",
+      "status": "WARNING",
+      "message": "Dashboard page analysis completed",
+      "details": [
+        "Contains form elements",
+        "Has validation/error handling"
+      ],
+      "timestamp": "2025-09-01T21:01:00.038Z"
+    },
+    {
+      "category": "Dashboard Forms",
+      "name": "page",
+      "status": "WARNING",
+      "message": "Dashboard page analysis completed",
+      "details": [
+        "Contains form elements",
+        "Has validation/error handling"
+      ],
+      "timestamp": "2025-09-01T21:01:00.038Z"
+    },
+    {
+      "category": "Dashboard Forms",
+      "name": "page",
+      "status": "WARNING",
+      "message": "Dashboard page analysis completed",
+      "details": [
+        "Contains form elements",
+        "Has validation/error handling"
+      ],
+      "timestamp": "2025-09-01T21:01:00.038Z"
+    },
+    {
+      "category": "Dashboard Forms",
+      "name": "page",
+      "status": "WARNING",
+      "message": "Dashboard page analysis completed",
+      "details": [
+        "Contains form elements"
+      ],
+      "timestamp": "2025-09-01T21:01:00.039Z"
+    },
+    {
+      "category": "Build Process",
+      "name": "TypeScript Compilation",
+      "status": "PASS",
+      "message": "TypeScript compilation successful",
+      "timestamp": "2025-09-01T21:01:03.597Z"
+    },
+    {
+      "category": "Build Process",
+      "name": "ESLint Check",
+      "status": "PASS",
+      "message": "Linting passed",
+      "timestamp": "2025-09-01T21:01:07.763Z"
+    },
+    {
+      "category": "SEO & Accessibility",
+      "name": "SEO Implementation - page.tsx",
+      "status": "WARNING",
+      "message": "SEO features analysis completed",
+      "details": [
+        "Has metadata generation"
+      ],
+      "timestamp": "2025-09-01T21:01:07.764Z"
+    },
+    {
+      "category": "SEO & Accessibility",
+      "name": "SEO Implementation - page.tsx",
+      "status": "PASS",
+      "message": "SEO features analysis completed",
+      "details": [
+        "Has JSON-LD structured data",
+        "Has metadata generation",
+        "Has accessibility attributes"
+      ],
+      "timestamp": "2025-09-01T21:01:07.764Z"
+    },
+    {
+      "category": "SEO & Accessibility",
+      "name": "SEO Implementation - page.tsx",
+      "status": "PASS",
+      "message": "SEO features analysis completed",
+      "details": [
+        "Has JSON-LD structured data",
+        "Has metadata generation"
+      ],
+      "timestamp": "2025-09-01T21:01:07.764Z"
+    },
+    {
+      "category": "Routing & Navigation",
+      "name": "Layout - layout.tsx",
+      "status": "PASS",
+      "message": "Layout file exists",
+      "details": [
+        "No navigation elements found",
+        "No breadcrumbs found"
+      ],
+      "timestamp": "2025-09-01T21:01:07.765Z"
+    },
+    {
+      "category": "Routing & Navigation",
+      "name": "Layout - layout.tsx",
+      "status": "PASS",
+      "message": "Layout file exists",
+      "details": [
+        "Has navigation elements",
+        "No breadcrumbs found"
+      ],
+      "timestamp": "2025-09-01T21:01:07.765Z"
+    },
+    {
+      "category": "Routing & Navigation",
+      "name": "Layout - layout.tsx",
+      "status": "PASS",
+      "message": "Layout file exists",
+      "details": [
+        "Has navigation elements",
+        "No breadcrumbs found"
+      ],
+      "timestamp": "2025-09-01T21:01:07.765Z"
+    }
+  ],
+  "environment": {
+    "nodeVersion": "v20.19.4",
+    "npmVersion": "10.8.2",
+    "timestamp": "2025-09-01T21:01:07.877Z",
+    "branch": "copilot/fix-eb98c01b-f116-4d9e-bec5-c8584b53bcb3"
+  }
+}
