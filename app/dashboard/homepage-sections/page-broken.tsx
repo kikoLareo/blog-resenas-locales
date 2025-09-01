@@ -17,15 +17,14 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  UniqueIdentifier,
 } from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -55,7 +54,117 @@ interface HomepageSection {
   };
 }
 
-// Configuración por defecto
+// Componente sortable para cada sección
+interface SortableSectionProps {
+  section: HomepageSection;
+  onToggle: (id: string) => void;
+  onConfigChange: (id: string, config: any) => void;
+  onDelete: (id: string) => void;
+  onEdit: (section: HomepageSection) => void;
+}
+
+function SortableSection({ section, onToggle, onConfigChange, onDelete, onEdit }: SortableSectionProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: section.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  const getSectionIcon = (type: string) => {
+    switch (type) {
+      case 'hero': return '🎯';
+      case 'featured': return '⭐';
+      case 'trending': return '🔥';
+      case 'categories': return '📁';
+      case 'newsletter': return '📧';
+      default: return '📄';
+    }
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`group relative ${isDragging ? 'z-50' : ''}`}
+    >
+      <Card className={`transition-all duration-200 ${
+        section.enabled 
+          ? 'border-green-200 bg-green-50' 
+          : 'border-gray-200 bg-gray-50'
+      } ${isDragging ? 'shadow-lg scale-105' : 'hover:shadow-md'}`}>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div
+                {...attributes}
+                {...listeners}
+                className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-200 rounded transition-colors"
+              >
+                <GripVertical className="h-4 w-4 text-gray-400" />
+              </div>
+              <div className="text-2xl">{getSectionIcon(section.type)}</div>
+              <div>
+                <CardTitle className="text-lg">{section.title}</CardTitle>
+                <Badge variant={section.enabled ? 'default' : 'secondary'} className="mt-1">
+                  {section.type}
+                </Badge>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onToggle(section.id)}
+                className="h-8 w-8 p-0"
+              >
+                {section.enabled ? (
+                  <Eye className="h-4 w-4 text-green-600" />
+                ) : (
+                  <EyeOff className="h-4 w-4 text-gray-400" />
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onEdit(section)}
+                className="h-8 w-8 p-0"
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onDelete(section.id)}
+                className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="text-sm text-gray-600">
+            <div className="flex gap-4">
+              <span>Items: {section.config.itemCount || 'Auto'}</span>
+              <span>Layout: {section.config.layout || 'Grid'}</span>
+              {section.config.title && <span>Título: {section.config.title}</span>}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 const defaultSections: HomepageSection[] = [
   {
     id: '1',
@@ -78,8 +187,9 @@ const defaultSections: HomepageSection[] = [
     order: 2,
     config: {
       title: 'Destacados de la semana',
-      subtitle: 'Los lugares que más nos han sorprendido',
+      subtitle: 'Los locales más recomendados',
       itemCount: 6,
+      showImages: true,
       layout: 'grid'
     }
   },
@@ -122,158 +232,12 @@ const defaultSections: HomepageSection[] = [
   }
 ];
 
-// Componente individual de sección sortable
-interface SortableItemProps {
-  section: HomepageSection;
-  onToggle: (id: string) => void;
-  onEdit: (section: HomepageSection) => void;
-  onDelete: (id: string) => void;
-  isSelected: boolean;
-}
-
-function SortableItem({ section, onToggle, onEdit, onDelete, isSelected }: SortableItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ 
-    id: section.id,
-    data: {
-      type: 'Section',
-      section,
-    },
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  const getSectionIcon = (type: string) => {
-    switch (type) {
-      case 'hero': return '🎯';
-      case 'featured': return '⭐';
-      case 'trending': return '🔥';
-      case 'categories': return '📁';
-      case 'newsletter': return '📧';
-      default: return '📄';
-    }
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`${isDragging ? 'opacity-30' : 'opacity-100'}`}
-    >
-      <Card 
-        className={`transition-all duration-200 cursor-pointer border-2 ${
-          section.enabled 
-            ? 'border-green-200 bg-green-50/30 hover:bg-green-50/50' 
-            : 'border-gray-200 bg-gray-50/30 hover:bg-gray-50/50'
-        } ${isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''} ${
-          isDragging ? 'shadow-lg' : 'hover:shadow-md'
-        }`}
-        onClick={() => onEdit(section)}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {/* Drag handle */}
-              <div
-                {...attributes}
-                {...listeners}
-                className="cursor-grab active:cursor-grabbing p-2 hover:bg-gray-200 rounded-md transition-colors touch-none"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <GripVertical className="h-5 w-5 text-gray-500" />
-              </div>
-              
-              {/* Section info */}
-              <div className="text-3xl">{getSectionIcon(section.type)}</div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 text-lg">
-                  {section.title}
-                </h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  {section.config.title || 'Sin título configurado'}
-                </p>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge variant={section.enabled ? 'default' : 'secondary'} className="text-xs">
-                    {section.type}
-                  </Badge>
-                  {section.config.itemCount && (
-                    <span className="text-xs text-gray-500">
-                      {section.config.itemCount} elementos
-                    </span>
-                  )}
-                  {section.config.layout && (
-                    <span className="text-xs text-gray-500">
-                      • {section.config.layout}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-            
-            {/* Action buttons */}
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggle(section.id);
-                }}
-                className="h-9 w-9 p-0"
-              >
-                {section.enabled ? (
-                  <Eye className="h-4 w-4 text-green-600" />
-                ) : (
-                  <EyeOff className="h-4 w-4 text-gray-400" />
-                )}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(section);
-                }}
-                className="h-9 w-9 p-0"
-              >
-                <Settings className="h-4 w-4 text-gray-600" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(section.id);
-                }}
-                className="h-9 w-9 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-// Componente principal
 export default function HomepageSectionsPage() {
   const [sections, setSections] = useState<HomepageSection[]>(defaultSections);
   const [selectedSection, setSelectedSection] = useState<HomepageSection | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
   // Cargar configuración desde Sanity al montar el componente
   useEffect(() => {
@@ -300,7 +264,7 @@ export default function HomepageSectionsPage() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 10,
+        distance: 8, // Requiere mover 8px antes de activar drag
       },
     }),
     useSensor(KeyboardSensor, {
@@ -308,20 +272,15 @@ export default function HomepageSectionsPage() {
     })
   );
 
-  // Manejar inicio del drag
-  function handleDragStart(event: DragStartEvent) {
-    setActiveId(event.active.id);
-  }
-
-  // Manejar final del drag
+  // Manejar el final del drag
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
-    
+
     if (active.id !== over?.id) {
       setSections((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over?.id);
-        
+
         const newSections = arrayMove(items, oldIndex, newIndex);
         
         // Actualizar el orden
@@ -334,8 +293,6 @@ export default function HomepageSectionsPage() {
         return updatedSections;
       });
     }
-    
-    setActiveId(null);
   }
 
   const updateSection = (id: string, updates: Partial<HomepageSection>) => {
@@ -343,11 +300,6 @@ export default function HomepageSectionsPage() {
       section.id === id ? { ...section, ...updates } : section
     ));
     setHasChanges(true);
-    
-    // Actualizar la sección seleccionada también
-    if (selectedSection?.id === id) {
-      setSelectedSection(prev => prev ? { ...prev, ...updates } : null);
-    }
   };
 
   const toggleSection = (id: string) => {
@@ -357,9 +309,6 @@ export default function HomepageSectionsPage() {
   const deleteSection = (id: string) => {
     setSections(prev => prev.filter(section => section.id !== id));
     setHasChanges(true);
-    if (selectedSection?.id === id) {
-      setSelectedSection(null);
-    }
   };
 
   const editSection = (section: HomepageSection) => {
@@ -369,6 +318,7 @@ export default function HomepageSectionsPage() {
   const saveChanges = async () => {
     setSaving(true);
     try {
+      // Enviar cambios a la API
       const response = await fetch('/api/admin/homepage-config', {
         method: 'POST',
         headers: {
@@ -406,16 +356,7 @@ export default function HomepageSectionsPage() {
     };
     setSections(prev => [...prev, newSection]);
     setHasChanges(true);
-    setSelectedSection(newSection);
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-gray-500">Cargando configuración...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -452,56 +393,64 @@ export default function HomepageSectionsPage() {
                 Secciones del Homepage
               </CardTitle>
               <p className="text-sm text-gray-500">
-                Arrastra las secciones para reordenarlas
+                Arrastra para reordenar las secciones
               </p>
             </CardHeader>
             <CardContent>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={sections.map(s => s.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-3">
-                    {sections
-                      .sort((a, b) => a.order - b.order)
-                      .map((section) => (
-                        <SortableItem
-                          key={section.id}
-                          section={section}
-                          onToggle={toggleSection}
-                          onEdit={editSection}
-                          onDelete={deleteSection}
-                          isSelected={selectedSection?.id === section.id}
-                        />
-                      ))}
-                  </div>
-                </SortableContext>
-                
-                <DragOverlay>
-                  {activeId ? (
-                    <Card className="shadow-lg border-2 border-blue-500 opacity-90">
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-3">
-                          <GripVertical className="h-5 w-5 text-gray-500" />
-                          <div className="text-3xl">
-                            {getSectionIcon(sections.find(s => s.id === activeId)?.type || 'featured')}
+              <div className="sections-container space-y-3">
+                {sections
+                  .sort((a, b) => a.order - b.order)
+                  .map((section) => (
+                    <div 
+                      key={section.id} 
+                      data-swapy-slot={`slot-${section.order}`}
+                      className="transition-all duration-200"
+                    >
+                      <div 
+                        data-swapy-item={section.id}
+                        className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md ${
+                          selectedSection?.id === section.id 
+                            ? 'border-blue-500 bg-blue-50' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        } ${!section.enabled ? 'opacity-60' : ''}`}
+                        onClick={() => setSelectedSection(section)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <GripVertical className="h-4 w-4 text-gray-400" />
+                            <div>
+                              <h3 className="font-medium text-gray-900">
+                                {section.title}
+                              </h3>
+                              <p className="text-sm text-gray-500">
+                                {section.config.title || 'Sin título configurado'}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="font-semibold text-gray-900">
-                              {sections.find(s => s.id === activeId)?.title}
-                            </h3>
+                          <div className="flex items-center space-x-2">
+                            <Badge variant={section.enabled ? 'default' : 'secondary'}>
+                              {section.type}
+                            </Badge>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleSection(section.id);
+                              }}
+                            >
+                              {section.enabled ? (
+                                <Eye className="h-4 w-4" />
+                              ) : (
+                                <EyeOff className="h-4 w-4" />
+                              )}
+                            </Button>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ) : null}
-                </DragOverlay>
-              </DndContext>
+                      </div>
+                    </div>
+                  ))}
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -606,7 +555,11 @@ export default function HomepageSectionsPage() {
                     <Button 
                       variant="destructive" 
                       size="sm"
-                      onClick={() => deleteSection(selectedSection.id)}
+                      onClick={() => {
+                        setSections(prev => prev.filter(s => s.id !== selectedSection.id));
+                        setSelectedSection(null);
+                        setHasChanges(true);
+                      }}
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
                       Eliminar Sección
@@ -614,8 +567,8 @@ export default function HomepageSectionsPage() {
                   </div>
                 </>
               ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <Settings className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <div className="text-center py-6 text-gray-500">
+                  <Settings className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">
                     Selecciona una sección para configurarla
                   </p>
@@ -639,7 +592,7 @@ export default function HomepageSectionsPage() {
                     .sort((a, b) => a.order - b.order)
                     .map((section) => (
                       <li key={section.id}>
-                        {section.title} ({section.type})
+                        {section.title}
                       </li>
                     ))}
                 </ol>
@@ -650,16 +603,4 @@ export default function HomepageSectionsPage() {
       </div>
     </div>
   );
-}
-
-// Helper function for drag overlay
-function getSectionIcon(type: string) {
-  switch (type) {
-    case 'hero': return '🎯';
-    case 'featured': return '⭐';
-    case 'trending': return '🔥';
-    case 'categories': return '📁';
-    case 'newsletter': return '📧';
-    default: return '📄';
-  }
 }
