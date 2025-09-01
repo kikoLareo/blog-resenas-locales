@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, Phone, Globe, Clock, Euro, Star, ExternalLink, Calendar, Users, Tag } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
 
 
 interface VenueDetailProps {
@@ -109,24 +109,50 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Breadcrumbs */}
-      <nav className="mb-6 text-sm text-gray-500">
-        <Link href="/" className="hover:text-gray-700">Inicio</Link>
-        <span className="mx-2">/</span>
-        <Link href={`/${venue.city.slug}`} className="hover:text-gray-700">
-          {venue.city.title}
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-gray-900">{venue.title}</span>
+      {/* Breadcrumbs with Schema.org markup */}
+      <nav 
+        aria-label="Navegación de ubicación"
+        className="mb-6 text-sm text-gray-500"
+        role="navigation"
+      >
+        <ol className="flex items-center" itemScope itemType="https://schema.org/BreadcrumbList">
+          <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+            <Link 
+              href="/" 
+              className="hover:text-gray-700"
+              itemProp="item"
+            >
+              <span itemProp="name">Inicio</span>
+            </Link>
+            <meta itemProp="position" content="1" />
+          </li>
+          <span className="mx-2" aria-hidden="true">/</span>
+          <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+            <Link 
+              href={`/${venue.city.slug}`} 
+              className="hover:text-gray-700"
+              itemProp="item"
+            >
+              <span itemProp="name">{venue.city.title}</span>
+            </Link>
+            <meta itemProp="position" content="2" />
+          </li>
+          <span className="mx-2" aria-hidden="true">/</span>
+          <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+            <span className="text-gray-900" itemProp="name">{venue.title}</span>
+            <meta itemProp="position" content="3" />
+          </li>
+        </ol>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <main>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Columna izquierda - Imágenes */}
         <div className="lg:col-span-2">
           {/* Imagen principal */}
           {heroImage && (
             <div className="relative aspect-[4/3] mb-4 rounded-lg overflow-hidden">
-              <Image
+              <ImageWithFallback
                 src={heroImage.asset.url}
                 alt={heroImage.alt || venue.title}
                 fill
@@ -138,22 +164,29 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
 
           {/* Galería de imágenes */}
           {venue.images && venue.images.length > 1 && (
-            <div className="grid grid-cols-4 gap-2 mb-8">
+            <div 
+              className="grid grid-cols-4 gap-2 mb-8"
+              role="group"
+              aria-label={`Galería de imágenes de ${venue.title}`}
+            >
               {venue.images.slice(0, 8).map((image, index) => (
-                <div
+                <button
                   key={image.asset._id}
                   className={`relative aspect-square rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
                     selectedImageIndex === index ? 'border-blue-500' : 'border-transparent'
                   }`}
                   onClick={() => setSelectedImageIndex(index)}
+                  aria-label={`Ver imagen ${index + 1} de ${venue.title}`}
+                  aria-pressed={selectedImageIndex === index}
+                  type="button"
                 >
-                  <Image
+                  <ImageWithFallback
                     src={image.asset.url}
                     alt={image.alt || `${venue.title} - Imagen ${index + 1}`}
                     fill
                     className="object-cover hover:scale-105 transition-transform"
                   />
-                </div>
+                </button>
               ))}
             </div>
           )}
@@ -191,17 +224,26 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
 
                 {/* Rating */}
                 {venue.reviewCount > 0 && (
-                  <div className="text-right">
-                    <div className={`text-3xl font-bold ${getRatingColor(averageRating)}`}>
+                  <div className="text-right" role="group" aria-labelledby="venue-rating">
+                    <div 
+                      id="venue-rating"
+                      className={`text-3xl font-bold ${getRatingColor(averageRating)}`}
+                      aria-label={`Calificación: ${formatRating(averageRating)} de 10`}
+                    >
                       {formatRating(averageRating)}
                     </div>
-                    <div className="flex items-center gap-1 mb-1">
+                    <div 
+                      className="flex items-center gap-1 mb-1"
+                      role="img"
+                      aria-label={`${Math.round(averageRating / 2)} de 5 estrellas`}
+                    >
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
                           className={`h-4 w-4 ${
                             i < Math.round(averageRating / 2) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
                           }`}
+                          aria-hidden="true"
                         />
                       ))}
                     </div>
@@ -416,6 +458,7 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
           </p>
         </div>
       )}
+      </main>
     </div>
   );
 }
