@@ -88,10 +88,10 @@ export default async function DashboardPage() {
             <FileText className="h-5 w-5 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{totalReviews || 7}</div>
+            <div className="text-3xl font-bold text-gray-900">{totalReviews}</div>
             <p className="text-xs text-gray-500 mt-1">
               <TrendingUp className="h-3 w-3 inline mr-1" />
-              +2 esta semana
+              {totalReviews > 0 ? '+2 esta semana' : 'Ninguna creada aún'}
             </p>
           </CardContent>
         </Card>
@@ -102,10 +102,10 @@ export default async function DashboardPage() {
             <MapPin className="h-5 w-5 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{totalVenues || 5}</div>
+            <div className="text-3xl font-bold text-gray-900">{totalVenues}</div>
             <p className="text-xs text-gray-500 mt-1">
               <TrendingUp className="h-3 w-3 inline mr-1" />
-              +1 esta semana
+              {totalVenues > 0 ? '+1 esta semana' : 'Ninguno creado aún'}
             </p>
           </CardContent>
         </Card>
@@ -116,9 +116,9 @@ export default async function DashboardPage() {
             <BarChart3 className="h-5 w-5 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{totalCities || 3}</div>
+            <div className="text-3xl font-bold text-gray-900">{totalCities}</div>
             <p className="text-xs text-gray-500 mt-1">
-              Valencia, Barcelona, Madrid
+              {totalCities > 0 ? 'Valencia, Barcelona, Madrid' : 'Ninguna creada aún'}
             </p>
           </CardContent>
         </Card>
@@ -129,10 +129,10 @@ export default async function DashboardPage() {
             <Users className="h-5 w-5 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{totalPosts || 2}</div>
+            <div className="text-3xl font-bold text-gray-900">{totalPosts}</div>
             <p className="text-xs text-gray-500 mt-1">
               <TrendingUp className="h-3 w-3 inline mr-1" />
-              Artículos publicados
+              {totalPosts > 0 ? 'Artículos publicados' : 'Ninguno creado aún'}
             </p>
           </CardContent>
         </Card>
@@ -165,6 +165,12 @@ export default async function DashboardPage() {
                 <Button variant="outline" className="w-full justify-start" size="sm">
                   <Star className="h-4 w-4 mr-2" />
                   Gestionar Destacados
+                </Button>
+              </Link>
+              <Link href="/dashboard/homepage-sections">
+                <Button variant="outline" className="w-full justify-start" size="sm">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Configurar Homepage
                 </Button>
               </Link>
               <Link href="/dashboard/blog/new">

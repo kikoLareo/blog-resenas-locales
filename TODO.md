@@ -125,10 +125,12 @@ accesos directos a funcionalidades del dashboard (COMPLETADO: nueva interfaz con
 - [ ] Implementar caché para datos que no cambian frecuentemente
 
 ### 2. Gestión de secciones de la página principal
-- [ ] Crear interfaz para gestionar las secciones destacadas
-- [ ] Permitir reordenar secciones con drag & drop
-- [ ] Configurar textos y elementos de cada sección
+- [x] Crear interfaz para gestionar las secciones destacadas (COMPLETADO: página con Swapy drag&drop)
+- [x] Permitir reordenar secciones con drag & drop (COMPLETADO: integración con Swapy)
+- [x] Configurar textos y elementos de cada sección (COMPLETADO: panel de configuración)
 - [ ] Preview en tiempo real de los cambios
+- [ ] Conectar con Sanity para persistir cambios
+- [ ] Implementar las secciones en el homepage real
 
 ### 3. Mejorar la interfaz del dashboard
 - [ ] Hacer las listas más compactas y funcionales

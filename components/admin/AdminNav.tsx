@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, FileText, MapPin, Settings, Users, Home, BookOpen, Tag, Star } from "lucide-react";
+import { BarChart3, FileText, MapPin, Settings, Users, Home, BookOpen, Tag, Star, Layout } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -11,6 +11,7 @@ const navigation = [
   { name: "Ciudades", href: "/dashboard/cities", icon: BarChart3 },
   { name: "Categorías", href: "/dashboard/categories", icon: Tag },
   { name: "Destacados", href: "/dashboard/featured", icon: Star },
+  { name: "Secciones Homepage", href: "/dashboard/homepage-sections", icon: Layout },
   { name: "Blog", href: "/dashboard/blog", icon: BookOpen },
   { name: "Configuración", href: "/dashboard/settings", icon: Settings },
 ];
