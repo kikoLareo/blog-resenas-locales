@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { client } from '@/lib/sanity.client';
 import { venueWithReviewsQuery } from '@/lib/public-queries';
-import VenueDetail from '@/components/VenueDetail';
+import VenueDetail from '@/components/venues/VenueDetail';
 import type { Metadata } from 'next';
 
 interface VenuePageProps {
@@ -91,6 +91,12 @@ async function getVenue(citySlug: string, venueSlug: string): Promise<VenueWithR
     const venue = await client.fetch(venueWithReviewsQuery, {
       citySlug,
       venueSlug,
+    }, {
+      cache: 'force-cache',
+      next: { 
+        revalidate: 3600, // 1 hour
+        tags: ['venues', `venue-${venueSlug}`, `city-${citySlug}`]
+      }
     });
     return venue;
   } catch (error) {
