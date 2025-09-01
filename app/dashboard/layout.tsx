@@ -2,6 +2,9 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { AdminHeader } from "@/components/admin/AdminHeader";
+import { createAdminMetadata } from "@/lib/seo-protection";
+
+export const metadata = createAdminMetadata("Dashboard Admin");
 
 export default async function DashboardLayout({
   children,

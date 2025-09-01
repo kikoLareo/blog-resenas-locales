@@ -9,6 +9,8 @@ Disallow: /studio/
 Disallow: /api/
 Disallow: /_next/
 Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /acceso
 
 # Allow crawling of images
 Allow: /images/

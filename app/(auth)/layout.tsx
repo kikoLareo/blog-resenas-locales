@@ -1,3 +1,7 @@
+import { createAdminMetadata } from "@/lib/seo-protection";
+
+export const metadata = createAdminMetadata("Acceso Admin");
+
 export default function AuthLayout({
   children,
 }: {
