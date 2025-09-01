@@ -64,27 +64,27 @@
 ## 📋 CHECKLIST DETALLADO
 
 ### Páginas Públicas
-- [ ] `/app/(public)/[city]/[venue]/page.tsx` - Detalle de venue
-- [ ] `/app/(public)/[city]/[venue]/review/[reviewSlug]/page.tsx` - Detalle de reseña
-- [ ] `/app/(public)/categorias/[category]/page.tsx` - Página de categoría
-- [ ] `/app/(public)/buscar/page.tsx` - Página de búsqueda
-- [ ] Mejorar `/app/(public)/[city]/page.tsx` - Lista de venues de ciudad
+- [x] `/app/(public)/[city]/[venue]/page.tsx` - Detalle de venue
+- [x] `/app/(public)/[city]/[venue]/review/[reviewSlug]/page.tsx` - Detalle de reseña
+- [x] `/app/(public)/categorias/[category]/page.tsx` - Página de categoría (implementada como `/categorias/[slug]/page.tsx`)
+- [x] `/app/(public)/buscar/page.tsx` - Página de búsqueda
+- [x] Mejorar `/app/(public)/[city]/page.tsx` - Lista de venues de ciudad
 
 ### Componentes UI
-- [ ] `components/VenueDetail.tsx` - Vista completa del local
-- [ ] `components/ReviewDetailPublic.tsx` - Vista pública de reseña
-- [ ] `components/VenueCard.tsx` - Tarjeta de local
-- [ ] `components/SearchForm.tsx` - Formulario de búsqueda
-- [ ] `components/FilterBar.tsx` - Barra de filtros
+- [x] `components/VenueDetail.tsx` - Vista completa del local (implementado como `components/venues/VenueDetail.tsx`)
+- [x] `components/ReviewDetailPublic.tsx` - Vista pública de reseña
+- [x] `components/VenueCard.tsx` - Tarjeta de local
+- [x] `components/SearchForm.tsx` - Formulario de búsqueda
+- [x] `components/FilterBar.tsx` - Barra de filtros
 
 ### Dashboard CRUD
-- [ ] `/app/dashboard/venues/new/page.tsx` - Crear venue
-- [ ] `/app/dashboard/venues/[id]/edit/page.tsx` - Editar venue
-- [ ] `/app/dashboard/cities/new/page.tsx` - Crear city
+- [x] `/app/dashboard/venues/new/page.tsx` - Crear venue
+- [x] `/app/dashboard/venues/[id]/edit/page.tsx` - Editar venue
+- [x] `/app/dashboard/cities/new/page.tsx` - Crear city
 - [ ] `/app/dashboard/cities/[id]/edit/page.tsx` - Editar city
-- [ ] `/app/dashboard/categories/new/page.tsx` - Crear category
+- [x] `/app/dashboard/categories/new/page.tsx` - Crear category
 - [ ] `/app/dashboard/categories/[id]/edit/page.tsx` - Editar category
-- [ ] Mejorar `/app/dashboard/reviews/new/page.tsx` - Crear review
+- [x] Mejorar `/app/dashboard/reviews/new/page.tsx` - Crear review
 - [ ] Mejorar `/app/dashboard/reviews/[id]/edit/page.tsx` - Editar review
 
 ### API y Backend
@@ -93,20 +93,20 @@
 - [ ] `/app/api/categories/route.ts` - CRUD categories
 - [ ] `/app/api/reviews/route.ts` - CRUD reviews
 - [ ] `/app/api/search/route.ts` - Búsqueda
-- [ ] `/app/api/upload/route.ts` - Subida de imágenes
+- [x] `/app/api/upload/route.ts` - Subida de imágenes (implementado como `/app/api/upload-image/route.ts`)
 
 ### Queries GROQ
-- [ ] Queries para páginas públicas de venue
-- [ ] Queries para páginas públicas de reseña
-- [ ] Queries de búsqueda con filtros
-- [ ] Queries optimizadas para listas
+- [x] Queries para páginas públicas de venue (en `lib/public-queries.ts`)
+- [x] Queries para páginas públicas de reseña (en `lib/public-queries.ts`)
+- [ ] Queries de búsqueda con filtros (necesario para página de búsqueda)
+- [x] Queries optimizadas para listas (en `lib/groq.ts` y `sanity/lib/queries.ts`)
 
 ### Funcionalidades Especiales
-- [ ] Sistema de búsqueda con filtros
-- [ ] Gestión de imágenes con Sanity
-- [ ] Homepage sections persistencia en Sanity
-- [ ] Loading states y error handling
-- [ ] SEO y metadata para todas las páginas
+- [x] Sistema de búsqueda con filtros (página `/buscar` con componentes SearchForm y FilterBar - funcionalidad básica implementada)
+- [x] Gestión de imágenes con Sanity (implementado con `ImageManager.tsx` y `/api/upload-image`)
+- [x] Homepage sections persistencia en Sanity (implementado en dashboard)
+- [x] Loading states y error handling (implementado en componentes)
+- [x] SEO y metadata para todas las páginas (implementado con JSON-LD)
 
 ## 🎯 PRIORIDADES INMEDIATAS
 
@@ -129,11 +129,18 @@
 - ✅ Sanity CMS configurado
 - ✅ Schemas definidos
 - ✅ Homepage sections management
-- ❌ Páginas públicas de detalle
-- ❌ CRUD completo en dashboard
-- ❌ Búsqueda y filtros
-- ❌ Gestión de imágenes
+- ✅ Páginas públicas de detalle (venue, review, category)
+- ✅ CRUD básico en dashboard (crear venues, cities, categories, reviews)
+- ❌ Búsqueda y filtros (falta página `/buscar` y componentes)
+- ✅ Gestión de imágenes
+- ❌ Algunas páginas de edición en dashboard (cities, categories, reviews)
+- ❌ API routes CRUD directas (actualmente usa Sanity client)
 
 ---
 
-**Comenzamos con las páginas públicas críticas para resolver los 404s inmediatamente.**
+**Tareas prioritarias pendientes:**
+1. Crear página de búsqueda `/app/(public)/buscar/page.tsx`
+2. Crear componentes `SearchForm.tsx` y `FilterBar.tsx`
+3. Completar páginas de edición faltantes en dashboard
+4. Implementar API routes CRUD si se necesitan (opcional, Sanity funciona bien)
+5. Crear query GROQ para búsqueda con filtros
