@@ -1,267 +1,217 @@
-import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import { Suspense } from 'react';
-import { VenueBreadcrumbs } from '@/components/Breadcrumbs';
-import LocalInfo from '@/components/LocalInfo';
-import Gallery from '@/components/Gallery';
-import { MultiScore, CompactScore } from '@/components/ScoreBar';
-import FAQ from '@/components/FAQ';
-import { SidebarAd, InArticleAd } from '@/components/AdSlot';
-import { Venue, Review } from '@/lib/types';
-import { SITE_CONFIG } from '@/lib/constants';
-import { venuePageJsonLd } from '@/lib/schema';
+import { client } from '@/lib/sanity.client';
+import { venueWithReviewsQuery } from '@/lib/public-queries';
+import VenueDetail from '@/components/VenueDetail';
+import type { Metadata } from 'next';
 
-type VenuePageProps = {
+interface VenuePageProps {
   params: Promise<{
     city: string;
     venue: string;
   }>;
+}
+
+// Definir el tipo del venue para TypeScript
+type VenueWithReviews = {
+  _id: string;
+  title: string;
+  slug: string;
+  description?: string;
+  address: string;
+  postalCode?: string;
+  phone?: string;
+  website?: string;
+  geo?: {
+    lat: number;
+    lng: number;
+  };
+  openingHours?: string;
+  priceRange?: string;
+  schemaType?: string;
+  social?: {
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+  };
+  images?: Array<{
+    asset: {
+      _id: string;
+      url: string;
+    };
+    alt?: string;
+    caption?: string;
+  }>;
+  city: {
+    _id: string;
+    title: string;
+    slug: string;
+    region?: string;
+  };
+  categories: Array<{
+    _id: string;
+    title: string;
+    slug: string;
+    icon?: string;
+    color?: string;
+  }>;
+  reviews: Array<{
+    _id: string;
+    title: string;
+    slug: string;
+    author: string;
+    visitDate?: string;
+    publishedAt: string;
+    ratings: {
+      food: number;
+      service: number;
+      ambience: number;
+      value: number;
+      overall: number;
+    };
+    avgTicket?: number;
+    highlights?: string[];
+    pros?: string[];
+    cons?: string[];
+    tldr: string;
+    gallery?: Array<{
+      asset: {
+        _id: string;
+        url: string;
+      };
+      alt?: string;
+    }>;
+    tags?: string[];
+  }>;
+  averageRating?: number;
+  reviewCount: number;
 };
 
-// Datos temporales hardcodeados para desarrollo
-const mockVenue: Venue = {
-  _id: 'venue-madrid-cafe-encanto',
-  title: 'Café con Encanto',
-  slug: { current: 'cafe-con-encanto' },
-  description: 'Un acogedor café en el corazón de Madrid que ofrece la mejor experiencia gastronómica con un ambiente único y personalizado.',
-  address: 'Calle Gran Vía, 123',
-  postalCode: '28013',
-  phone: '+34 91 123 45 67',
-  website: 'https://cafeconencanto.com',
-  openingHours: [
-    'Lunes 08:00-22:00',
-    'Martes 08:00-22:00',
-    'Miércoles 08:00-22:00',
-    'Jueves 08:00-23:00',
-    'Viernes 08:00-23:00',
-    'Sábado 09:00-23:00',
-    'Domingo 09:00-21:00'
-  ],
-  priceRange: '€€',
-  schemaType: 'CafeOrCoffeeShop',
-  images: [
-    {
-      _type: 'image',
-      asset: {
-        _id: 'image-1',
-        url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop',
-        metadata: {
-          dimensions: {
-            width: 800,
-            height: 600,
-            aspectRatio: 1.33
-          }
-        }
-      },
-      alt: 'Interior del café'
-    }
-  ],
-  geo: {
-    lat: 40.4168,
-    lng: -3.7038
-  },
-  social: {
-    instagram: '@cafeconencanto',
-    facebook: 'cafeconencanto'
-  },
-  city: {
-    _id: 'city-madrid',
-    title: 'Madrid',
-    slug: { current: 'madrid' },
-    region: 'Comunidad de Madrid'
-  },
-  categories: [
-    {
-      _id: 'cat-cafe',
-      title: 'Cafeterías',
-      slug: { current: 'cafeterias' },
-      icon: 'coffee',
-      color: '#8B4513'
-    },
-    {
-      _id: 'cat-brunch',
-      title: 'Brunch',
-      slug: { current: 'brunch' },
-      icon: 'egg',
-      color: '#FFD700'
-    }
-  ],
-  reviews: []
-};
+async function getVenue(citySlug: string, venueSlug: string): Promise<VenueWithReviews | null> {
+  try {
+    const venue = await client.fetch(venueWithReviewsQuery, {
+      citySlug,
+      venueSlug,
+    });
+    return venue;
+  } catch (error) {
+    console.error('Error fetching venue:', error);
+    return null;
+  }
+}
 
 export async function generateMetadata({ params }: VenuePageProps): Promise<Metadata> {
-  const { venue: venueSlug, city } = await params;
-  
-  if (venueSlug !== 'cafe-con-encanto') {
+  const { city, venue: venueSlug } = await params;
+  const venue = await getVenue(city, venueSlug);
+
+  if (!venue) {
     return {
       title: 'Local no encontrado',
+      description: 'El local que buscas no existe o ha sido eliminado.',
     };
   }
 
-  const venue = mockVenue;
-  const title = `${venue.title} - ${venue.city.title}`;
-  const description = `${venue.description}. Dirección, horarios, teléfono y reseñas.`;
+  const averageRating = venue.averageRating || 0;
+  const ratingText = averageRating >= 8 ? 'Excelente' : averageRating >= 6 ? 'Muy bueno' : averageRating >= 4 ? 'Bueno' : 'Regular';
+  
+  const title = venue.reviewCount > 0 
+    ? `${venue.title} - ${ratingText} (${averageRating.toFixed(1)}/10) | ${venue.city.title}`
+    : `${venue.title} | ${venue.city.title}`;
+  
+  const description = venue.description 
+    ? venue.description.slice(0, 160)
+    : `Descubre ${venue.title} en ${venue.city.title}. ${venue.priceRange ? `${venue.priceRange} • ` : ''}${venue.categories.map(c => c.title).join(', ')}`;
+
+  const images = venue.images?.map(img => ({
+    url: img.asset.url,
+    alt: img.alt || venue.title,
+    width: 1200,
+    height: 800,
+  })) || [];
 
   return {
     title,
     description,
     openGraph: {
-      title: `${title} | ${SITE_CONFIG.name}`,
+      title,
       description,
       type: 'website',
-      url: `${SITE_CONFIG.url}/${city}/${venueSlug}`,
-      images: (venue.images && venue.images.length > 0) ? [
-        {
-          url: (venue.images[0] as any).asset?.url || (venue.images[0] as any).url,
-          width: 1200,
-          height: 630,
-          alt: (venue.images[0] as any).alt || title,
-        },
-      ] : [],
-      locale: 'es_ES',
+      images,
+      siteName: 'Blog de Reseñas Locales',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${title} | ${SITE_CONFIG.name}`,
+      title,
       description,
-      images: (venue.images && venue.images.length > 0) ? [(venue.images[0] as any).asset?.url || (venue.images[0] as any).url] : [],
+      images: images.map(img => img.url),
     },
     alternates: {
-      canonical: `${SITE_CONFIG.url}/${city}/${venueSlug}`,
+      canonical: `/${city}/${venueSlug}`,
     },
   };
 }
 
-// Loading components
-function VenueInfoSkeleton() {
+export default async function VenuePage({ params }: VenuePageProps) {
+  const { city, venue: venueSlug } = await params;
+  const venue = await getVenue(city, venueSlug);
+
+  if (!venue) {
+    notFound();
+  }
+
+  // Generar JSON-LD para SEO
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: venue.title,
+    description: venue.description,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: venue.address,
+      addressLocality: venue.city.title,
+      addressRegion: venue.city.region,
+      postalCode: venue.postalCode,
+      addressCountry: 'ES',
+    },
+    telephone: venue.phone,
+    url: venue.website,
+    image: venue.images?.map(img => img.asset.url) || [],
+    priceRange: venue.priceRange,
+    geo: venue.geo ? {
+      '@type': 'GeoCoordinates',
+      latitude: venue.geo.lat,
+      longitude: venue.geo.lng,
+    } : undefined,
+    aggregateRating: venue.reviewCount > 0 ? {
+      '@type': 'AggregateRating',
+      ratingValue: venue.averageRating,
+      reviewCount: venue.reviewCount,
+      bestRating: 10,
+      worstRating: 0,
+    } : undefined,
+    review: venue.reviews.map(review => ({
+      '@type': 'Review',
+      author: {
+        '@type': 'Person',
+        name: review.author,
+      },
+      datePublished: review.publishedAt,
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: review.ratings.overall,
+        bestRating: 10,
+        worstRating: 0,
+      },
+      reviewBody: review.tldr,
+    })),
+  };
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">
-      <div className="h-6 bg-gray-200 rounded w-1/3 mb-4" />
-      <div className="space-y-3">
-        <div className="h-4 bg-gray-200 rounded w-3/4" />
-        <div className="h-4 bg-gray-200 rounded w-1/2" />
-        <div className="h-4 bg-gray-200 rounded w-2/3" />
-      </div>
-    </div>
-  );
-}
-
-function ReviewCardSkeleton() {
-  return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6 animate-pulse">
-      <div className="space-y-4">
-        <div className="h-6 bg-gray-200 rounded w-3/4" />
-        <div className="h-4 bg-gray-200 rounded w-full" />
-        <div className="h-4 bg-gray-200 rounded w-5/6" />
-        <div className="flex space-x-4">
-          <div className="h-20 bg-gray-200 rounded w-1/2" />
-          <div className="h-20 bg-gray-200 rounded w-1/2" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Review Card Component
-function VenueReviewCard({ review }: { review: Review }) {
-  const overallRating = (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4;
-
-  return (
-    <article className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <h3 className="text-xl font-bold text-gray-900 mb-2">
-            <Link 
-              href={`/${review.venue.city.slug.current}/${review.venue.slug.current}/review/${review.slug.current}`}
-              className="hover:text-primary-600 transition-colors"
-            >
-              {review.title}
-            </Link>
-          </h3>
-          <div className="flex items-center text-sm text-gray-600 mb-3">
-            <span>{review.author}</span>
-            <span className="mx-2">•</span>
-            <time dateTime={review.publishedAt} suppressHydrationWarning>
-              {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(review.publishedAt))}
-            </time>
-          </div>
-        </div>
-        <CompactScore score={overallRating} />
-      </div>
-
-      {/* Ratings */}
-      <div className="mb-4">
-        <MultiScore 
-          scores={[
-            { label: 'Comida', value: review.ratings.food },
-            { label: 'Servicio', value: review.ratings.service },
-            { label: 'Ambiente', value: review.ratings.ambience },
-            { label: 'Precio', value: review.ratings.value },
-          ]}
-          showAverage={false}
-        />
-      </div>
-
-      {/* TLDR */}
-      <p className="text-gray-700 mb-4 leading-relaxed">
-        {review.tldr}
-      </p>
-
-      {/* Pros/Cons */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        <div>
-          <h4 className="text-sm font-medium text-green-700 mb-2">✓ Pros</h4>
-          <ul className="text-sm text-gray-600 space-y-1">
-            {review.pros.map((pro, index) => (
-              <li key={index}>• {pro}</li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h4 className="text-sm font-medium text-red-700 mb-2">✗ Contras</h4>
-          <ul className="text-sm text-gray-600 space-y-1">
-            {review.cons?.map((con, index) => (
-              <li key={index}>• {con}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* Read More Link */}
-      <div className="pt-4 border-t border-gray-100">
-        <Link
-          href={`/${review.venue.city.slug.current}/${review.venue.slug.current}/review/${review.slug.current}`}
-          className="text-primary-600 hover:text-primary-700 font-medium text-sm"
-        >
-          Leer reseña completa →
-        </Link>
-      </div>
-    </article>
-  );
-}
-
-export default async function VenuePage({ params }: { params: Promise<{ city: string; venue: string }> }) {
-  const { city, venue } = await params;
-  
-  return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Café con Encanto
-        </h1>
-        <div className="bg-white rounded-lg p-6 shadow-sm">
-          <p className="text-lg text-gray-700 mb-4">
-            Ciudad: <strong>{city}</strong>
-          </p>
-          <p className="text-lg text-gray-700 mb-4">
-            Local: <strong>{venue}</strong>
-          </p>
-          <p className="text-gray-600">
-            Un acogedor café en el corazón de Madrid que ofrece la mejor experiencia gastronómica con un ambiente único y personalizado.
-          </p>
-        </div>
-      </div>
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <VenueDetail venue={venue} />
+    </>
   );
 }
