@@ -13,6 +13,7 @@ interface Review {
   slug: { current: string };
   _createdAt: string;
   _updatedAt: string;
+  published: boolean;
   publishedAt: string | null;
   venue: {
     title: string;
@@ -25,7 +26,7 @@ interface Review {
     overall: number;
     food: number;
     service: number;
-    ambiance: number;
+    ambience: number;
     value: number;
   };
   status: "published" | "draft";
@@ -41,7 +42,9 @@ export default function ReviewsPage() {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
+        console.log('Fetching reviews with query:', reviewsListQuery);
         const data = await adminSanityClient.fetch<Review[]>(reviewsListQuery);
+        console.log('Fetched reviews:', data);
         setReviews(data);
         setFilteredReviews(data);
       } catch (error) {

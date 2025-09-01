@@ -10,15 +10,16 @@ export const dashboardStatsQuery = `
       _id,
       title,
       _createdAt,
+      published,
       "venue": venue->{title, "city": city->title},
       ratings
     },
-                    "recentVenues": *[_type == "venue"] | order(_createdAt desc)[0...5] {
-                  _id,
-                  title,
-                  _createdAt,
-                  "city": city->title
-                }
+    "recentVenues": *[_type == "venue"] | order(_createdAt desc)[0...5] {
+      _id,
+      title,
+      _createdAt,
+      "city": city->title
+    }
   }
 `;
 
@@ -30,14 +31,15 @@ export const reviewsListQuery = `
     slug,
     _createdAt,
     _updatedAt,
+    published,
     publishedAt,
-                    "venue": venue->{
-                  title,
-                  "city": city->{title, slug}
-                },
+    "venue": venue->{
+      title,
+      "city": city->{title, slug}
+    },
     ratings,
     "status": select(
-      publishedAt != null => "published",
+      published == true => "published",
       "draft"
     )
   }
