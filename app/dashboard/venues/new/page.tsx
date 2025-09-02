@@ -33,6 +33,16 @@ export default function NewVenuePage() {
         return;
       }
 
+      // Validate website URL if provided
+      if (formData.website && formData.website.trim()) {
+        try {
+          new URL(formData.website.trim());
+        } catch {
+          alert('Por favor, introduce una URL válida (ej: https://www.ejemplo.com)');
+          return;
+        }
+      }
+
       const response = await fetch('/api/admin/venues', {
         method: 'POST',
         headers: {
@@ -145,6 +155,7 @@ export default function NewVenuePage() {
                   <Label htmlFor="website">Sitio Web</Label>
                   <Input
                     id="website"
+                    type="url"
                     value={formData.website}
                     onChange={(e) => setFormData({...formData, website: e.target.value})}
                     placeholder="https://www.ejemplo.com"
