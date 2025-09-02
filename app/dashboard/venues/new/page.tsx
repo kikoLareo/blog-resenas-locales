@@ -9,6 +9,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Link from "next/link";
 import { ArrowLeft, Save, X } from "lucide-react";
 
+// Phone number validation function
+const validatePhoneNumber = (phone: string): boolean => {
+  if (!phone.trim()) {
+    return true; // Phone is optional, empty is valid
+  }
+  
+  // Allow international and local phone formats
+  // Clean the phone number by removing spaces and dashes, then validate
+  const cleanPhone = phone.replace(/[\s\-]/g, '');
+  
+  // International: +XX followed by 7-15 digits
+  // Local: 7-15 digits without country code
+  const phoneRegex = /^(\+\d{1,4})?\d{7,15}$/;
+  return phoneRegex.test(cleanPhone);
+};
+
 export default function NewVenuePage() {
   const [formData, setFormData] = useState({
     title: "",
@@ -30,6 +46,12 @@ export default function NewVenuePage() {
       // Validate required fields
       if (!formData.title || !formData.address) {
         alert('Título y dirección son campos requeridos');
+        return;
+      }
+
+      // Validate phone number format
+      if (!validatePhoneNumber(formData.phone)) {
+        alert('El formato del teléfono no es válido. Use formato internacional (+34 91 123 45 67) o local (91 123 45 67)');
         return;
       }
 
