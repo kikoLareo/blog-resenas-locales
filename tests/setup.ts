@@ -1,4 +1,4 @@
-import { expect, afterEach } from 'vitest';
+import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
 
@@ -57,3 +57,9 @@ process.env.SITE_NAME = 'Test Blog';
 process.env.SANITY_PROJECT_ID = 'test-project';
 process.env.SANITY_DATASET = 'test';
 process.env.ADS_PROVIDER = 'none';
+
+// Mock window.alert for tests
+Object.defineProperty(window, 'alert', {
+  writable: true,
+  value: vi.fn(),
+});

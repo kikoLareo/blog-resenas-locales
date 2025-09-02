@@ -217,7 +217,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const saveButton = screen.getByRole('button', { name: /guardar/i });
+      const saveButton = screen.getByRole('button', { name: /crear/i });
       await user.click(saveButton);
       
       // Should validate required fields
