@@ -56,7 +56,7 @@ describe('Featured Items Form', () => {
       
       // Basic form fields
       expect(screen.getByLabelText(/título interno/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/tipo de contenido/i)).toBeInTheDocument();
+      expect(screen.getByText(/tipo de contenido/i)).toBeInTheDocument(); // Select component
       expect(screen.getByLabelText(/orden de aparición/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/activo en carrusel/i)).toBeInTheDocument();
       
@@ -89,7 +89,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
+      const typeSelect = screen.getByRole("combobox");
       await user.click(typeSelect);
       
       // Should show all available types
@@ -126,7 +126,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
+      const typeSelect = screen.getByRole("combobox");
       expect(typeSelect).toHaveValue('review');
     });
 
@@ -155,7 +155,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
+      const typeSelect = screen.getByRole("combobox");
       await user.click(typeSelect);
       await user.click(screen.getByText(/⭐ reseña/i));
       
@@ -175,7 +175,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
+      const typeSelect = screen.getByRole("combobox");
       await user.click(typeSelect);
       await user.click(screen.getByText(/🏪 local\/restaurante/i));
       
@@ -195,7 +195,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
+      const typeSelect = screen.getByRole("combobox");
       await user.click(typeSelect);
       await user.click(screen.getByText(/📚 colección/i));
       
@@ -255,7 +255,7 @@ describe('Featured Items Form', () => {
       );
       
       // Select review type
-      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
+      const typeSelect = screen.getByRole("combobox");
       await user.click(typeSelect);
       await user.click(screen.getByText(/⭐ reseña/i));
       
@@ -440,7 +440,7 @@ describe('Featured Items Form', () => {
       );
       
       // Select type that requires API call
-      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
+      const typeSelect = screen.getByRole("combobox");
       await user.click(typeSelect);
       await user.click(screen.getByText(/⭐ reseña/i));
       
@@ -484,7 +484,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
+      const typeSelect = screen.getByRole("combobox");
       
       // Rapid type changes
       await user.click(typeSelect);
@@ -513,7 +513,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
+      const typeSelect = screen.getByRole("combobox");
       await user.click(typeSelect);
       await user.click(screen.getByText(/⭐ reseña/i));
       
@@ -538,7 +538,7 @@ describe('Featured Items Form', () => {
       await user.type(titleInput, 'My Featured Item');
       
       // Change type
-      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
+      const typeSelect = screen.getByRole("combobox");
       await user.click(typeSelect);
       await user.click(screen.getByText(/⭐ reseña/i));
       
