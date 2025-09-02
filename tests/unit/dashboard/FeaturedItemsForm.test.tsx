@@ -55,10 +55,10 @@ describe('Featured Items Form', () => {
       );
       
       // Basic form fields
-      expect(screen.getByLabelText(/título/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/tipo/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/orden/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/activo/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/título interno/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/tipo de contenido/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/orden de aparición/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/activo en carrusel/i)).toBeInTheDocument();
       
       // Custom content fields
       expect(screen.getByLabelText(/título personalizado/i)).toBeInTheDocument();
@@ -89,7 +89,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo/i);
+      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
       await user.click(typeSelect);
       
       // Should show all available types
@@ -126,7 +126,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo/i);
+      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
       expect(typeSelect).toHaveValue('review');
     });
 
@@ -155,7 +155,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo/i);
+      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
       await user.click(typeSelect);
       await user.click(screen.getByText(/⭐ reseña/i));
       
@@ -175,7 +175,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo/i);
+      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
       await user.click(typeSelect);
       await user.click(screen.getByText(/🏪 local\/restaurante/i));
       
@@ -195,7 +195,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo/i);
+      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
       await user.click(typeSelect);
       await user.click(screen.getByText(/📚 colección/i));
       
@@ -221,7 +221,7 @@ describe('Featured Items Form', () => {
       await user.click(saveButton);
       
       // Should validate required fields
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/título interno/i);
       expect(titleInput).toBeRequired();
     });
 
@@ -255,7 +255,7 @@ describe('Featured Items Form', () => {
       );
       
       // Select review type
-      const typeSelect = screen.getByLabelText(/tipo/i);
+      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
       await user.click(typeSelect);
       await user.click(screen.getByText(/⭐ reseña/i));
       
@@ -277,7 +277,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/título interno/i);
       const longTitle = 'x'.repeat(200); // Very long title
       
       await user.type(titleInput, longTitle);
@@ -298,7 +298,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/título interno/i);
       const customTitleInput = screen.getByLabelText(/título personalizado/i);
       
       await user.type(titleInput, 'New Featured Item');
@@ -417,7 +417,7 @@ describe('Featured Items Form', () => {
       await user.click(previewButton);
       
       // Change title
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/título interno/i);
       await user.type(titleInput, 'Updated Title');
       
       // Preview should reflect changes
@@ -440,7 +440,7 @@ describe('Featured Items Form', () => {
       );
       
       // Select type that requires API call
-      const typeSelect = screen.getByLabelText(/tipo/i);
+      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
       await user.click(typeSelect);
       await user.click(screen.getByText(/⭐ reseña/i));
       
@@ -461,7 +461,7 @@ describe('Featured Items Form', () => {
       );
       
       // Fill required fields
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/título interno/i);
       await user.type(titleInput, 'Test Item');
       
       // Save
@@ -484,7 +484,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo/i);
+      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
       
       // Rapid type changes
       await user.click(typeSelect);
@@ -513,7 +513,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const typeSelect = screen.getByLabelText(/tipo/i);
+      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
       await user.click(typeSelect);
       await user.click(screen.getByText(/⭐ reseña/i));
       
@@ -534,11 +534,11 @@ describe('Featured Items Form', () => {
       );
       
       // Fill some data
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/título interno/i);
       await user.type(titleInput, 'My Featured Item');
       
       // Change type
-      const typeSelect = screen.getByLabelText(/tipo/i);
+      const typeSelect = screen.getByLabelText(/tipo de contenido/i);
       await user.click(typeSelect);
       await user.click(screen.getByText(/⭐ reseña/i));
       
@@ -588,7 +588,7 @@ describe('Featured Items Form', () => {
         />
       );
       
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/título interno/i);
       expect(titleInput).toHaveAttribute('aria-required', 'true');
     });
   });
