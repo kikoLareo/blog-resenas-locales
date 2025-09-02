@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { adminSanityClient } from "@/lib/admin-sanity";
+import { adminSanityClient, adminSanityWriteClient } from "@/lib/admin-sanity";
 import { venuesListQuery } from "@/lib/admin-queries";
 import { generateUniqueCode } from "@/lib/qr-utils";
 import { useRouter } from "next/navigation";
@@ -70,7 +70,7 @@ export default function NewQRCodePage() {
         currentUses: 0,
       };
 
-      await adminSanityClient.create(qrCodeData);
+      await adminSanityWriteClient.create(qrCodeData);
       
       router.push('/dashboard/qr-codes');
     } catch (error) {
