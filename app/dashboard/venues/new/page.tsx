@@ -83,13 +83,13 @@ export default function NewVenuePage() {
           <CardTitle className="text-2xl font-bold">Nuevo Local</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <form role="form" className="space-y-6">
             {/* Información Básica */}
             <div>
               <h3 className="text-lg font-semibold mb-4">Información Básica</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="title">Nombre del Local *</Label>
+                  <Label htmlFor="title">Título *</Label>
                   <Input
                     id="title"
                     value={formData.title}
@@ -160,7 +160,7 @@ export default function NewVenuePage() {
                 <div>
                   <Label htmlFor="city">Ciudad *</Label>
                   <Select value={formData.city} onValueChange={(value) => setFormData({...formData, city: value})}>
-                    <SelectTrigger>
+                    <SelectTrigger id="city">
                       <SelectValue placeholder="Selecciona una ciudad" />
                     </SelectTrigger>
                     <SelectContent>
@@ -174,7 +174,7 @@ export default function NewVenuePage() {
                 <div>
                   <Label htmlFor="priceRange">Rango de Precios</Label>
                   <Select value={formData.priceRange} onValueChange={(value) => setFormData({...formData, priceRange: value})}>
-                    <SelectTrigger>
+                    <SelectTrigger id="priceRange">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -199,7 +199,7 @@ export default function NewVenuePage() {
                     }
                   }}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="categories">
                     <SelectValue placeholder="Añadir categoría" />
                   </SelectTrigger>
                   <SelectContent>
@@ -233,7 +233,7 @@ export default function NewVenuePage() {
                 )}
               </div>
             </div>
-          </div>
+          </form>
         </CardContent>
       </Card>
     </div>
