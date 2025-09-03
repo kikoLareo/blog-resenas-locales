@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import Link from "next/link";
 import { ArrowLeft, Save, X } from "lucide-react";
 
 export default function NewReviewPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -25,19 +27,39 @@ export default function NewReviewPage() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSave = async () => {
     setIsLoading(true);
+    setError(null);
+    
     try {
-      // Aquí iría la lógica para guardar en Sanity
-      console.log('Guardando nueva reseña:', formData);
-      // Redirigir a la lista de reseñas después de guardar
-      window.location.href = '/dashboard/reviews';
+      const response = await fetch('/api/admin/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al guardar la reseña');
+      }
+
+      // Redirect to reviews list on success
+      router.push('/dashboard/reviews');
     } catch (error) {
       console.error('Error al guardar:', error);
+      setError(error instanceof Error ? error.message : 'Error al guardar la reseña');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleCancel = () => {
+    router.push('/dashboard/reviews');
   };
 
   return (
@@ -50,7 +72,7 @@ export default function NewReviewPage() {
           </Button>
         </Link>
         <div className="flex space-x-2">
-          <Button variant="outline" onClick={() => window.location.href = '/dashboard/reviews'}>
+          <Button variant="outline" onClick={handleCancel}>
             <X className="mr-2 h-4 w-4" />
             Cancelar
           </Button>
@@ -66,6 +88,11 @@ export default function NewReviewPage() {
           <CardTitle className="text-2xl font-bold">Nueva Reseña</CardTitle>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+              <p className="text-red-800 text-sm">{error}</p>
+            </div>
+          )}
           <div className="space-y-6">
             {/* Información Básica */}
             <div>
