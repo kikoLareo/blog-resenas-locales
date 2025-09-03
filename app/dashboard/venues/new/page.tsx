@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { ArrowLeft, Save, X } from "lucide-react";
+
+interface Category {
+  _id: string;
+  title: string;
+  slug: string;
+}
 
 export default function NewVenuePage() {
   const [formData, setFormData] = useState({
@@ -23,6 +29,29 @@ export default function NewVenuePage() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/admin/references?type=category');
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data);
+        } else {
+          console.error('Failed to fetch categories:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -191,23 +220,38 @@ export default function NewVenuePage() {
                 <Select 
                   value="" 
                   onValueChange={(value) => {
-                    if (!formData.categories.includes(value)) {
+                    // Find the category title from the selected value (which is the _id)
+                    const selectedCategory = categories.find(cat => cat._id === value);
+                    if (selectedCategory && !formData.categories.includes(selectedCategory.title)) {
                       setFormData({
                         ...formData, 
-                        categories: [...formData.categories, value]
+                        categories: [...formData.categories, selectedCategory.title]
                       });
                     }
                   }}
+                  disabled={loadingCategories}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Añadir categoría" />
+                    <SelectValue placeholder={loadingCategories ? "Cargando categorías..." : "Añadir categoría"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pizzeria">Pizzería</SelectItem>
-                    <SelectItem value="restaurante">Restaurante</SelectItem>
-                    <SelectItem value="cafe">Café</SelectItem>
-                    <SelectItem value="bar">Bar</SelectItem>
-                    <SelectItem value="heladeria">Heladería</SelectItem>
+                    {categories.length > 0 ? (
+                      categories.map((category) => (
+                        <SelectItem 
+                          key={category._id} 
+                          value={category._id}
+                          disabled={formData.categories.includes(category.title)}
+                        >
+                          {category.title}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      !loadingCategories && (
+                        <SelectItem value="" disabled>
+                          No hay categorías disponibles
+                        </SelectItem>
+                      )
+                    )}
                   </SelectContent>
                 </Select>
                 {formData.categories.length > 0 && (
