@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Link from "next/link";
 import { ArrowLeft, Save, X } from "lucide-react";
 
+interface Venue {
+  _id: string;
+  title: string;
+  slug: {
+    current: string;
+  };
+}
+
 export default function NewReviewPage() {
+  const [venues, setVenues] = useState<Venue[]>([]);
+  const [venuesLoading, setVenuesLoading] = useState(true);
+  const [venuesError, setVenuesError] = useState<string | null>(null);
+  
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -25,6 +37,31 @@ export default function NewReviewPage() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch venues on component mount
+  useEffect(() => {
+    const fetchVenues = async () => {
+      try {
+        setVenuesLoading(true);
+        setVenuesError(null);
+        
+        const response = await fetch('/api/admin/venues');
+        if (!response.ok) {
+          throw new Error('Error al cargar los locales');
+        }
+        
+        const venuesData = await response.json();
+        setVenues(venuesData);
+      } catch (error) {
+        console.error('Error fetching venues:', error);
+        setVenuesError(error instanceof Error ? error.message : 'Error al cargar los locales');
+      } finally {
+        setVenuesLoading(false);
+      }
+    };
+
+    fetchVenues();
+  }, []);
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -109,12 +146,22 @@ export default function NewReviewPage() {
                 <Label htmlFor="venue">Seleccionar Local *</Label>
                 <Select value={formData.venue} onValueChange={(value) => setFormData({...formData, venue: value})}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona un local" />
+                    <SelectValue placeholder={venuesLoading ? "Cargando locales..." : "Selecciona un local"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="local1">Pizzería Tradizionale</SelectItem>
-                    <SelectItem value="local2">Restaurante El Bueno</SelectItem>
-                    <SelectItem value="local3">Café Central</SelectItem>
+                    {venuesLoading ? (
+                      <SelectItem value="loading" disabled>Cargando locales...</SelectItem>
+                    ) : venuesError ? (
+                      <SelectItem value="error" disabled>Error: {venuesError}</SelectItem>
+                    ) : venues.length === 0 ? (
+                      <SelectItem value="empty" disabled>No hay locales disponibles</SelectItem>
+                    ) : (
+                      venues.map((venue) => (
+                        <SelectItem key={venue._id} value={venue._id}>
+                          {venue.title}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </div>
