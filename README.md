@@ -218,10 +218,10 @@ npm run type-check   # TypeScript check
 │   ├── ui/                # Componentes base (shadcn/ui)
 │   ├── admin/             # Componentes del dashboard
 │   ├── ImageManager.tsx   # Gestión de imágenes
-│   ├── QRVenueForm.tsx    # Formulario QR
+│   ├── QrVenueForm.tsx    # Formulario QR
 │   ├── AdSlot.tsx         # Anuncios sin CLS
-│   ├── FAQ.tsx            # Preguntas frecuentes
-│   ├── TLDR.tsx           # Resúmenes AEO
+│   ├── Faq.tsx            # Preguntas frecuentes
+│   ├── Tldr.tsx           # Resúmenes AEO
 │   ├── ScoreBar.tsx       # Puntuaciones visuales
 │   └── Breadcrumbs.tsx    # Navegación + JSON-LD
 ├── lib/                   # Utilidades
