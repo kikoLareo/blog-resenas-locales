@@ -363,7 +363,8 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                       ...formData, 
                       ratings: { ...formData.ratings, food: parseFloat(value) }
                     })}>
-                      <SelectTrigger aria-label="Seleccionar puntuación para comida del 1 al 5">
+
+                      <SelectTrigger aria-label="Valoración de comida, escala del 1 al 5" aria-describedby="edit-food-rating-desc">
                         <SelectValue placeholder="Selecciona puntuación" />
                       </SelectTrigger>
                       <SelectContent>
@@ -374,6 +375,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                         ))}
                       </SelectContent>
                     </Select>
+                    <div id="edit-food-rating-desc" className="sr-only">Selecciona una puntuación del 1 al 5 para la calidad de la comida</div>
                   </div>
                   <div>
                     <Label htmlFor="service">Servicio</Label>
@@ -381,7 +383,8 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                       ...formData, 
                       ratings: { ...formData.ratings, service: parseFloat(value) }
                     })}>
-                      <SelectTrigger aria-label="Seleccionar puntuación para servicio del 1 al 5">
+
+                      <SelectTrigger aria-label="Valoración de servicio, escala del 1 al 5" aria-describedby="edit-service-rating-desc">
                         <SelectValue placeholder="Selecciona puntuación" />
                       </SelectTrigger>
                       <SelectContent>
@@ -392,6 +395,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                         ))}
                       </SelectContent>
                     </Select>
+                    <div id="edit-service-rating-desc" className="sr-only">Selecciona una puntuación del 1 al 5 para la calidad del servicio</div>
                   </div>
                   <div>
                     <Label htmlFor="ambience">Ambiente</Label>
@@ -399,7 +403,8 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                       ...formData, 
                       ratings: { ...formData.ratings, ambience: parseFloat(value) }
                     })}>
-                      <SelectTrigger aria-label="Seleccionar puntuación para ambiente del 1 al 5">
+
+                      <SelectTrigger aria-label="Valoración de ambiente, escala del 1 al 5" aria-describedby="edit-ambience-rating-desc">
                         <SelectValue placeholder="Selecciona puntuación" />
                       </SelectTrigger>
                       <SelectContent>
@@ -410,6 +415,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                         ))}
                       </SelectContent>
                     </Select>
+                    <div id="edit-ambience-rating-desc" className="sr-only">Selecciona una puntuación del 1 al 5 para la calidad del ambiente</div>
                   </div>
                   <div>
                     <Label htmlFor="value">Relación Calidad-Precio</Label>
@@ -417,7 +423,8 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                       ...formData, 
                       ratings: { ...formData.ratings, value: parseFloat(value) }
                     })}>
-                      <SelectTrigger aria-label="Seleccionar puntuación para relación calidad-precio del 1 al 5">
+
+                      <SelectTrigger aria-label="Valoración de relación calidad-precio, escala del 1 al 5" aria-describedby="edit-value-rating-desc">
                         <SelectValue placeholder="Selecciona puntuación" />
                       </SelectTrigger>
                       <SelectContent>
@@ -428,6 +435,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                         ))}
                       </SelectContent>
                     </Select>
+                    <div id="edit-value-rating-desc" className="sr-only">Selecciona una puntuación del 1 al 5 para la relación calidad-precio</div>
                   </div>
                 </div>
               </div>

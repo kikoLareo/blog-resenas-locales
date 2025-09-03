@@ -8,6 +8,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { ArrowLeft, Save, X } from "lucide-react";
+import { isValidUrl, getUrlErrorMessage } from "@/lib/validation";
+
+// Phone number validation function
+const validatePhoneNumber = (phone: string): boolean => {
+  if (!phone.trim()) {
+    return true; // Phone is optional, empty is valid
+  }
+  
+  // Allow international and local phone formats
+  // Clean the phone number by removing spaces and dashes, then validate
+  const cleanPhone = phone.replace(/[\s\-]/g, '');
+  
+  // International: +XX followed by 7-15 digits
+  // Local: 7-15 digits without country code
+  const phoneRegex = /^(\+\d{1,4})?\d{7,15}$/;
+  return phoneRegex.test(cleanPhone);
+};
 
 export default function NewVenuePage() {
   const [formData, setFormData] = useState({
@@ -23,14 +40,42 @@ export default function NewVenuePage() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
 
   const handleSave = async () => {
     setIsLoading(true);
+    setErrors({});
+    
     try {
       // Validate required fields
+      const newErrors: {[key: string]: string} = {};
+      
       if (!formData.title || !formData.address) {
-        alert('Título y dirección son campos requeridos');
+        if (!formData.title) newErrors.title = 'El título es requerido';
+        if (!formData.address) newErrors.address = 'La dirección es requerida';
+      }
+
+      // Validate URL format if website is provided
+      if (formData.website && !isValidUrl(formData.website)) {
+        newErrors.website = getUrlErrorMessage(formData.website);
+      }
+
+      // If there are errors, show them and stop submission
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        setIsLoading(false);
         return;
+      }
+
+      // Validate website URL if provided
+      if (formData.website && formData.website.trim()) {
+        try {
+          new URL(formData.website.trim());
+        } catch {
+          alert('Por favor, introduce una URL válida (ej: https://www.ejemplo.com)');
+          return;
+        }
+
       }
 
       const response = await fetch('/api/admin/venues', {
@@ -93,9 +138,19 @@ export default function NewVenuePage() {
                   <Input
                     id="title"
                     value={formData.title}
-                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, title: e.target.value});
+                      // Clear error when user starts typing
+                      if (errors.title) {
+                        setErrors({...errors, title: ''});
+                      }
+                    }}
                     placeholder="Ej: Pizzería Tradizionale"
+                    className={errors.title ? 'border-red-500 focus:border-red-500' : ''}
                   />
+                  {errors.title && (
+                    <p className="text-sm text-red-600 mt-1">{errors.title}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="slug">Slug *</Label>
@@ -128,9 +183,19 @@ export default function NewVenuePage() {
                   <Input
                     id="address"
                     value={formData.address}
-                    onChange={(e) => setFormData({...formData, address: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, address: e.target.value});
+                      // Clear error when user starts typing
+                      if (errors.address) {
+                        setErrors({...errors, address: ''});
+                      }
+                    }}
                     placeholder="Calle Mayor, 123"
+                    className={errors.address ? 'border-red-500 focus:border-red-500' : ''}
                   />
+                  {errors.address && (
+                    <p className="text-sm text-red-600 mt-1">{errors.address}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="phone">Teléfono</Label>
@@ -145,10 +210,21 @@ export default function NewVenuePage() {
                   <Label htmlFor="website">Sitio Web</Label>
                   <Input
                     id="website"
+                    type="url"
                     value={formData.website}
-                    onChange={(e) => setFormData({...formData, website: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, website: e.target.value});
+                      // Clear error when user starts typing
+                      if (errors.website) {
+                        setErrors({...errors, website: ''});
+                      }
+                    }}
                     placeholder="https://www.ejemplo.com"
+                    className={errors.website ? 'border-red-500 focus:border-red-500' : ''}
                   />
+                  {errors.website && (
+                    <p className="text-sm text-red-600 mt-1">{errors.website}</p>
+                  )}
                 </div>
               </div>
             </div>
