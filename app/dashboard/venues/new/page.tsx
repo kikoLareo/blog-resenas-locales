@@ -49,10 +49,15 @@ export default function NewVenuePage() {
         return;
       }
 
-      // Validate phone number format
-      if (!validatePhoneNumber(formData.phone)) {
-        alert('El formato del teléfono no es válido. Use formato internacional (+34 91 123 45 67) o local (91 123 45 67)');
-        return;
+      // Validate website URL if provided
+      if (formData.website && formData.website.trim()) {
+        try {
+          new URL(formData.website.trim());
+        } catch {
+          alert('Por favor, introduce una URL válida (ej: https://www.ejemplo.com)');
+          return;
+        }
+
       }
 
       const response = await fetch('/api/admin/venues', {
@@ -167,6 +172,7 @@ export default function NewVenuePage() {
                   <Label htmlFor="website">Sitio Web</Label>
                   <Input
                     id="website"
+                    type="url"
                     value={formData.website}
                     onChange={(e) => setFormData({...formData, website: e.target.value})}
                     placeholder="https://www.ejemplo.com"
