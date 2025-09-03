@@ -290,6 +290,22 @@ describe('Reviews Form - New Review Page', () => {
       expect(document.activeElement).toBeInstanceOf(HTMLElement);
     });
 
+    it('should have proper ARIA attributes for rating selects', () => {
+      render(<NewReviewPage />);
+      
+      // Look for elements with our specific aria-labels
+      const foodSelect = screen.getByLabelText('Seleccionar puntuación para comida del 1 al 5');
+      const serviceSelect = screen.getByLabelText('Seleccionar puntuación para servicio del 1 al 5');
+      const ambienceSelect = screen.getByLabelText('Seleccionar puntuación para ambiente del 1 al 5');
+      const valueSelect = screen.getByLabelText('Seleccionar puntuación para relación calidad-precio del 1 al 5');
+      
+      // Verify all rating selects have proper ARIA attributes
+      expect(foodSelect).toHaveAttribute('aria-label', 'Seleccionar puntuación para comida del 1 al 5');
+      expect(serviceSelect).toHaveAttribute('aria-label', 'Seleccionar puntuación para servicio del 1 al 5');
+      expect(ambienceSelect).toHaveAttribute('aria-label', 'Seleccionar puntuación para ambiente del 1 al 5');
+      expect(valueSelect).toHaveAttribute('aria-label', 'Seleccionar puntuación para relación calidad-precio del 1 al 5');
+    });
+
     it('should have proper ARIA attributes', () => {
       render(<NewReviewPage />);
       

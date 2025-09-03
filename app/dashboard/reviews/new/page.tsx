@@ -133,6 +133,7 @@ export default function NewReviewPage() {
                       ratings: {...formData.ratings, food: parseInt(value)}
                     })}
                   >
+
                     <SelectTrigger aria-label="Valoración de comida, escala del 1 al 5" aria-describedby="food-rating-desc">
                       <SelectValue />
                     </SelectTrigger>
@@ -153,6 +154,7 @@ export default function NewReviewPage() {
                       ratings: {...formData.ratings, service: parseInt(value)}
                     })}
                   >
+
                     <SelectTrigger aria-label="Valoración de servicio, escala del 1 al 5" aria-describedby="service-rating-desc">
                       <SelectValue />
                     </SelectTrigger>
@@ -173,6 +175,7 @@ export default function NewReviewPage() {
                       ratings: {...formData.ratings, ambience: parseInt(value)}
                     })}
                   >
+
                     <SelectTrigger aria-label="Valoración de ambiente, escala del 1 al 5" aria-describedby="ambience-rating-desc">
                       <SelectValue />
                     </SelectTrigger>
@@ -193,6 +196,7 @@ export default function NewReviewPage() {
                       ratings: {...formData.ratings, value: parseInt(value)}
                     })}
                   >
+
                     <SelectTrigger aria-label="Valoración de relación calidad-precio, escala del 1 al 5" aria-describedby="value-rating-desc">
                       <SelectValue />
                     </SelectTrigger>

@@ -363,6 +363,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                       ...formData, 
                       ratings: { ...formData.ratings, food: parseFloat(value) }
                     })}>
+
                       <SelectTrigger aria-label="Valoración de comida, escala del 1 al 5" aria-describedby="edit-food-rating-desc">
                         <SelectValue placeholder="Selecciona puntuación" />
                       </SelectTrigger>
@@ -382,6 +383,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                       ...formData, 
                       ratings: { ...formData.ratings, service: parseFloat(value) }
                     })}>
+
                       <SelectTrigger aria-label="Valoración de servicio, escala del 1 al 5" aria-describedby="edit-service-rating-desc">
                         <SelectValue placeholder="Selecciona puntuación" />
                       </SelectTrigger>
@@ -401,6 +403,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                       ...formData, 
                       ratings: { ...formData.ratings, ambience: parseFloat(value) }
                     })}>
+
                       <SelectTrigger aria-label="Valoración de ambiente, escala del 1 al 5" aria-describedby="edit-ambience-rating-desc">
                         <SelectValue placeholder="Selecciona puntuación" />
                       </SelectTrigger>
@@ -420,6 +423,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                       ...formData, 
                       ratings: { ...formData.ratings, value: parseFloat(value) }
                     })}>
+
                       <SelectTrigger aria-label="Valoración de relación calidad-precio, escala del 1 al 5" aria-describedby="edit-value-rating-desc">
                         <SelectValue placeholder="Selecciona puntuación" />
                       </SelectTrigger>
