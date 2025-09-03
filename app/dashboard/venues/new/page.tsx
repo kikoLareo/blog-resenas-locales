@@ -8,9 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { ArrowLeft, Save, X } from "lucide-react";
+import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 
 export default function NewVenuePage() {
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     title: "",
     slug: "",
     description: "",
@@ -20,9 +21,19 @@ export default function NewVenuePage() {
     priceRange: "€€",
     city: "",
     categories: [] as string[]
-  });
+  };
 
+  const [formData, setFormData] = useState(initialFormData);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Check if form has unsaved changes
+  const hasUnsavedChanges = JSON.stringify(formData) !== JSON.stringify(initialFormData);
+  
+  // Add unsaved changes warning
+  useUnsavedChangesWarning({ 
+    hasUnsavedChanges: hasUnsavedChanges && !isLoading,
+    message: "You have unsaved venue information. Are you sure you want to leave?"
+  });
 
   const handleSave = async () => {
     setIsLoading(true);
