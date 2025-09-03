@@ -69,6 +69,7 @@ export default function NewCategoryPage() {
                     value={formData.title}
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
                     placeholder="Ej: Pizzería"
+                    aria-required="true"
                   />
                 </div>
                 <div>

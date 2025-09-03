@@ -95,6 +95,7 @@ export default function NewVenuePage() {
                     value={formData.title}
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
                     placeholder="Ej: Pizzería Tradizionale"
+                    aria-required="true"
                   />
                 </div>
                 <div>
@@ -130,6 +131,7 @@ export default function NewVenuePage() {
                     value={formData.address}
                     onChange={(e) => setFormData({...formData, address: e.target.value})}
                     placeholder="Calle Mayor, 123"
+                    aria-required="true"
                   />
                 </div>
                 <div>
@@ -160,7 +162,7 @@ export default function NewVenuePage() {
                 <div>
                   <Label htmlFor="city">Ciudad *</Label>
                   <Select value={formData.city} onValueChange={(value) => setFormData({...formData, city: value})}>
-                    <SelectTrigger id="city">
+                    <SelectTrigger id="city" aria-required="true">
                       <SelectValue placeholder="Selecciona una ciudad" />
                     </SelectTrigger>
                     <SelectContent>
