@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { ArrowLeft, Save, X } from "lucide-react";
+import { slugify } from "@/lib/slug";
 
 export default function NewReviewPage() {
   const [formData, setFormData] = useState({
@@ -25,6 +26,24 @@ export default function NewReviewPage() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
+
+  // Auto-generate slug from title
+  useEffect(() => {
+    if (formData.title && !isSlugManuallyEdited) {
+      const newSlug = slugify(formData.title);
+      setFormData(prev => ({ ...prev, slug: newSlug }));
+    }
+  }, [formData.title, isSlugManuallyEdited]);
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({...formData, title: e.target.value});
+  };
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({...formData, slug: e.target.value});
+    setIsSlugManuallyEdited(true);
+  };
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -76,7 +95,7 @@ export default function NewReviewPage() {
                   <Input
                     id="title"
                     value={formData.title}
-                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                    onChange={handleTitleChange}
                     placeholder="Ej: Pizza Margherita - La mejor de Madrid"
                   />
                 </div>
@@ -85,7 +104,7 @@ export default function NewReviewPage() {
                   <Input
                     id="slug"
                     value={formData.slug}
-                    onChange={(e) => setFormData({...formData, slug: e.target.value})}
+                    onChange={handleSlugChange}
                     placeholder="pizza-margherita-madrid"
                   />
                 </div>
