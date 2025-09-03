@@ -25,8 +25,33 @@ export default function NewReviewPage() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
+
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+    
+    if (!formData.title.trim()) {
+      newErrors.title = 'El título es obligatorio';
+    }
+    
+    if (!formData.slug.trim()) {
+      newErrors.slug = 'El slug es obligatorio';
+    }
+    
+    if (!formData.venue.trim()) {
+      newErrors.venue = 'Debe seleccionar un local';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSave = async () => {
+    // Validate form before saving
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsLoading(true);
     try {
       // Aquí iría la lógica para guardar en Sanity
@@ -78,7 +103,11 @@ export default function NewReviewPage() {
                     value={formData.title}
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
                     placeholder="Ej: Pizza Margherita - La mejor de Madrid"
+                    className={errors.title ? "border-red-500" : ""}
                   />
+                  {errors.title && (
+                    <span className="text-red-500 text-sm mt-1">{errors.title}</span>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="slug">Slug *</Label>
@@ -87,7 +116,11 @@ export default function NewReviewPage() {
                     value={formData.slug}
                     onChange={(e) => setFormData({...formData, slug: e.target.value})}
                     placeholder="pizza-margherita-madrid"
+                    className={errors.slug ? "border-red-500" : ""}
                   />
+                  {errors.slug && (
+                    <span className="text-red-500 text-sm mt-1">{errors.slug}</span>
+                  )}
                 </div>
               </div>
               <div className="mt-4">
@@ -108,7 +141,7 @@ export default function NewReviewPage() {
               <div>
                 <Label htmlFor="venue">Seleccionar Local *</Label>
                 <Select value={formData.venue} onValueChange={(value) => setFormData({...formData, venue: value})}>
-                  <SelectTrigger>
+                  <SelectTrigger className={errors.venue ? "border-red-500" : ""}>
                     <SelectValue placeholder="Selecciona un local" />
                   </SelectTrigger>
                   <SelectContent>
@@ -117,6 +150,9 @@ export default function NewReviewPage() {
                     <SelectItem value="local3">Café Central</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.venue && (
+                  <span className="text-red-500 text-sm mt-1">{errors.venue}</span>
+                )}
               </div>
             </div>
 

@@ -265,6 +265,88 @@ describe('Reviews Form - New Review Page', () => {
     });
   });
 
+  describe('Form Validation', () => {
+    it('should show validation errors for empty required fields', async () => {
+      const user = userEvent.setup();
+      render(<NewReviewPage />);
+      
+      const saveButton = screen.getByRole('button', { name: /guardar reseña/i });
+      
+      // Try to save with empty required fields
+      await user.click(saveButton);
+      
+      // Should show validation errors
+      expect(screen.getByText('El título es obligatorio')).toBeInTheDocument();
+      expect(screen.getByText('El slug es obligatorio')).toBeInTheDocument();
+      expect(screen.getByText('Debe seleccionar un local')).toBeInTheDocument();
+    });
+
+    it('should not show validation errors when required fields are filled', async () => {
+      const user = userEvent.setup();
+      render(<NewReviewPage />);
+      
+      // Fill required fields
+      const titleInput = screen.getByLabelText(/título/i);
+      const slugInput = screen.getByLabelText(/slug/i);
+      
+      await user.type(titleInput, 'Test Title');
+      await user.type(slugInput, 'test-slug');
+      
+      // Select a venue
+      const venueSelect = screen.getByRole('combobox', { name: /seleccionar local/i });
+      await user.click(venueSelect);
+      await user.click(screen.getByText('Pizzería Tradizionale'));
+      
+      const saveButton = screen.getByRole('button', { name: /guardar reseña/i });
+      await user.click(saveButton);
+      
+      // Should not show validation errors
+      expect(screen.queryByText('El título es obligatorio')).not.toBeInTheDocument();
+      expect(screen.queryByText('El slug es obligatorio')).not.toBeInTheDocument();
+      expect(screen.queryByText('Debe seleccionar un local')).not.toBeInTheDocument();
+    });
+
+    it('should add red border to invalid fields', async () => {
+      const user = userEvent.setup();
+      render(<NewReviewPage />);
+      
+      const saveButton = screen.getByRole('button', { name: /guardar reseña/i });
+      
+      // Try to save with empty required fields
+      await user.click(saveButton);
+      
+      // Should add red border to invalid fields
+      const titleInput = screen.getByLabelText(/título/i);
+      const slugInput = screen.getByLabelText(/slug/i);
+      
+      expect(titleInput).toHaveClass('border-red-500');
+      expect(slugInput).toHaveClass('border-red-500');
+    });
+
+    it('should clear validation errors when fields are filled', async () => {
+      const user = userEvent.setup();
+      render(<NewReviewPage />);
+      
+      const saveButton = screen.getByRole('button', { name: /guardar reseña/i });
+      
+      // First trigger validation errors
+      await user.click(saveButton);
+      expect(screen.getByText('El título es obligatorio')).toBeInTheDocument();
+      
+      // Then fill the title field
+      const titleInput = screen.getByLabelText(/título/i);
+      await user.type(titleInput, 'Test Title');
+      
+      // Click save again to re-validate
+      await user.click(saveButton);
+      
+      // Title error should be gone, but others should remain
+      expect(screen.queryByText('El título es obligatorio')).not.toBeInTheDocument();
+      expect(screen.getByText('El slug es obligatorio')).toBeInTheDocument();
+      expect(screen.getByText('Debe seleccionar un local')).toBeInTheDocument();
+    });
+  });
+
   describe('Accessibility', () => {
     it('should have proper labels for all form fields', () => {
       render(<NewReviewPage />);
