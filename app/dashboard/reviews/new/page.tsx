@@ -8,8 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { ArrowLeft, Save, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function NewReviewPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -32,7 +34,7 @@ export default function NewReviewPage() {
       // Aquí iría la lógica para guardar en Sanity
       console.log('Guardando nueva reseña:', formData);
       // Redirigir a la lista de reseñas después de guardar
-      window.location.href = '/dashboard/reviews';
+      router.push('/dashboard/reviews');
     } catch (error) {
       console.error('Error al guardar:', error);
     } finally {
@@ -50,7 +52,7 @@ export default function NewReviewPage() {
           </Button>
         </Link>
         <div className="flex space-x-2">
-          <Button variant="outline" onClick={() => window.location.href = '/dashboard/reviews'}>
+          <Button variant="outline" onClick={() => router.push('/dashboard/reviews')}>
             <X className="mr-2 h-4 w-4" />
             Cancelar
           </Button>
