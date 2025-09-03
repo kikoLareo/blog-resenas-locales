@@ -95,8 +95,19 @@ describe('Venues Form - New Venue Page', () => {
       // Test invalid phone formats
       await user.type(phoneInput, 'invalid-phone');
       
-      // Should validate phone format
-      // This would need proper validation implementation
+      // Should show error message for invalid format
+      await waitFor(() => {
+        expect(screen.getByText(/formato de teléfono no válido/i)).toBeInTheDocument();
+      });
+
+      // Clear and test valid Spanish phone format
+      await user.clear(phoneInput);
+      await user.type(phoneInput, '+34 91 123 45 67');
+      
+      // Should not show error for valid format
+      await waitFor(() => {
+        expect(screen.queryByText(/formato de teléfono no válido/i)).not.toBeInTheDocument();
+      });
     });
 
     it('should validate website URL format', async () => {

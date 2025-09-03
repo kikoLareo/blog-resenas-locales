@@ -13,6 +13,7 @@ import Link from "next/link";
 import { ArrowLeft, Edit, Eye, MapPin, Phone, Globe, Clock, Euro, Tag, Building2, X, Save } from "lucide-react";
 import { notFound } from "next/navigation";
 import { useState } from "react";
+import { validatePhone } from "@/lib/phone-validation";
 
 interface VenueDetailPageProps {
   params: Promise<{ id: string }>;
@@ -57,6 +58,7 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [formData, setFormData] = useState(venue);
   const [images, setImages] = useState<any[]>([]);
+  const [phoneError, setPhoneError] = useState<string>("");
 
   const publicVenueUrl = venue.slug?.current && venue.city?.slug?.current
     ? `/${venue.city.slug.current}/venue/${venue.slug.current}`
@@ -69,7 +71,28 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
       }, 0) / venue.reviews.length
     : 0;
 
+  const handlePhoneChange = (value: string) => {
+    setFormData({...formData, phone: value});
+    
+    // Validate phone number on change
+    const validation = validatePhone(value);
+    if (!validation.isValid && validation.error) {
+      setPhoneError(validation.error);
+    } else {
+      setPhoneError("");
+    }
+  };
+
   const handleSave = () => {
+    // Validate phone number if provided
+    if (formData.phone) {
+      const phoneValidation = validatePhone(formData.phone);
+      if (!phoneValidation.isValid) {
+        alert(phoneValidation.error || 'Formato de teléfono no válido');
+        return;
+      }
+    }
+
     // Aquí iría la lógica para guardar en Sanity
     console.log('Guardando cambios:', formData);
     setIsEditModalOpen(false);
@@ -287,8 +310,13 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
                     <Input
                       id="phone"
                       value={formData.phone || ''}
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      onChange={(e) => handlePhoneChange(e.target.value)}
+                      placeholder="+34 91 123 45 67"
+                      className={phoneError ? "border-red-500" : ""}
                     />
+                    {phoneError && (
+                      <p className="text-sm text-red-600 mt-1">{phoneError}</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="website">Sitio Web</Label>

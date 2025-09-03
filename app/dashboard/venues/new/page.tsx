@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { ArrowLeft, Save, X } from "lucide-react";
+import { validatePhone } from "@/lib/phone-validation";
 
 export default function NewVenuePage() {
   const [formData, setFormData] = useState({
@@ -23,6 +24,19 @@ export default function NewVenuePage() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [phoneError, setPhoneError] = useState<string>("");
+
+  const handlePhoneChange = (value: string) => {
+    setFormData({...formData, phone: value});
+    
+    // Validate phone number on change
+    const validation = validatePhone(value);
+    if (!validation.isValid && validation.error) {
+      setPhoneError(validation.error);
+    } else {
+      setPhoneError("");
+    }
+  };
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -31,6 +45,15 @@ export default function NewVenuePage() {
       if (!formData.title || !formData.address) {
         alert('Título y dirección son campos requeridos');
         return;
+      }
+
+      // Validate phone number if provided
+      if (formData.phone) {
+        const phoneValidation = validatePhone(formData.phone);
+        if (!phoneValidation.isValid) {
+          alert(phoneValidation.error || 'Formato de teléfono no válido');
+          return;
+        }
       }
 
       const response = await fetch('/api/admin/venues', {
@@ -137,9 +160,13 @@ export default function NewVenuePage() {
                   <Input
                     id="phone"
                     value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    onChange={(e) => handlePhoneChange(e.target.value)}
                     placeholder="+34 91 123 45 67"
+                    className={phoneError ? "border-red-500" : ""}
                   />
+                  {phoneError && (
+                    <p className="text-sm text-red-600 mt-1">{phoneError}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="website">Sitio Web</Label>
