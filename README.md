@@ -635,13 +635,19 @@ IndexNow (dry-run): { "host": "...", "urlList": [...] }
 
 ## 📚 Documentación
 
-### Guías Disponibles
+### Guías Principales
+- **[📖 Índice Completo de Documentación](docs/README.md)** - Navegación organizada por categorías
 - **[Documentación Técnica](docs/TECHNICAL_DOCUMENTATION.md)** - Arquitectura, APIs, componentes
 - **[Guía de Usuario](docs/USER_GUIDE.md)** - Manual completo del dashboard
 - **[Directrices de Código](CODE_GUIDELINES.md)** - Estándares y mejores prácticas para el código
-- **[Reglas para IA](AI_MODEL_RULES.md)** - Guía para asistentes de IA trabajando con el proyecto
-- **[TODO](TODO.md)** - Lista de tareas y estado del proyecto
-- **[Memory Bank](MEMORY_BANK.md)** - Decisiones técnicas y contexto
+
+### Documentación por Categorías
+- **[🤖 Desarrollo con IA](docs/ai-development/)** - Reglas, agentes y herramientas de IA
+- **[📋 Planificación](docs/planning/)** - Planes maestros y lista de tareas
+- **[⚡ Funcionalidades](docs/features/)** - Estados y especificaciones de características
+- **[🏗️ Infraestructura](docs/infrastructure/)** - Despliegue y arquitectura técnica
+- **[📊 Reportes](docs/reports/)** - Auditorías y análisis del proyecto
+- **[🐛 Issues](docs/issues/)** - Seguimiento de problemas identificados
 
 ## 🐛 Troubleshooting
 
