@@ -133,7 +133,7 @@ export default function NewReviewPage() {
                       ratings: {...formData.ratings, food: parseInt(value)}
                     })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Seleccionar puntuación para comida del 1 al 5">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -152,7 +152,7 @@ export default function NewReviewPage() {
                       ratings: {...formData.ratings, service: parseInt(value)}
                     })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Seleccionar puntuación para servicio del 1 al 5">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -171,7 +171,7 @@ export default function NewReviewPage() {
                       ratings: {...formData.ratings, ambience: parseInt(value)}
                     })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Seleccionar puntuación para ambiente del 1 al 5">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -190,7 +190,7 @@ export default function NewReviewPage() {
                       ratings: {...formData.ratings, value: parseInt(value)}
                     })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Seleccionar puntuación para relación calidad-precio del 1 al 5">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>

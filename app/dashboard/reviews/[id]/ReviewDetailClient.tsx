@@ -363,7 +363,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                       ...formData, 
                       ratings: { ...formData.ratings, food: parseFloat(value) }
                     })}>
-                      <SelectTrigger>
+                      <SelectTrigger aria-label="Seleccionar puntuación para comida del 1 al 5">
                         <SelectValue placeholder="Selecciona puntuación" />
                       </SelectTrigger>
                       <SelectContent>
@@ -381,7 +381,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                       ...formData, 
                       ratings: { ...formData.ratings, service: parseFloat(value) }
                     })}>
-                      <SelectTrigger>
+                      <SelectTrigger aria-label="Seleccionar puntuación para servicio del 1 al 5">
                         <SelectValue placeholder="Selecciona puntuación" />
                       </SelectTrigger>
                       <SelectContent>
@@ -399,7 +399,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                       ...formData, 
                       ratings: { ...formData.ratings, ambience: parseFloat(value) }
                     })}>
-                      <SelectTrigger>
+                      <SelectTrigger aria-label="Seleccionar puntuación para ambiente del 1 al 5">
                         <SelectValue placeholder="Selecciona puntuación" />
                       </SelectTrigger>
                       <SelectContent>
@@ -417,7 +417,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                       ...formData, 
                       ratings: { ...formData.ratings, value: parseFloat(value) }
                     })}>
-                      <SelectTrigger>
+                      <SelectTrigger aria-label="Seleccionar puntuación para relación calidad-precio del 1 al 5">
                         <SelectValue placeholder="Selecciona puntuación" />
                       </SelectTrigger>
                       <SelectContent>
