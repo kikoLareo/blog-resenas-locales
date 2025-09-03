@@ -143,7 +143,23 @@ GA_MEASUREMENT_ID=G-XXXXXXXXXX
 PLAUSIBLE_DOMAIN=tu-dominio.com
 ```
 
-### 4. Ejecutar en desarrollo
+### 4. Configurar la base de datos
+
+```bash
+# Generar cliente de Prisma
+npx prisma generate
+
+# Ejecutar migraciones (si usas PostgreSQL)
+npx prisma migrate dev
+
+# Para desarrollo local con datos de prueba (opcional)
+npx prisma db seed  # si existe un script de seed
+```
+
+> **Nota**: Los archivos `.db` (SQLite) no se incluyen en el repositorio por seguridad. 
+> Para desarrollo local, las migraciones recrearán automáticamente la estructura de la base de datos.
+
+### 5. Ejecutar en desarrollo
 
 ```bash
 # Servidor de desarrollo
