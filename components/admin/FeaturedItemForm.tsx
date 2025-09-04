@@ -223,7 +223,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
 
             {/* Tipo */}
             <div className="space-y-2">
-              <Label>Tipo de Contenido</Label>
+              <Label htmlFor="contentType">Tipo de Contenido</Label>
               <Select 
                 value={formData.type} 
                 onValueChange={(value: 'review' | 'venue' | 'category' | 'collection' | 'guide') => setFormData(prev => ({ 
@@ -232,7 +232,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
                   selectedReference: '' // Reset selection cuando cambia tipo
                 }))}
               >
-                <SelectTrigger>
+                <SelectTrigger id="contentType">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -248,13 +248,13 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
             {/* Referencia */}
             {['review', 'venue', 'category'].includes(formData.type) && (
               <div className="space-y-2">
-                <Label>Seleccionar {formData.type === 'review' ? 'Reseña' : formData.type === 'venue' ? 'Local' : 'Categoría'}</Label>
+                <Label htmlFor="selectedReference">Seleccionar {formData.type === 'review' ? 'Reseña' : formData.type === 'venue' ? 'Local' : 'Categoría'}</Label>
                 <Select 
                   value={formData.selectedReference} 
                   onValueChange={(value) => setFormData(prev => ({ ...prev, selectedReference: value }))}
                   disabled={loadingReferences}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="selectedReference">
                     <SelectValue placeholder={
                       loadingReferences 
                         ? "Cargando..." 

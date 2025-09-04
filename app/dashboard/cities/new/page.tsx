@@ -74,9 +74,9 @@ export default function NewCityPage() {
             <CardTitle>Información de la Ciudad</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} role="form" className="space-y-6">
               <div>
-                <Label htmlFor="title">Nombre de la Ciudad *</Label>
+                <Label htmlFor="title">Título *</Label>
                 <Input
                   id="title"
                   value={formData.title}

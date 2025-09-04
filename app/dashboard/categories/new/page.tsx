@@ -57,18 +57,19 @@ export default function NewCategoryPage() {
           <CardTitle className="text-2xl font-bold">Nueva Categoría</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <form role="form" className="space-y-6">
             {/* Información Básica */}
             <div>
               <h3 className="text-lg font-semibold mb-4">Información Básica</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="title">Nombre de la Categoría *</Label>
+                  <Label htmlFor="title">Título *</Label>
                   <Input
                     id="title"
                     value={formData.title}
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
                     placeholder="Ej: Pizzería"
+                    aria-required="true"
                   />
                 </div>
                 <div>
@@ -121,7 +122,7 @@ export default function NewCategoryPage() {
                 ))}
               </div>
             </div>
-          </div>
+          </form>
         </CardContent>
       </Card>
     </div>

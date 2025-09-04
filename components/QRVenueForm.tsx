@@ -81,7 +81,7 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} role="form" className="space-y-6">
       {/* Información personal */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
@@ -129,7 +129,7 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
               onValueChange={(value) => setFormData({ ...formData, partySize: value })}
               required
             >
-              <SelectTrigger>
+              <SelectTrigger id="partySize">
                 <SelectValue placeholder="Seleccionar" />
               </SelectTrigger>
               <SelectContent>
@@ -180,7 +180,7 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
               value={formData.occasion}
               onValueChange={(value) => setFormData({ ...formData, occasion: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger id="occasion">
                 <SelectValue placeholder="Seleccionar ocasión" />
               </SelectTrigger>
               <SelectContent>
@@ -200,7 +200,7 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
               value={formData.rating}
               onValueChange={(value) => setFormData({ ...formData, rating: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger id="rating">
                 <SelectValue placeholder="Seleccionar" />
               </SelectTrigger>
               <SelectContent>
