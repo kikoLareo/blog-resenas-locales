@@ -169,7 +169,8 @@ export default function NewReviewPage() {
                       ratings: {...formData.ratings, food: parseInt(value)}
                     })}
                   >
-                    <SelectTrigger>
+
+                    <SelectTrigger aria-label="Valoración de comida, escala del 1 al 5" aria-describedby="food-rating-desc">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -178,6 +179,7 @@ export default function NewReviewPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                  <div id="food-rating-desc" className="sr-only">Selecciona una puntuación del 1 al 5 para la calidad de la comida</div>
                 </div>
                 <div>
                   <Label htmlFor="service">Servicio</Label>
@@ -188,7 +190,8 @@ export default function NewReviewPage() {
                       ratings: {...formData.ratings, service: parseInt(value)}
                     })}
                   >
-                    <SelectTrigger>
+
+                    <SelectTrigger aria-label="Valoración de servicio, escala del 1 al 5" aria-describedby="service-rating-desc">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -197,6 +200,7 @@ export default function NewReviewPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                  <div id="service-rating-desc" className="sr-only">Selecciona una puntuación del 1 al 5 para la calidad del servicio</div>
                 </div>
                 <div>
                   <Label htmlFor="ambience">Ambiente</Label>
@@ -207,7 +211,8 @@ export default function NewReviewPage() {
                       ratings: {...formData.ratings, ambience: parseInt(value)}
                     })}
                   >
-                    <SelectTrigger>
+
+                    <SelectTrigger aria-label="Valoración de ambiente, escala del 1 al 5" aria-describedby="ambience-rating-desc">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -216,6 +221,7 @@ export default function NewReviewPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                  <div id="ambience-rating-desc" className="sr-only">Selecciona una puntuación del 1 al 5 para la calidad del ambiente</div>
                 </div>
                 <div>
                   <Label htmlFor="value">Relación Calidad-Precio</Label>
@@ -226,7 +232,8 @@ export default function NewReviewPage() {
                       ratings: {...formData.ratings, value: parseInt(value)}
                     })}
                   >
-                    <SelectTrigger>
+
+                    <SelectTrigger aria-label="Valoración de relación calidad-precio, escala del 1 al 5" aria-describedby="value-rating-desc">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -235,6 +242,7 @@ export default function NewReviewPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                  <div id="value-rating-desc" className="sr-only">Selecciona una puntuación del 1 al 5 para la relación calidad-precio</div>
                 </div>
               </div>
             </div>
