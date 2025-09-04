@@ -37,7 +37,7 @@ describe('Reviews Form - New Review Page', () => {
       render(<NewReviewPage />);
       
       // Check for basic form fields
-      expect(screen.getByLabelText(/título de la reseña/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/título/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/slug/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/contenido de la reseña/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/seleccionar local/i)).toBeInTheDocument();
@@ -73,7 +73,7 @@ describe('Reviews Form - New Review Page', () => {
       const user = userEvent.setup();
       render(<NewReviewPage />);
       
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const saveButton = screen.getByRole('button', { name: /guardar reseña/i });
       
       // Try to submit without title
@@ -177,7 +177,7 @@ describe('Reviews Form - New Review Page', () => {
       const user = userEvent.setup();
       render(<NewReviewPage />);
       
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const slugInput = screen.getByLabelText(/slug/i);
       
       await user.type(titleInput, 'Test Review Title');
@@ -217,7 +217,7 @@ describe('Reviews Form - New Review Page', () => {
       const user = userEvent.setup();
       render(<NewReviewPage />);
       
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const longTitle = 'x'.repeat(1000); // Very long title
       
       await user.type(titleInput, longTitle);
@@ -230,7 +230,7 @@ describe('Reviews Form - New Review Page', () => {
       const user = userEvent.setup();
       render(<NewReviewPage />);
       
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const specialChars = '!@#$%^&*(){}[]|\\:";\'<>,.?/~`';
       
       await user.type(titleInput, specialChars);
@@ -286,7 +286,7 @@ describe('Reviews Form - New Review Page', () => {
       render(<NewReviewPage />);
       
       // Fill required fields
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const slugInput = screen.getByLabelText(/slug/i);
       
       await user.type(titleInput, 'Test Title');
@@ -316,7 +316,7 @@ describe('Reviews Form - New Review Page', () => {
       await user.click(saveButton);
       
       // Should add red border to invalid fields
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const slugInput = screen.getByLabelText(/slug/i);
       
       expect(titleInput).toHaveClass('border-red-500');
@@ -334,7 +334,7 @@ describe('Reviews Form - New Review Page', () => {
       expect(screen.getByText('El título es obligatorio')).toBeInTheDocument();
       
       // Then fill the title field
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       await user.type(titleInput, 'Test Title');
       
       // Click save again to re-validate

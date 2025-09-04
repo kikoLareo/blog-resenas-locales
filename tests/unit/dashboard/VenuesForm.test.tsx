@@ -37,7 +37,7 @@ describe('Venues Form - New Venue Page', () => {
       render(<NewVenuePage />);
       
       // Check for basic venue information fields
-      expect(screen.getByLabelText(/título de la reseña/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/título/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/slug/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/descripción/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/dirección/i)).toBeInTheDocument();
@@ -76,7 +76,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const saveButton = screen.getByRole('button', { name: /guardar local/i });
       
       // Try to submit without required fields
@@ -91,7 +91,7 @@ describe('Venues Form - New Venue Page', () => {
       render(<NewVenuePage />);
       
       const phoneInput = screen.getByLabelText(/teléfono/i);
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const addressInput = screen.getByLabelText(/dirección/i);
       const saveButton = screen.getByRole('button', { name: /guardar local/i });
       
@@ -163,7 +163,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const slugInput = screen.getByLabelText(/slug/i);
       
       await user.type(titleInput, 'Restaurant El Buen Sabor');
@@ -206,7 +206,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const saveButton = screen.getByRole('button', { name: /guardar local/i });
       
       await user.type(titleInput, 'Test Venue');
@@ -222,7 +222,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const addressInput = screen.getByLabelText(/dirección/i);
       const phoneInput = screen.getByLabelText(/teléfono/i);
       
@@ -275,7 +275,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const longTitle = 'x'.repeat(500); // Very long title
       
       await user.type(titleInput, longTitle);
@@ -288,7 +288,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const specialName = 'Café "El Buen Sabor" & Co.';
       
       await user.type(titleInput, specialName);
@@ -314,7 +314,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const saveButton = screen.getByRole('button', { name: /guardar local/i });
       
       // Fill only required fields
@@ -329,7 +329,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título de la reseña/i);
+      const titleInput = screen.getByLabelText(/título/i);
       const saveButton = screen.getByRole('button', { name: /guardar local/i });
       
       await user.type(titleInput, 'Existing Venue Name');
