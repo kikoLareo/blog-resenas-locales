@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { ArrowLeft, Save, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function NewReviewPage() {
   const router = useRouter();
@@ -55,13 +55,29 @@ export default function NewReviewPage() {
     }
     
     setIsLoading(true);
+    setErrors({});
+    let error = null;
+    
     try {
-      // Aquí iría la lógica para guardar en Sanity
-      console.log('Guardando nueva reseña:', formData);
-      // Redirigir a la lista de reseñas después de guardar
+      const response = await fetch('/api/admin/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al guardar la reseña');
+      }
+
+      // Redirect to reviews list on success
       router.push('/dashboard/reviews');
     } catch (error) {
       console.error('Error al guardar:', error);
+      setErrors({ submit: error instanceof Error ? error.message : 'Error al guardar la reseña' });
     } finally {
       // Mantener isLoading un poco más por si el test está observando la transición
       setTimeout(() => setIsLoading(false), 60);
@@ -82,6 +98,7 @@ export default function NewReviewPage() {
       // ignore
     }
   };
+
 
   return (
     <div className="space-y-6">
