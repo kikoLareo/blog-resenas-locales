@@ -43,20 +43,20 @@ export default function CreateUserForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+    <form role="form" onSubmit={handleSubmit} className="space-y-4 max-w-md">
       <div>
-        <label className="block text-sm font-medium text-gray-700">Email</label>
-        <input value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300" type="email" required />
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+        <input id="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300" type="email" required />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Contraseña</label>
-        <input value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300" type="password" required />
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700">Contraseña</label>
+        <input id="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300" type="password" required />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Rol</label>
-        <select value={role} onChange={(e) => setRole(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300">
+        <label htmlFor="role" className="block text-sm font-medium text-gray-700">Rol</label>
+        <select id="role" value={role} onChange={(e) => setRole(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300">
           <option value="MEMBER">MEMBER</option>
           <option value="EDITOR">EDITOR</option>
           <option value="ADMIN">ADMIN</option>
@@ -64,8 +64,8 @@ export default function CreateUserForm() {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Admin API Secret</label>
-        <input value={adminSecret} onChange={(e) => setAdminSecret(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300" type="password" placeholder="Secreto admin para la API" required />
+        <label htmlFor="adminSecret" className="block text-sm font-medium text-gray-700">Admin API Secret</label>
+        <input id="adminSecret" value={adminSecret} onChange={(e) => setAdminSecret(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300" type="password" placeholder="Secreto admin para la API" required />
       </div>
 
       <div>
