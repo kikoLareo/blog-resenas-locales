@@ -81,6 +81,7 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
   }
 
   return (
+
     <form role="form" onSubmit={handleSubmit} className="space-y-6">
       {/* Información personal */}
       <div className="space-y-4">
