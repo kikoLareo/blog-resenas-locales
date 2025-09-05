@@ -51,6 +51,24 @@ Object.defineProperty(window, 'matchMedia', {
   }),
 });
 
+// Polyfill pointer capture methods used by Radix in jsdom environment
+if (typeof Element !== 'undefined' && !(Element.prototype as any).hasPointerCapture) {
+  (Element.prototype as any).hasPointerCapture = function () {
+    return false;
+  };
+}
+if (typeof Element !== 'undefined' && !(Element.prototype as any).setPointerCapture) {
+  (Element.prototype as any).setPointerCapture = function () {};
+}
+if (typeof Element !== 'undefined' && !(Element.prototype as any).releasePointerCapture) {
+  (Element.prototype as any).releasePointerCapture = function () {};
+}
+
+  // Polyfill scrollIntoView used by some components (Radix) in tests
+  if (typeof Element !== 'undefined' && !(Element.prototype as any).scrollIntoView) {
+    (Element.prototype as any).scrollIntoView = function () {};
+  }
+
 // Mock environment variables for tests
 process.env.SITE_URL = 'http://localhost:3000';
 process.env.SITE_NAME = 'Test Blog';

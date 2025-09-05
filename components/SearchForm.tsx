@@ -52,7 +52,7 @@ export default function SearchForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`relative ${className}`}>
+    <form role="form" onSubmit={handleSubmit} className={`relative ${className}`}>
       <div className="relative">
         {/* Icono de búsqueda */}
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -186,7 +186,7 @@ export function CompactSearchForm({ className = '' }: { className?: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className={`relative ${className}`}>
+    <form role="form" onSubmit={handleSubmit} className={`relative ${className}`}>
       <div className="relative">
         <input
           type="text"

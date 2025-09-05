@@ -51,7 +51,7 @@ export default function ContactoPage() {
             <div className="bg-white rounded-lg border border-gray-200 p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Envíanos un mensaje</h2>
               
-              <form className="space-y-6">
+              <form role="form" className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
