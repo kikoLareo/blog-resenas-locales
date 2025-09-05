@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { SITE_CONFIG } from '@/lib/constants';
 import { Post } from '@/lib/types';
 import { postPageJsonLd } from '@/lib/schema';
-import FAQ from '@/components/FAQ';
+import FAQ from '@/components/Faq';
 
 type BlogPostPageProps = {
   params: Promise<{ slug: string }>;
