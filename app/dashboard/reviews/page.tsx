@@ -123,20 +123,21 @@ export default function ReviewsPage() {
           <div className="mb-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
                   Buscar
                 </label>
                 <Input
+                  id="search"
                   placeholder="Buscar por título, local o ciudad..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
                   Estado
                 </label>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <Select id="status" value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger>
                     <SelectValue placeholder="Filtrar por estado" />
                   </SelectTrigger>

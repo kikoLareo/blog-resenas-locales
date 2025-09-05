@@ -207,7 +207,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
         </CardHeader>
         
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form role="form" onSubmit={handleSubmit} className="space-y-6">
             {/* Título interno */}
             <div className="space-y-2">
               <Label htmlFor="title">Título Interno</Label>
@@ -223,8 +223,9 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
 
             {/* Tipo */}
             <div className="space-y-2">
-              <Label>Tipo de Contenido</Label>
+              <Label htmlFor="type">Tipo de Contenido</Label>
               <Select 
+                id="type"
                 value={formData.type} 
                 onValueChange={(value: 'review' | 'venue' | 'category' | 'collection' | 'guide') => setFormData(prev => ({ 
                   ...prev, 

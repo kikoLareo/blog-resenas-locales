@@ -151,20 +151,21 @@ export default function VenuesPage() {
           <div className="mb-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
                   Buscar
                 </label>
                 <Input
+                  id="search"
                   placeholder="Buscar por nombre, ciudad o dirección..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
                   Ciudad
                 </label>
-                <Select value={cityFilter} onValueChange={setCityFilter}>
+                <Select id="city" value={cityFilter} onValueChange={setCityFilter}>
                   <SelectTrigger>
                     <SelectValue placeholder="Filtrar por ciudad" />
                   </SelectTrigger>
