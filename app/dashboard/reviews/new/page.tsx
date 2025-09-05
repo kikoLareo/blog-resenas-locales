@@ -68,6 +68,21 @@ export default function NewReviewPage() {
     }
   };
 
+  const handleCancel = () => {
+    try {
+      window.location.href = '/dashboard/reviews';
+    } catch (e) {
+      // ignore
+    }
+    try {
+      if (typeof window.location.assign === 'function') {
+        window.location.assign('/dashboard/reviews');
+      }
+    } catch (e) {
+      // ignore
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -78,11 +93,11 @@ export default function NewReviewPage() {
           </Button>
         </Link>
         <div className="flex space-x-2">
-          <Button variant="outline" onClick={() => router.push('/dashboard/reviews')}>
+            <Button type="button" variant="outline" onClick={handleCancel}>
             <X className="mr-2 h-4 w-4" />
             Cancelar
           </Button>
-          <Button onClick={handleSave} disabled={isLoading} aria-label={isLoading ? 'Guardando' : 'Guardar Reseña'}>
+            <Button type="button" onClick={handleSave} disabled={isLoading} aria-label={isLoading ? 'Guardando' : 'Guardar Reseña'}>
             <Save className="mr-2 h-4 w-4" />
             {isLoading ? 'Guardando...' : 'Guardar Reseña'}
           </Button>
