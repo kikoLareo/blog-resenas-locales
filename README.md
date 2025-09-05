@@ -143,14 +143,19 @@ GA_MEASUREMENT_ID=G-XXXXXXXXXX
 PLAUSIBLE_DOMAIN=tu-dominio.com
 ```
 
+
 ### 4. Configurar la base de datos
 
 ```bash
 # Generar cliente de Prisma
 npx prisma generate
 
-# Ejecutar migraciones (si usas PostgreSQL)
+# Ejecutar migraciones (con PostgreSQL configurado)
 npx prisma migrate dev
+```
+
+> **Nota**: Los archivos de base de datos (.db) no están incluidos en el repositorio siguiendo las mejores prácticas. La base de datos se generará localmente al ejecutar las migraciones.
+
 
 # Para desarrollo local con datos de prueba (opcional)
 npx prisma db seed  # si existe un script de seed
