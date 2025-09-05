@@ -15,9 +15,11 @@ export function isValidUrl(url: string): boolean {
   try {
     // Use URL constructor for validation
     const urlObj = new URL(url);
-    
-    // Check if protocol is http or https
-    return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+    // Accept only http and https schemes for safety and consistency
+    if (urlObj.protocol === 'http:' || urlObj.protocol === 'https:') {
+      return true;
+    }
+    return false;
   } catch {
     return false;
   }
