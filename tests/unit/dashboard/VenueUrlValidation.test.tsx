@@ -128,6 +128,12 @@ describe('URL Validation Fix', () => {
   it('should validate various URL formats correctly', async () => {
     const user = userEvent.setup();
     
+    // Mock fetch to avoid actual API call and unrelated alerts
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+
     const testCases = [
       { url: 'https://www.example.com', shouldPass: true },
       { url: 'http://localhost:3000', shouldPass: true },
@@ -135,7 +141,7 @@ describe('URL Validation Fix', () => {
       { url: 'example.com', shouldPass: false },
       { url: 'www.example.com', shouldPass: false },
       { url: 'not-a-url', shouldPass: false },
-      { url: 'ftp://example.com', shouldPass: true }, // Valid URL, just not HTTP
+  { url: 'ftp://example.com', shouldPass: false }, // FTP is not accepted (only http/https)
     ];
     
     for (const testCase of testCases) {
@@ -162,5 +168,7 @@ describe('URL Validation Fix', () => {
       mockAlert.mockClear();
       unmount();
     }
+
+  vi.restoreAllMocks();
   });
 });
