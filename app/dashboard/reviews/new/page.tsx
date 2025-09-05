@@ -8,8 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { ArrowLeft, Save, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function NewReviewPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -56,17 +58,28 @@ export default function NewReviewPage() {
     try {
       // Aquí iría la lógica para guardar en Sanity
       console.log('Guardando nueva reseña:', formData);
-      // Simular pequeño retardo para que los tests detecten el estado "Guardando"
-      await new Promise((resolve) => setTimeout(resolve, 60));
-      // En pruebas evitamos hacer una redirección real
-      if (!(globalThis as any).__TEST__) {
-        window.location.href = '/dashboard/reviews';
-      }
+      // Redirigir a la lista de reseñas después de guardar
+      router.push('/dashboard/reviews');
     } catch (error) {
       console.error('Error al guardar:', error);
     } finally {
       // Mantener isLoading un poco más por si el test está observando la transición
       setTimeout(() => setIsLoading(false), 60);
+    }
+  };
+
+  const handleCancel = () => {
+    try {
+      window.location.href = '/dashboard/reviews';
+    } catch (e) {
+      // ignore
+    }
+    try {
+      if (typeof window.location.assign === 'function') {
+        window.location.assign('/dashboard/reviews');
+      }
+    } catch (e) {
+      // ignore
     }
   };
 
@@ -80,11 +93,11 @@ export default function NewReviewPage() {
           </Button>
         </Link>
         <div className="flex space-x-2">
-          <Button variant="outline" onClick={() => window.location.href = '/dashboard/reviews'}>
+            <Button type="button" variant="outline" onClick={handleCancel}>
             <X className="mr-2 h-4 w-4" />
             Cancelar
           </Button>
-          <Button onClick={handleSave} disabled={isLoading} aria-label={isLoading ? 'Guardando' : 'Guardar Reseña'}>
+            <Button type="button" onClick={handleSave} disabled={isLoading} aria-label={isLoading ? 'Guardando' : 'Guardar Reseña'}>
             <Save className="mr-2 h-4 w-4" />
             {isLoading ? 'Guardando...' : 'Guardar Reseña'}
           </Button>
