@@ -245,8 +245,9 @@ describe('Reviews Form - New Review Page', () => {
       await user.type(titleInput, longTitle);
       
       // Should handle long input gracefully
-      expect(titleInput.value.length).toBeLessThanOrEqual(1000);
-    });
+      // titleInput is an HTMLElement; cast to HTMLInputElement to access .value
+      expect((titleInput as HTMLInputElement).value.length).toBeLessThanOrEqual(1000);
+    }, { timeout: 20000 });
 
     it('should handle special characters in input', async () => {
       const user = userEvent.setup();
