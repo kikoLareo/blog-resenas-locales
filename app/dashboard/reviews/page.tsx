@@ -137,8 +137,8 @@ export default function ReviewsPage() {
                 <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
                   Estado
                 </label>
-                <Select id="status" value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger id="status">
                     <SelectValue placeholder="Filtrar por estado" />
                   </SelectTrigger>
                   <SelectContent>

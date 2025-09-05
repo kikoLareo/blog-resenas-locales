@@ -165,8 +165,8 @@ export default function VenuesPage() {
                 <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
                   Ciudad
                 </label>
-                <Select id="city" value={cityFilter} onValueChange={setCityFilter}>
-                  <SelectTrigger>
+                <Select value={cityFilter} onValueChange={setCityFilter}>
+                  <SelectTrigger id="city">
                     <SelectValue placeholder="Filtrar por ciudad" />
                   </SelectTrigger>
                   <SelectContent>
