@@ -9,15 +9,19 @@ vi.mock('next/link', () => ({
     <a href={href}>{children}</a>
 }));
 
+const mockPush = vi.fn();
+const mockReplace = vi.fn();
+const mockBack = vi.fn();
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: vi.fn(),
-    replace: vi.fn(),
-    back: vi.fn(),
+    push: mockPush,
+    replace: mockReplace,
+    back: mockBack,
   }),
 }));
 
-// Mock window.location
+//  Mock window.location
 const mockLocation = {
   href: '',
 };
@@ -26,9 +30,37 @@ Object.defineProperty(window, 'location', {
   writable: true,
 });
 
+// Mock alert
+const mockAlert = vi.fn();
+Object.defineProperty(window, 'alert', {
+  value: mockAlert,
+  writable: true,
+});
+
+// Mock global fetch for categories API
+global.fetch = vi.fn().mockImplementation((url) => {
+  if (url.includes('/api/admin/references?type=category')) {
+    return Promise.resolve({
+      ok: true,
+      json: async () => [
+        { _id: '1', title: 'Restaurant', slug: 'restaurant' },
+        { _id: '2', title: 'Bar', slug: 'bar' }
+      ],
+    });
+  }
+  return Promise.resolve({
+    ok: true,
+    json: async () => ({ success: true }),
+  });
+});
+
 describe('Venues Form - New Venue Page', () => {
   beforeEach(() => {
     mockLocation.href = '';
+    mockPush.mockClear();
+    mockReplace.mockClear();
+    mockBack.mockClear();
+    mockAlert.mockClear();
     vi.clearAllMocks();
   });
 
@@ -37,7 +69,7 @@ describe('Venues Form - New Venue Page', () => {
       render(<NewVenuePage />);
       
       // Check for basic venue information fields
-      expect(screen.getByLabelText(/título/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/nombre del local/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/slug/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/descripción/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/dirección/i)).toBeInTheDocument();
@@ -76,7 +108,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/nombre del local/i);
       const saveButton = screen.getByRole('button', { name: /guardar local/i });
       
       // Try to submit without required fields
@@ -91,7 +123,7 @@ describe('Venues Form - New Venue Page', () => {
       render(<NewVenuePage />);
       
       const phoneInput = screen.getByLabelText(/teléfono/i);
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/nombre del local/i);
       const addressInput = screen.getByLabelText(/dirección/i);
       const saveButton = screen.getByRole('button', { name: /guardar local/i });
       
@@ -116,10 +148,9 @@ describe('Venues Form - New Venue Page', () => {
       await waitFor(() => {
         expect(screen.queryByText(/formato de teléfono no válido/i)).not.toBeInTheDocument();
       });
-      // Should show validation error for invalid phone
-      // Note: In a real test environment, we would check for the alert or error message
-      // For now, we verify the phone input accepts the invalid format but validation should catch it
-      expect(phoneInput).toHaveValue('invalid-phone');
+      
+      // Should retain the valid phone number
+      expect(phoneInput).toHaveValue('+34 91 123 45 67');
     });
 
     it('should accept valid phone number formats', async () => {
@@ -176,7 +207,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/nombre del local/i);
       const slugInput = screen.getByLabelText(/slug/i);
       
       await user.type(titleInput, 'Restaurant El Buen Sabor');
@@ -189,7 +220,43 @@ describe('Venues Form - New Venue Page', () => {
   describe('User Feedback', () => {
     it('should show loading state when saving', async () => {
       const user = userEvent.setup();
+      
+      // Mock fetch with delay for this test
+      const mockFetch = vi.fn().mockImplementation((url) => {
+        if (url.includes('/api/admin/references?type=category')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              { _id: '1', title: 'Restaurant', slug: 'restaurant' },
+              { _id: '2', title: 'Bar', slug: 'bar' }
+            ],
+          });
+        }
+        if (url.includes('/api/admin/venues')) {
+          // Add delay to keep loading state visible
+          return new Promise(resolve => {
+            setTimeout(() => {
+              resolve({
+                ok: true,
+                json: async () => ({ success: true }),
+              });
+            }, 100);
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ success: true }),
+        });
+      });
+      global.fetch = mockFetch;
+      
       render(<NewVenuePage />);
+      
+      // Fill required fields so validation passes and loading state persists
+      const titleInput = screen.getByLabelText(/nombre del local/i);
+      const addressInput = screen.getByLabelText(/dirección/i);
+      await user.type(titleInput, 'Test Restaurant');
+      await user.type(addressInput, 'Test Address 123');
       
       const saveButton = screen.getByRole('button', { name: /guardar local/i });
       
@@ -203,7 +270,43 @@ describe('Venues Form - New Venue Page', () => {
 
     it('should disable save button during loading', async () => {
       const user = userEvent.setup();
+      
+      // Mock fetch with delay for this test
+      const mockFetch = vi.fn().mockImplementation((url) => {
+        if (url.includes('/api/admin/references?type=category')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              { _id: '1', title: 'Restaurant', slug: 'restaurant' },
+              { _id: '2', title: 'Bar', slug: 'bar' }
+            ],
+          });
+        }
+        if (url.includes('/api/admin/venues')) {
+          // Add delay to keep loading state visible
+          return new Promise(resolve => {
+            setTimeout(() => {
+              resolve({
+                ok: true,
+                json: async () => ({ success: true }),
+              });
+            }, 100);
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ success: true }),
+        });
+      });
+      global.fetch = mockFetch;
+      
       render(<NewVenuePage />);
+      
+      // Fill required fields so validation passes and loading state persists
+      const titleInput = screen.getByLabelText(/nombre del local/i);
+      const addressInput = screen.getByLabelText(/dirección/i);
+      await user.type(titleInput, 'Test Restaurant');
+      await user.type(addressInput, 'Test Address 123');
       
       const saveButton = screen.getByRole('button', { name: /guardar local/i });
       
@@ -219,7 +322,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/nombre del local/i);
       const saveButton = screen.getByRole('button', { name: /guardar local/i });
       
       await user.type(titleInput, 'Test Venue');
@@ -235,7 +338,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/nombre del local/i);
       const addressInput = screen.getByLabelText(/dirección/i);
       const phoneInput = screen.getByLabelText(/teléfono/i);
       
@@ -279,7 +382,7 @@ describe('Venues Form - New Venue Page', () => {
       await user.click(cancelButton);
       
       // Should navigate back to venues list
-      expect(mockLocation.href).toBe('/dashboard/venues');
+      expect(mockPush).toHaveBeenCalledWith('/dashboard/venues');
     });
   });
 
@@ -288,7 +391,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/nombre del local/i);
       const longTitle = 'x'.repeat(500); // Very long title
       
       await user.type(titleInput, longTitle);
@@ -301,7 +404,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/nombre del local/i);
       const specialName = 'Café "El Buen Sabor" & Co.';
       
       await user.type(titleInput, specialName);
@@ -327,7 +430,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/nombre del local/i);
       const saveButton = screen.getByRole('button', { name: /guardar local/i });
       
       // Fill only required fields
@@ -342,7 +445,7 @@ describe('Venues Form - New Venue Page', () => {
       const user = userEvent.setup();
       render(<NewVenuePage />);
       
-      const titleInput = screen.getByLabelText(/título/i);
+      const titleInput = screen.getByLabelText(/nombre del local/i);
       const saveButton = screen.getByRole('button', { name: /guardar local/i });
       
       await user.type(titleInput, 'Existing Venue Name');

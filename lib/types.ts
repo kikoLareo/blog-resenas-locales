@@ -141,6 +141,7 @@ export interface Post {
   };
   excerpt?: string;
   cover?: SanityImage;
+  heroImage?: SanityImage;
   faq?: Array<{
     question: string;
     answer: string;

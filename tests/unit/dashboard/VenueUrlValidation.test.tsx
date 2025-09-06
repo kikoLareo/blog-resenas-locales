@@ -33,6 +33,23 @@ Object.defineProperty(window, 'alert', {
   writable: true,
 });
 
+// Mock global fetch for categories API
+global.fetch = vi.fn().mockImplementation((url) => {
+  if (url.includes('/api/admin/references?type=category')) {
+    return Promise.resolve({
+      ok: true,
+      json: async () => [
+        { _id: '1', title: 'Restaurant', slug: 'restaurant' },
+        { _id: '2', title: 'Bar', slug: 'bar' }
+      ],
+    });
+  }
+  return Promise.resolve({
+    ok: true,
+    json: async () => ({ success: true }),
+  });
+});
+
 describe('URL Validation Fix', () => {
   beforeEach(() => {
     mockLocation.href = '';

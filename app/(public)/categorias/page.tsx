@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_CONFIG } from '@/lib/constants';
+import { Category } from '@/lib/types';
 import { sanityFetch } from '@/lib/sanity.client';
 
 // Query para obtener todas las categorías con estadísticas
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
 
 export default async function CategoriasPage() {
   // Obtener categorías reales de Sanity
-  const categories = await sanityFetch({
+  const categories: Category[] = await sanityFetch({
     query: categoriesQuery,
     tags: ['category'],
   });
