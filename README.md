@@ -143,7 +143,28 @@ GA_MEASUREMENT_ID=G-XXXXXXXXXX
 PLAUSIBLE_DOMAIN=tu-dominio.com
 ```
 
-### 4. Ejecutar en desarrollo
+
+### 4. Configurar la base de datos
+
+```bash
+# Generar cliente de Prisma
+npx prisma generate
+
+# Ejecutar migraciones (con PostgreSQL configurado)
+npx prisma migrate dev
+```
+
+> **Nota**: Los archivos de base de datos (.db) no están incluidos en el repositorio siguiendo las mejores prácticas. La base de datos se generará localmente al ejecutar las migraciones.
+
+
+# Para desarrollo local con datos de prueba (opcional)
+npx prisma db seed  # si existe un script de seed
+```
+
+> **Nota**: Los archivos `.db` (SQLite) no se incluyen en el repositorio por seguridad. 
+> Para desarrollo local, las migraciones recrearán automáticamente la estructura de la base de datos.
+
+### 5. Ejecutar en desarrollo
 
 ```bash
 # Servidor de desarrollo
@@ -197,10 +218,10 @@ npm run type-check   # TypeScript check
 │   ├── ui/                # Componentes base (shadcn/ui)
 │   ├── admin/             # Componentes del dashboard
 │   ├── ImageManager.tsx   # Gestión de imágenes
-│   ├── QRVenueForm.tsx    # Formulario QR
+│   ├── QrVenueForm.tsx    # Formulario QR
 │   ├── AdSlot.tsx         # Anuncios sin CLS
-│   ├── FAQ.tsx            # Preguntas frecuentes
-│   ├── TLDR.tsx           # Resúmenes AEO
+│   ├── Faq.tsx            # Preguntas frecuentes
+│   ├── Tldr.tsx           # Resúmenes AEO
 │   ├── ScoreBar.tsx       # Puntuaciones visuales
 │   └── Breadcrumbs.tsx    # Navegación + JSON-LD
 ├── lib/                   # Utilidades
@@ -635,13 +656,19 @@ IndexNow (dry-run): { "host": "...", "urlList": [...] }
 
 ## 📚 Documentación
 
-### Guías Disponibles
+### Guías Principales
+- **[📖 Índice Completo de Documentación](docs/README.md)** - Navegación organizada por categorías
 - **[Documentación Técnica](docs/TECHNICAL_DOCUMENTATION.md)** - Arquitectura, APIs, componentes
 - **[Guía de Usuario](docs/USER_GUIDE.md)** - Manual completo del dashboard
 - **[Directrices de Código](CODE_GUIDELINES.md)** - Estándares y mejores prácticas para el código
-- **[Reglas para IA](AI_MODEL_RULES.md)** - Guía para asistentes de IA trabajando con el proyecto
-- **[TODO](TODO.md)** - Lista de tareas y estado del proyecto
-- **[Memory Bank](MEMORY_BANK.md)** - Decisiones técnicas y contexto
+
+### Documentación por Categorías
+- **[🤖 Desarrollo con IA](docs/ai-development/)** - Reglas, agentes y herramientas de IA
+- **[📋 Planificación](docs/planning/)** - Planes maestros y lista de tareas
+- **[⚡ Funcionalidades](docs/features/)** - Estados y especificaciones de características
+- **[🏗️ Infraestructura](docs/infrastructure/)** - Despliegue y arquitectura técnica
+- **[📊 Reportes](docs/reports/)** - Auditorías y análisis del proyecto
+- **[🐛 Issues](docs/issues/)** - Seguimiento de problemas identificados
 
 ## 🐛 Troubleshooting
 
