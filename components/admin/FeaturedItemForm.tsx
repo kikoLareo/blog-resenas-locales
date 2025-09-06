@@ -1,6 +1,15 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+
+// Minimal inline alert component
+function InlineAlert({ message }: { message: string }) {
+  return (
+    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm" role="alert">
+      {message}
+    </div>
+  );
+}
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -53,6 +62,8 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
   const [previewItem, setPreviewItem] = useState<FeaturedItem | null>(null);
   const [references, setReferences] = useState<any[]>([]);
   const [loadingReferences, setLoadingReferences] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState<{
     title: string;
     type: 'review' | 'venue' | 'category' | 'collection' | 'guide';
@@ -97,9 +108,16 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
 
   const loadReferences = async (type: 'review' | 'venue' | 'category') => {
     setLoadingReferences(true);
-    const data = await fetchReferences(type);
-    setReferences(data);
-    setLoadingReferences(false);
+    setError(null);
+    try {
+      const data = await fetchReferences(type);
+      setReferences(data);
+    } catch (err) {
+      setError('Error al cargar las referencias. Intenta de nuevo.');
+      setReferences([]);
+    } finally {
+      setLoadingReferences(false);
+    }
   };
 
   const getSelectedReference = (item: FeaturedItem): string => {
@@ -109,36 +127,46 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
     return '';
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Crear el objeto según el tipo
-    let reference = {};
-    if (formData.type === 'review') {
-      const review = references.find((r: any) => r._id === formData.selectedReference);
-      reference = { reviewRef: review };
-    } else if (formData.type === 'venue') {
-      const venue = references.find((v: any) => v._id === formData.selectedReference);
-      reference = { venueRef: venue };
-    } else if (formData.type === 'category') {
-      const category = references.find((c: any) => c._id === formData.selectedReference);
-      reference = { categoryRef: category };
+    setError(null);
+    setSubmitting(true);
+    try {
+      // Crear el objeto según el tipo
+      let reference = {};
+      if (formData.type === 'review') {
+        const review = references.find((r: any) => r._id === formData.selectedReference);
+        if (!review) throw new Error('Debes seleccionar una reseña válida.');
+        reference = { reviewRef: review };
+      } else if (formData.type === 'venue') {
+        const venue = references.find((v: any) => v._id === formData.selectedReference);
+        if (!venue) throw new Error('Debes seleccionar un local válido.');
+        reference = { venueRef: venue };
+      } else if (formData.type === 'category') {
+        const category = references.find((c: any) => c._id === formData.selectedReference);
+        if (!category) throw new Error('Debes seleccionar una categoría válida.');
+        reference = { categoryRef: category };
+      }
+
+      const savedItem: FeaturedItem = {
+        _id: item?._id || Date.now().toString(),
+        title: formData.title,
+        type: formData.type,
+        customTitle: formData.customTitle,
+        customDescription: formData.customDescription,
+        isActive: formData.isActive,
+        order: formData.order,
+        _createdAt: item?._createdAt || new Date().toISOString(),
+        _updatedAt: new Date().toISOString(),
+        ...reference
+      };
+
+      onSave(savedItem);
+    } catch (err: any) {
+      setError(err.message || 'Error al guardar el elemento.');
+    } finally {
+      setSubmitting(false);
     }
-
-    const savedItem: FeaturedItem = {
-      _id: item?._id || Date.now().toString(),
-      title: formData.title,
-      type: formData.type,
-      customTitle: formData.customTitle,
-      customDescription: formData.customDescription,
-      isActive: formData.isActive,
-      order: formData.order,
-      _createdAt: item?._createdAt || new Date().toISOString(),
-      _updatedAt: new Date().toISOString(),
-      ...reference
-    };
-
-    onSave(savedItem);
   };
 
   const handlePreview = () => {
@@ -223,8 +251,8 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>
-        
         <CardContent>
+          {error && <InlineAlert message={error} />}
           <form role="form" onSubmit={handleSubmit} className="space-y-6">
             {/* Título interno */}
             <div className="space-y-2">
@@ -267,31 +295,37 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
             {['review', 'venue', 'category'].includes(formData.type) && (
               <div className="space-y-2">
                 <Label htmlFor="reference-select">Seleccionar {formData.type === 'review' ? 'Reseña' : formData.type === 'venue' ? 'Local' : 'Categoría'}</Label>
-                  <Select 
-                    value={formData.selectedReference} 
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, selectedReference: value }))}
-                    disabled={loadingReferences}
+                <Select
+                  value={formData.selectedReference}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, selectedReference: value }))}
+                  disabled={loadingReferences || submitting}
+                >
+                  <SelectTrigger
+                    id="reference-select"
+                    aria-label={
+                      loadingReferences
+                        ? 'Cargando referencias'
+                        : `Seleccionar ${formData.type === 'review' ? 'Reseña' : formData.type === 'venue' ? 'Local' : 'Categoría'}`
+                    }
                   >
-                    <SelectTrigger
-                      id="reference-select"
-                      aria-label={
-                        loadingReferences
-                          ? 'Cargando referencias'
-                          : `Seleccionar ${formData.type === 'review' ? 'Reseña' : formData.type === 'venue' ? 'Local' : 'Categoría'}`
-                      }
-                    >
-                      <SelectValue placeholder={
-                        loadingReferences 
-                          ? "Cargando..." 
-                          : `Selecciona una ${formData.type === 'review' ? 'reseña' : formData.type === 'venue' ? 'local' : 'categoría'}`
-                      } />
-                    </SelectTrigger>
+                    <SelectValue placeholder={
+                      loadingReferences
+                        ? 'Cargando...'
+                        : `Selecciona una ${formData.type === 'review' ? 'reseña' : formData.type === 'venue' ? 'local' : 'categoría'}`
+                    } />
+                  </SelectTrigger>
                   <SelectContent>
-                    {getReferenceOptions().map((option: any) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
+                    {loadingReferences ? (
+                      <div className="px-4 py-2 text-gray-500">Cargando...</div>
+                    ) : getReferenceOptions().length === 0 ? (
+                      <div className="px-4 py-2 text-gray-500">No hay opciones disponibles</div>
+                    ) : (
+                      getReferenceOptions().map((option: any) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -368,16 +402,16 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
 
             {/* Acciones */}
             <div className="flex justify-end space-x-3 pt-6 border-t">
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
                 Cancelar
               </Button>
-              <Button type="button" variant="outline" onClick={handlePreview}>
+              <Button type="button" variant="outline" onClick={handlePreview} disabled={submitting}>
                 <Eye className="h-4 w-4 mr-2" />
                 Vista Previa
               </Button>
-              <Button type="submit">
+              <Button type="submit" disabled={submitting}>
                 <Save className="h-4 w-4 mr-2" />
-                {item ? 'Actualizar' : 'Crear'}
+                {submitting ? 'Guardando...' : item ? 'Actualizar' : 'Crear'}
               </Button>
             </div>
           </form>
