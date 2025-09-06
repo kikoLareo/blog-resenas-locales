@@ -15,6 +15,22 @@ import { notFound } from "next/navigation";
 import { useState } from "react";
 import { validatePhone } from "@/lib/phone-validation";
 
+// Phone number validation function
+const validatePhoneNumber = (phone: string): boolean => {
+  if (!phone.trim()) {
+    return true; // Phone is optional, empty is valid
+  }
+  
+  // Allow international and local phone formats
+  // Clean the phone number by removing spaces and dashes, then validate
+  const cleanPhone = phone.replace(/[\s\-]/g, '');
+  
+  // International: +XX followed by 7-15 digits
+  // Local: 7-15 digits without country code
+  const phoneRegex = /^(\+\d{1,4})?\d{7,15}$/;
+  return phoneRegex.test(cleanPhone);
+};
+
 interface VenueDetailPageProps {
   params: Promise<{ id: string }>;
 }
@@ -59,6 +75,7 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
   const [formData, setFormData] = useState(venue);
   const [images, setImages] = useState<any[]>([]);
   const [phoneError, setPhoneError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const publicVenueUrl = venue.slug?.current && venue.city?.slug?.current
     ? `/${venue.city.slug.current}/venue/${venue.slug.current}`
@@ -83,19 +100,57 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
     }
   };
 
-  const handleSave = () => {
-    // Validate phone number if provided
-    if (formData.phone) {
-      const phoneValidation = validatePhone(formData.phone);
-      if (!phoneValidation.isValid) {
-        alert(phoneValidation.error || 'Formato de teléfono no válido');
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+       // Validate required fields
+      if (!formData.title || !formData.address) {
+        alert('Título y dirección son campos requeridos');
         return;
       }
-    }
 
-    // Aquí iría la lógica para guardar en Sanity
-    console.log('Guardando cambios:', formData);
-    setIsEditModalOpen(false);
+      // Validate phone number format
+      if (!validatePhoneNumber(formData.phone || '')) {
+        alert('El formato del teléfono no es válido. Use formato internacional (+34 91 123 45 67) o local (91 123 45 67)');
+        return;
+      }
+
+      const response = await fetch(`/api/admin/venues/${venue._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          _id: venue._id,
+          title: formData.title,
+          slug: formData.slug?.current,
+          description: formData.description,
+          address: formData.address,
+          phone: formData.phone,
+          website: formData.website,
+          priceRange: formData.priceRange,
+          city: formData.city?._id,
+          categories: formData.categories?.map(cat => cat._id) || [],
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('Local actualizado exitosamente');
+        setIsEditModalOpen(false);
+        // Refresh the page to show updated data
+        window.location.reload();
+      } else {
+        alert(result.error || 'Error al actualizar el local');
+      }
+    } catch (error) {
+      console.error('Error al guardar:', error);
+      alert('Error al guardar el local');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -334,9 +389,9 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
                 <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
                   Cancelar
                 </Button>
-                <Button onClick={handleSave}>
+                <Button onClick={handleSave} disabled={isLoading}>
                   <Save className="mr-2 h-4 w-4" />
-                  Guardar Cambios
+                  {isLoading ? 'Guardando...' : 'Guardar Cambios'}
                 </Button>
               </div>
             </div>

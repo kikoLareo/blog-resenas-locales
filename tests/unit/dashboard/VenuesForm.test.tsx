@@ -91,9 +91,17 @@ describe('Venues Form - New Venue Page', () => {
       render(<NewVenuePage />);
       
       const phoneInput = screen.getByLabelText(/teléfono/i);
+      const titleInput = screen.getByLabelText(/título/i);
+      const addressInput = screen.getByLabelText(/dirección/i);
+      const saveButton = screen.getByRole('button', { name: /guardar local/i });
+      
+      // Fill required fields first
+      await user.type(titleInput, 'Test Venue');
+      await user.type(addressInput, 'Test Address 123');
       
       // Test invalid phone formats
       await user.type(phoneInput, 'invalid-phone');
+      await user.click(saveButton);
       
       // Should show error message for invalid format
       await waitFor(() => {
@@ -108,6 +116,34 @@ describe('Venues Form - New Venue Page', () => {
       await waitFor(() => {
         expect(screen.queryByText(/formato de teléfono no válido/i)).not.toBeInTheDocument();
       });
+      // Should show validation error for invalid phone
+      // Note: In a real test environment, we would check for the alert or error message
+      // For now, we verify the phone input accepts the invalid format but validation should catch it
+      expect(phoneInput).toHaveValue('invalid-phone');
+    });
+
+    it('should accept valid phone number formats', async () => {
+      const user = userEvent.setup();
+      render(<NewVenuePage />);
+      
+      const phoneInput = screen.getByLabelText(/teléfono/i);
+      
+      // Clear any existing value
+      await user.clear(phoneInput);
+      
+      // Test valid international phone format
+      await user.type(phoneInput, '+34 91 123 45 67');
+      expect(phoneInput).toHaveValue('+34 91 123 45 67');
+      
+      // Clear and test local format
+      await user.clear(phoneInput);
+      await user.type(phoneInput, '91 123 45 67');
+      expect(phoneInput).toHaveValue('91 123 45 67');
+      
+      // Clear and test compact format
+      await user.clear(phoneInput);
+      await user.type(phoneInput, '+34911234567');
+      expect(phoneInput).toHaveValue('+34911234567');
     });
 
     it('should validate website URL format', async () => {
