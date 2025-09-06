@@ -95,10 +95,11 @@ export default function CitiesPage() {
         <CardContent>
           {/* Filtros */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
               Buscar
             </label>
             <Input
+              id="search"
               placeholder="Buscar por nombre de ciudad..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
