@@ -220,6 +220,36 @@ describe('Venues Form - New Venue Page', () => {
   describe('User Feedback', () => {
     it('should show loading state when saving', async () => {
       const user = userEvent.setup();
+      
+      // Mock fetch with delay for this test
+      const mockFetch = vi.fn().mockImplementation((url) => {
+        if (url.includes('/api/admin/references?type=category')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              { _id: '1', title: 'Restaurant', slug: 'restaurant' },
+              { _id: '2', title: 'Bar', slug: 'bar' }
+            ],
+          });
+        }
+        if (url.includes('/api/admin/venues')) {
+          // Add delay to keep loading state visible
+          return new Promise(resolve => {
+            setTimeout(() => {
+              resolve({
+                ok: true,
+                json: async () => ({ success: true }),
+              });
+            }, 100);
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ success: true }),
+        });
+      });
+      global.fetch = mockFetch;
+      
       render(<NewVenuePage />);
       
       // Fill required fields so validation passes and loading state persists
@@ -240,6 +270,36 @@ describe('Venues Form - New Venue Page', () => {
 
     it('should disable save button during loading', async () => {
       const user = userEvent.setup();
+      
+      // Mock fetch with delay for this test
+      const mockFetch = vi.fn().mockImplementation((url) => {
+        if (url.includes('/api/admin/references?type=category')) {
+          return Promise.resolve({
+            ok: true,
+            json: async () => [
+              { _id: '1', title: 'Restaurant', slug: 'restaurant' },
+              { _id: '2', title: 'Bar', slug: 'bar' }
+            ],
+          });
+        }
+        if (url.includes('/api/admin/venues')) {
+          // Add delay to keep loading state visible
+          return new Promise(resolve => {
+            setTimeout(() => {
+              resolve({
+                ok: true,
+                json: async () => ({ success: true }),
+              });
+            }, 100);
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ success: true }),
+        });
+      });
+      global.fetch = mockFetch;
+      
       render(<NewVenuePage />);
       
       // Fill required fields so validation passes and loading state persists
