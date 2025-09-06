@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { sanityFetch } from '@/lib/sanity.client';
 import { qrCodeByCodeQuery } from '@/sanity/lib/queries';
 import { isQRCodeValid, recordQRUsage } from '@/lib/qr-utils';
-import QRVenueForm from '@/components/QRVenueForm';
+import QRVenueForm from '@/components/QrVenueForm';
 
 interface QRCodePageProps {
   params: Promise<{
