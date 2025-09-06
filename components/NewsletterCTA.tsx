@@ -43,7 +43,7 @@ export function NewsletterCTA() {
           <p className="text-lg text-muted-foreground mb-8">
             Únete a nuestra comunidad de food lovers y recibe reseñas exclusivas, nuevas aperturas y ofertas especiales directamente en tu bandeja de entrada.
           </p>
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+          <form role="form" onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
             <Input type="email" placeholder="tu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} className="flex-1" required />
             <Button type="submit" className="bg-accent hover:bg-accent/90 px-8">Suscribirse</Button>
           </form>

@@ -123,8 +123,9 @@ function ConsentDetails({ onSave, onCancel }: ConsentDetailsProps) {
             <h4 className="font-medium text-gray-900">Cookies de Análisis</h4>
             <p className="text-sm text-gray-600">Nos ayudan a entender cómo usas el sitio</p>
           </div>
-          <label className="relative inline-flex items-center cursor-pointer">
+          <label htmlFor="analytics" className="relative inline-flex items-center cursor-pointer">
             <input
+              id="analytics"
               type="checkbox"
               checked={preferences.analytics}
               onChange={() => togglePreference('analytics')}
@@ -142,8 +143,9 @@ function ConsentDetails({ onSave, onCancel }: ConsentDetailsProps) {
             <h4 className="font-medium text-gray-900">Cookies Publicitarias</h4>
             <p className="text-sm text-gray-600">Para mostrar anuncios relevantes</p>
           </div>
-          <label className="relative inline-flex items-center cursor-pointer">
+          <label htmlFor="advertising" className="relative inline-flex items-center cursor-pointer">
             <input
+              id="advertising"
               type="checkbox"
               checked={preferences.advertising}
               onChange={() => togglePreference('advertising')}
@@ -161,8 +163,9 @@ function ConsentDetails({ onSave, onCancel }: ConsentDetailsProps) {
             <h4 className="font-medium text-gray-900">Cookies Funcionales</h4>
             <p className="text-sm text-gray-600">Mejoran la funcionalidad del sitio</p>
           </div>
-          <label className="relative inline-flex items-center cursor-pointer">
+          <label htmlFor="functional" className="relative inline-flex items-center cursor-pointer">
             <input
+              id="functional"
               type="checkbox"
               checked={preferences.functional}
               onChange={() => togglePreference('functional')}

@@ -40,7 +40,7 @@ type FeaturedItem = {
 };
 
 // Definiciones CSS para animaciones personalizadas
-import './hero-swipe-animations.css';
+import '@/styles/hero-swipe-animations.css';
 
 // Datos de fallback para cuando no hay FeaturedItems
 const fallbackHeroReviews = [
