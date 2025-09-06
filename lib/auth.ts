@@ -4,7 +4,10 @@ import bcrypt from "bcrypt";
 import prisma from './prisma';
 
 if (!process.env.NEXTAUTH_SECRET) {
-  throw new Error("NEXTAUTH_SECRET must be set");
+  // Don't throw here to avoid breaking build-time collection and server-side
+  // code analysis in environments where auth isn't configured (CI/local).
+  // Individual API routes should guard usage of auth as needed.
+  console.warn("NEXTAUTH_SECRET is not set — authentication will be disabled in this environment.");
 }
 
 // Valores por defecto para desarrollo
