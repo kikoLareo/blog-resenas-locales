@@ -14,7 +14,7 @@ interface BlogPost {
 }
 
 export default async function BlogPage() {
-  // Por ahora usamos datos mock, después conectaremos con Sanity
+  // TODO: Conectar con Sanity para obtener posts reales del dashboard admin
   const posts: BlogPost[] = [
     {
       _id: "1",

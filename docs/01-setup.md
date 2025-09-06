@@ -31,16 +31,8 @@ npm install
 npm run dev
 ```
 
-### Seed de contenido (opcional)
+### Contenido
 
-1. Crea un token con permisos de Editor en Sanity.
-2. Ejecuta:
-
-```
-export SANITY_AUTH_TOKEN=tu_token
-npx sanity exec sanity/seed.ts --with-user-token
-```
-
-Esto crea ciudades, categorías, locales, reseñas y posts de ejemplo con imágenes.
+La aplicación funciona únicamente con datos reales ingresados a través del Studio de Sanity. Asegúrate de crear contenido real (ciudades, categorías, locales, reseñas y posts) directamente en el Studio.
 
 

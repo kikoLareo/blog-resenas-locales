@@ -4,64 +4,68 @@ import { notFound } from 'next/navigation';
 import { SITE_CONFIG } from '@/lib/constants';
 import { Post } from '@/lib/types';
 import { postPageJsonLd } from '@/lib/schema';
+import { sanityFetch } from '@/lib/sanity.client';
 import FAQ from '@/components/Faq';
 
 type BlogPostPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-// Mock data - En producción, obtener de Sanity
-const mockPost: Post = {
-  _id: 'post-1',
-  _type: 'post',
-  title: 'Los 10 mejores restaurantes gallegos de Santiago',
-  slug: { current: 'mejores-restaurantes-gallegos-santiago' },
-  excerpt: 'Descubre los restaurantes que mejor representan la gastronomía gallega en la capital compostelana.',
-  author: 'Carlos Fernández',
-  publishedAt: '2024-01-18T14:00:00Z',
-  body: [],
-  tags: ['guías', 'gastronomía', 'gallego'],
-  faq: [
-    {
-      question: '¿Cuáles son los platos gallegos más típicos?',
-      answer: 'Los platos más representativos incluyen pulpo a la gallega, empanada gallega, lacón con grelos, caldeirada y tarta de Santiago.',
+// Query para obtener post completo
+const postDetailQuery = `
+  *[_type == "post" && slug.current == $slug][0] {
+    _id,
+    _type,
+    title,
+    slug,
+    excerpt,
+    author,
+    publishedAt,
+    heroImage {
+      asset-> {
+        _id,
+        url
+      },
+      alt
     },
-    {
-      question: '¿Qué vino gallego recomiendan con mariscos?',
-      answer: 'Los vinos blancos gallegos como Albariño, Godello o Ribeiro son perfectos para maridar con mariscos y pescados.',
-    },
-  ],
-};
+    body,
+    tags,
+    faq[] {
+      question,
+      answer
+    }
+  }
+`;
 
-const mockRelatedPosts: Post[] = [
-  {
-    _id: 'post-2',
-    _type: 'post',
-    title: 'Guía completa de tapas en Madrid',
-    slug: { current: 'guia-completa-tapas-madrid' },
-    excerpt: 'Todo lo que necesitas saber sobre la cultura del tapeo en la capital española.',
-    author: 'Ana Martínez',
-    publishedAt: '2024-01-15T10:30:00Z',
-    body: [],
-    tags: ['guías', 'tapas', 'madrid'],
-  },
-  {
-    _id: 'post-3',
-    _type: 'post',
-    title: 'Cómo elegir el mejor vino para maridar',
-    slug: { current: 'como-elegir-mejor-vino-maridar' },
-    excerpt: 'Consejos de expertos para maridar vinos con diferentes tipos de comida.',
-    author: 'Miguel Rodríguez',
-    publishedAt: '2024-01-12T16:45:00Z',
-    body: [],
-    tags: ['consejos', 'vino', 'maridaje'],
-  },
-];
+// Query para obtener posts relacionados
+const relatedPostsQuery = `
+  *[_type == "post" && slug.current != $slug] | order(publishedAt desc)[0...3] {
+    _id,
+    _type,
+    title,
+    slug,
+    excerpt,
+    author,
+    publishedAt,
+    heroImage {
+      asset-> {
+        _id,
+        url
+      },
+      alt
+    },
+    tags
+  }
+`;
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  // En producción, obtener datos reales de Sanity basado en params.slug
-  // const post = await getPostData(params.slug);
-  const post = mockPost;
+  const { slug } = await params;
+  
+  const post = await sanityFetch<Post | null>({
+    query: postDetailQuery,
+    params: { slug },
+    tags: ['post'],
+  });
   
   if (!post) {
     return {
@@ -76,19 +80,31 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       title: `${post.title} | ${SITE_CONFIG.name}`,
       description: post.excerpt || 'Artículo del blog gastronómico',
       type: 'article',
-      url: `${SITE_CONFIG.url}/blog/${(await params).slug}`,
+      url: `${SITE_CONFIG.url}/blog/${slug}`,
       publishedTime: post.publishedAt,
     },
     alternates: {
-      canonical: `${SITE_CONFIG.url}/blog/${(await params).slug}`,
+      canonical: `${SITE_CONFIG.url}/blog/${slug}`,
     },
   };
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  // En producción, obtener datos reales de Sanity basado en params.slug
-  // const post = await getPostData(params.slug);
-  const post = mockPost;
+  const { slug } = await params;
+  
+  // Obtener post y posts relacionados de Sanity
+  const [post, relatedPosts] = await Promise.all([
+    sanityFetch<Post | null>({
+      query: postDetailQuery,
+      params: { slug },
+      tags: ['post'],
+    }),
+    sanityFetch<Post[]>({
+      query: relatedPostsQuery,
+      params: { slug },
+      tags: ['post'],
+    })
+  ]);
 
   if (!post) {
     notFound();
@@ -217,10 +233,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           )}
 
           {/* Related Posts */}
-          <section className="mb-12">
-            <h3 className="text-2xl font-bold text-gray-900 mb-8">Artículos Relacionados</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {mockRelatedPosts.slice(0, 2).map((relatedPost) => (
+          {relatedPosts && relatedPosts.length > 0 && (
+            <section className="mb-12">
+              <h3 className="text-2xl font-bold text-gray-900 mb-8">Artículos Relacionados</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {relatedPosts.slice(0, 2).map((relatedPost) => (
                 <article key={relatedPost._id} className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
                   <div className="p-6">
                     <h4 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
@@ -247,8 +264,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   </div>
                 </article>
               ))}
-            </div>
-          </section>
+              </div>
+            </section>
+          )}
         </div>
       </div>
       </div>

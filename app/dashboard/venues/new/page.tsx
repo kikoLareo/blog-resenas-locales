@@ -418,6 +418,7 @@ export default function NewVenuePage() {
                         className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full flex items-center"
                       >
                    
+                
                           {category}
                           <button
                             onClick={() => setFormData({
