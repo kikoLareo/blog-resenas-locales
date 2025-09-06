@@ -172,6 +172,24 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
     setShowPreview(true);
   };
 
+  // If preview is open, keep the preview item in sync with form data so tests and UI update
+  useEffect(() => {
+    if (showPreview) {
+      const previewItem: FeaturedItem = {
+        _id: 'preview',
+        title: formData.title,
+        type: formData.type,
+        customTitle: formData.customTitle,
+        customDescription: formData.customDescription,
+        isActive: formData.isActive,
+        order: formData.order,
+        _createdAt: new Date().toISOString(),
+        _updatedAt: new Date().toISOString(),
+      };
+      setPreviewItem(previewItem);
+    }
+  }, [formData, showPreview]);
+
   const getReferenceOptions = () => {
     switch (formData.type) {
       case 'review':
@@ -207,7 +225,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
         </CardHeader>
         
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form role="form" onSubmit={handleSubmit} className="space-y-6">
             {/* Título interno */}
             <div className="space-y-2">
               <Label htmlFor="title">Título Interno</Label>
@@ -223,7 +241,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
 
             {/* Tipo */}
             <div className="space-y-2">
-              <Label>Tipo de Contenido</Label>
+              <Label htmlFor="type-trigger">Tipo de Contenido</Label>
               <Select 
                 value={formData.type} 
                 onValueChange={(value: 'review' | 'venue' | 'category' | 'collection' | 'guide') => setFormData(prev => ({ 
@@ -232,7 +250,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
                   selectedReference: '' // Reset selection cuando cambia tipo
                 }))}
               >
-                <SelectTrigger>
+                <SelectTrigger id="type-trigger" aria-label="Tipo de Contenido">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -248,19 +266,26 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
             {/* Referencia */}
             {['review', 'venue', 'category'].includes(formData.type) && (
               <div className="space-y-2">
-                <Label>Seleccionar {formData.type === 'review' ? 'Reseña' : formData.type === 'venue' ? 'Local' : 'Categoría'}</Label>
-                <Select 
-                  value={formData.selectedReference} 
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, selectedReference: value }))}
-                  disabled={loadingReferences}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={
-                      loadingReferences 
-                        ? "Cargando..." 
-                        : `Selecciona una ${formData.type === 'review' ? 'reseña' : formData.type === 'venue' ? 'local' : 'categoría'}`
-                    } />
-                  </SelectTrigger>
+                <Label htmlFor="reference-select">Seleccionar {formData.type === 'review' ? 'Reseña' : formData.type === 'venue' ? 'Local' : 'Categoría'}</Label>
+                  <Select 
+                    value={formData.selectedReference} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, selectedReference: value }))}
+                    disabled={loadingReferences}
+                  >
+                    <SelectTrigger
+                      id="reference-select"
+                      aria-label={
+                        loadingReferences
+                          ? 'Cargando referencias'
+                          : `Seleccionar ${formData.type === 'review' ? 'Reseña' : formData.type === 'venue' ? 'Local' : 'Categoría'}`
+                      }
+                    >
+                      <SelectValue placeholder={
+                        loadingReferences 
+                          ? "Cargando..." 
+                          : `Selecciona una ${formData.type === 'review' ? 'reseña' : formData.type === 'venue' ? 'local' : 'categoría'}`
+                      } />
+                    </SelectTrigger>
                   <SelectContent>
                     {getReferenceOptions().map((option: any) => (
                       <SelectItem key={option.value} value={option.value}>

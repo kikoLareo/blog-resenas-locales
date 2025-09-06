@@ -11,8 +11,18 @@ import {
 // GET - Obtener configuración actual
 export async function GET() {
   try {
+    // If NEXTAUTH_SECRET is not configured, don't call getServerSession during
+    // build-time or in environments where auth isn't set up. Return 503 so the
+    // caller knows the admin API isn't available.
+    if (!process.env.NEXTAUTH_SECRET) {
+      return NextResponse.json(
+        { error: 'Authentication not configured' },
+        { status: 503 }
+      );
+    }
+
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
@@ -31,8 +41,15 @@ export async function GET() {
 // POST - Guardar nueva configuración
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.NEXTAUTH_SECRET) {
+      return NextResponse.json(
+        { error: 'Authentication not configured' },
+        { status: 503 }
+      );
+    }
+
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }

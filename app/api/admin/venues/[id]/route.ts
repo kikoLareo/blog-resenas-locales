@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { adminSanityClient } from '@/lib/admin-sanity';
+import { adminSanityClient, adminSanityWriteClient } from '@/lib/admin-sanity';
 import { revalidateTag } from 'next/cache';
 
 // GET - Fetch single venue by ID
@@ -93,7 +93,7 @@ export async function PUT(
     }
 
     // Update venue document
-    const venue = await adminSanityClient
+    const venue = await adminSanityWriteClient
       .patch(id)
       .set({
         title: data.title,
@@ -177,7 +177,7 @@ export async function DELETE(
     }
 
     // Delete venue
-    await adminSanityClient.delete(id);
+    await adminSanityWriteClient.delete(id);
 
     // Revalidate relevant pages
     revalidateTag('venues');
