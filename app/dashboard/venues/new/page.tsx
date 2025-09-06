@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,12 @@ const validatePhoneNumber = (phone: string): boolean => {
   return phoneRegex.test(cleanPhone);
 };
 
+interface Category {
+  _id: string;
+  title: string;
+  slug: string;
+}
+
 export default function NewVenuePage() {
   const [formData, setFormData] = useState({
     title: "",
@@ -40,7 +46,31 @@ export default function NewVenuePage() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/admin/references?type=category');
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data);
+        } else {
+          console.error('Failed to fetch categories:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -317,12 +347,62 @@ export default function NewVenuePage() {
                       <SelectItem value="heladeria">Heladería</SelectItem>
                     </SelectContent>
                   </Select>
-                  {formData.categories.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {formData.categories.map((category, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full flex items-center"
+                </div>
+              </div>
+              <div className="mt-4">
+                <Label htmlFor="categories">Categorías</Label>
+                <Select 
+                  value="" 
+                  onValueChange={(value) => {
+                    // Find the category title from the selected value (which is the _id)
+                    const selectedCategory = categories.find(cat => cat._id === value);
+                    if (selectedCategory && !formData.categories.includes(selectedCategory.title)) {
+                      setFormData({
+                        ...formData, 
+                        categories: [...formData.categories, selectedCategory.title]
+                      });
+                    }
+                  }}
+                  disabled={loadingCategories}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={loadingCategories ? "Cargando categorías..." : "Añadir categoría"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.length > 0 ? (
+                      categories.map((category) => (
+                        <SelectItem 
+                          key={category._id} 
+                          value={category._id}
+                          disabled={formData.categories.includes(category.title)}
+                        >
+                          {category.title}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      !loadingCategories && (
+                        <SelectItem value="" disabled>
+                          No hay categorías disponibles
+                        </SelectItem>
+                      )
+                    )}
+                  </SelectContent>
+                </Select>
+                {formData.categories.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {formData.categories.map((category, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full flex items-center"
+                      >
+                        {category}
+                        <button
+                          onClick={() => setFormData({
+                            ...formData,
+                            categories: formData.categories.filter((_, i) => i !== index)
+                          })}
+                          className="ml-1 text-blue-600 hover:text-blue-800"
+
                         >
                           {category}
                           <button
