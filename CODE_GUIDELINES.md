@@ -38,6 +38,56 @@ Este documento establece las reglas y consideraciones a tener en cuenta al desar
    }
    ```
 
+### Convenciones de Nomenclatura
+
+1. **Componentes React** - Usar PascalCase estricto para archivos de componentes:
+   ```
+   UserProfile.tsx    ✓ Correcto
+   VenueDetail.tsx    ✓ Correcto 
+   Faq.tsx           ✓ Correcto (acrónimo tratado como palabra)
+   Tldr.tsx          ✓ Correcto (acrónimo tratado como palabra)
+   QrVenueForm.tsx   ✓ Correcto (consistente con otros QR*)
+   ```
+
+2. **Páginas App Router** - Usar kebab-case para carpetas y archivos especiales:
+   ```
+   user-profile/      ✓ Correcto para carpetas
+   blog-posts/        ✓ Correcto para carpetas
+   page.tsx          ✓ Correcto para archivos especiales
+   layout.tsx        ✓ Correcto para archivos especiales
+   not-found.tsx     ✓ Correcto para archivos especiales
+   ```
+
+3. **Archivos utilitarios** - Usar kebab-case:
+   ```
+   api-client.ts     ✓ Correcto
+   date-utils.ts     ✓ Correcto
+   qr-utils.ts       ✓ Correcto
+   auth-config.ts    ✓ Correcto
+   ```
+
+4. **Archivos de estilos** - Usar kebab-case:
+   ```
+   global-styles.css     ✓ Correcto
+   component-theme.css   ✓ Correcto
+   hero-carousel.css     ✓ Correcto
+   ```
+
+5. **Tipos TypeScript** - Usar kebab-case para archivos:
+   ```
+   user-types.ts     ✓ Correcto
+   api-types.ts      ✓ Correcto
+   venue-types.ts    ✓ Correcto
+   ```
+
+6. **Tratamiento de acrónimos** - Convertir acrónimos a PascalCase para componentes:
+   ```
+   FAQ → Faq         ✓ Más consistente
+   TLDR → Tldr       ✓ Más consistente
+   QR → Qr           ✓ Más consistente
+   API → Api         ✓ Más consistente
+   ```
+
 ### SEO y Estructura de Datos
 
 1. **Metadatos por página** - Cada página debe tener sus propios metadatos usando el sistema de metadatos de Next.js:

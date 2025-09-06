@@ -267,7 +267,7 @@ export default function ImageManager({
                 if (!image) return null;
 
                 return (
-                  <form onSubmit={(e) => {
+                  <form role="form" onSubmit={(e) => {
                     e.preventDefault();
                     const formData = new FormData(e.currentTarget);
                     handleUpdateImage(editingImage, {
