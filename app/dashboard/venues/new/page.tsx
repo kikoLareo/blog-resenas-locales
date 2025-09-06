@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,22 +12,6 @@ import { ArrowLeft, Save, X } from "lucide-react";
 import { validatePhone } from "@/lib/phone-validation";
 import { isValidUrl, getUrlErrorMessage } from "@/lib/validation";
 
-// Phone number validation function
-const validatePhoneNumber = (phone: string): boolean => {
-  if (!phone.trim()) {
-    return true; // Phone is optional, empty is valid
-  }
-  
-  // Allow international and local phone formats
-  // Clean the phone number by removing spaces and dashes, then validate
-  const cleanPhone = phone.replace(/[\s\-]/g, '');
-  
-  // International: +XX followed by 7-15 digits
-  // Local: 7-15 digits without country code
-  const phoneRegex = /^(\+\d{1,4})?\d{7,15}$/;
-  return phoneRegex.test(cleanPhone);
-};
-
 interface Category {
   _id: string;
   title: string;
@@ -34,6 +19,7 @@ interface Category {
 }
 
 export default function NewVenuePage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -101,18 +87,8 @@ export default function NewVenuePage() {
 
       // Validate URL format if website is provided
       if (formData.website && !isValidUrl(formData.website)) {
-        // Surface a generic invalid-URL alert to match tests' expectations
         alert('Por favor, introduce una URL válida (ej: https://www.ejemplo.com)');
-        // Keep loading visible briefly so tests can detect it
-        setTimeout(() => setIsLoading(false), 50);
-        return;
-      }
-
-      // If there are errors, show them and stop submission
-      if (Object.keys(newErrors).length > 0) {
-        setErrors(newErrors);
-        // Keep loading visible briefly so tests can detect it
-        setTimeout(() => setIsLoading(false), 50);
+        setIsLoading(false);
         return;
       }
 
@@ -121,16 +97,16 @@ export default function NewVenuePage() {
         const phoneValidation = validatePhone(formData.phone);
         if (!phoneValidation.isValid) {
           alert(phoneValidation.error || 'Formato de teléfono no válido');
+          setIsLoading(false);
           return;
         }
-      // Validate website URL if provided
-      if (formData.website && formData.website.trim()) {
-        try {
-          new URL(formData.website.trim());
-        } catch {
-          alert('Por favor, introduce una URL válida (ej: https://www.ejemplo.com)');
-          return;
-        }
+      }
+
+      // If there are errors, show them and stop submission
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        setIsLoading(false);
+        return;
       }
 
       const response = await fetch('/api/admin/venues', {
@@ -145,17 +121,14 @@ export default function NewVenuePage() {
 
       if (response.ok) {
         alert('Local guardado exitosamente');
-        window.location.href = '/dashboard/venues';
+        router.push('/dashboard/venues');
       } else {
         alert(result.error || 'Error al guardar el local');
       }
-    }
     } catch (error) {
-      // Logging removed to satisfy lint in tests environment
       alert('Error al guardar el local');
     } finally {
-      // Ensure loading state is visible for a short period so tests can observe it
-      setTimeout(() => setIsLoading(false), 50);
+      setIsLoading(false);
     }
   };
 
@@ -169,7 +142,7 @@ export default function NewVenuePage() {
           </Button>
         </Link>
         <div className="flex space-x-2">
-          <Button variant="outline" onClick={() => window.location.href = '/dashboard/venues'}>
+          <Button variant="outline" onClick={() => router.push('/dashboard/venues')}>
             <X className="mr-2 h-4 w-4" />
             Cancelar
           </Button>
@@ -197,7 +170,7 @@ export default function NewVenuePage() {
                     <Label htmlFor="title">Nombre del Local *</Label>
                     <Input
                       id="title"
-                      aria-label="Título"
+                      aria-label="Nombre del Local"
                       required
                       value={formData.title}
                       onChange={(e) => {
@@ -270,9 +243,13 @@ export default function NewVenuePage() {
                       id="phone"
                       aria-label="Teléfono"
                       value={formData.phone}
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      onChange={(e) => handlePhoneChange(e.target.value)}
                       placeholder="+34 91 123 45 67"
+                      className={phoneError ? 'border-red-500 focus:border-red-500' : ''}
                     />
+                    {phoneError && (
+                      <p className="text-sm text-red-600 mt-1">{phoneError}</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="website">Sitio Web</Label>
@@ -348,7 +325,7 @@ export default function NewVenuePage() {
                 <div className="mt-4">
                   <Label htmlFor="categories">Categorías</Label>
                   <Select 
-                    value="" 
+                    value={undefined} 
                     onValueChange={(value) => {
                       if (!formData.categories.includes(value)) {
                         setFormData({
@@ -374,7 +351,7 @@ export default function NewVenuePage() {
               <div className="mt-4">
                 <Label htmlFor="categories">Categorías</Label>
                 <Select 
-                  value="" 
+                  value={undefined} 
                   onValueChange={(value) => {
                     // Find the category title from the selected value (which is the _id)
                     const selectedCategory = categories.find(cat => cat._id === value);
@@ -403,7 +380,7 @@ export default function NewVenuePage() {
                       ))
                     ) : (
                       !loadingCategories && (
-                        <SelectItem value="" disabled>
+                        <SelectItem value="no-categories" disabled>
                           No hay categorías disponibles
                         </SelectItem>
                       )
