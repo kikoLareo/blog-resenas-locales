@@ -15,17 +15,9 @@
 - Cliente: `lib/sanity.client.ts` – helpers `sanityFetch`, `preview` y tags ISR.
 - GROQ: `sanity/lib/queries.ts` – `homepageQuery`, `venuesByCityQuery`, etc.
 
-### Seed de contenido
+### Contenido
 
-- Script: `sanity/seed.ts`
-- Uso:
-
-```
-export SANITY_AUTH_TOKEN=tu_token_editor
-npx sanity exec sanity/seed.ts --with-user-token
-```
-
-Genera ciudades, categorías, locales, reseñas y posts con imágenes.
+El sistema trabaja únicamente con datos reales ingresados a través del Studio de Sanity. No se utilizan datos de prueba o mockeados.
 
 ### Finalidad y por qué Sanity
 

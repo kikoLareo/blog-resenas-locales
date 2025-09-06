@@ -7,7 +7,7 @@ Guía rápida:
 - 01-setup.md: requisitos, variables de entorno y puesta en marcha
 - 02-architecture.md: arquitectura, directorios y flujo de datos
 - 03-frontend-ui.md: App Router, páginas y componentes de UI
-- 04-sanity.md: Studio, esquemas, cliente, consultas GROQ y seed
+- 04-sanity.md: Studio, esquemas, cliente y consultas GROQ
 - 05-seo-jsonld.md: SEO/AEO, metadatos y JSON-LD
 - 06-sitemaps-indexnow.md: sitemaps dinámicos e IndexNow
 - 07-auth-admin.md: diseño del panel de administración (pendiente)
