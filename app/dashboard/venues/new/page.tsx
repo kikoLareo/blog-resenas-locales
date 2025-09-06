@@ -149,6 +149,7 @@ export default function NewVenuePage() {
       } else {
         alert(result.error || 'Error al guardar el local');
       }
+    }
     } catch (error) {
       // Logging removed to satisfy lint in tests environment
       alert('Error al guardar el local');
@@ -416,15 +417,7 @@ export default function NewVenuePage() {
                         key={index}
                         className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-full flex items-center"
                       >
-                        {category}
-                        <button
-                          onClick={() => setFormData({
-                            ...formData,
-                            categories: formData.categories.filter((_, i) => i !== index)
-                          })}
-                          className="ml-1 text-blue-600 hover:text-blue-800"
-
-                        >
+                   
                           {category}
                           <button
                             onClick={() => setFormData({
@@ -441,7 +434,6 @@ export default function NewVenuePage() {
                   )}
                 </div>
               </div>
-            </div>
           </CardContent>
         </Card>
       </form>
