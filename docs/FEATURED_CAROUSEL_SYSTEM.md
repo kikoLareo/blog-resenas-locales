@@ -188,7 +188,6 @@ console.log('Transformed data:', adaptFeaturedItemToHeroReview(item));
 ## 🚀 Próximos Pasos
 
 ### Funcionalidades Planeadas
-- [ ] **Integración completa con Sanity** (actualmente con mock data)
 - [ ] **Analytics de clics** en elementos del carrusel
 - [ ] **Programación de contenido** (publicar en fecha específica)
 - [ ] **A/B Testing** de elementos destacados
@@ -211,6 +210,6 @@ console.log('Transformed data:', adaptFeaturedItemToHeroReview(item));
 - ✅ Sistema de fallback robusto
 - ✅ TypeScript con tipos completos
 - ✅ Componentes totalmente funcionales
-- ⚠️ Pendiente: Conectar con Sanity API real (actualmente mock data)
+- ✅ Conectado con Sanity API real
 
 **URL de acceso**: http://localhost:3000/dashboard/featured

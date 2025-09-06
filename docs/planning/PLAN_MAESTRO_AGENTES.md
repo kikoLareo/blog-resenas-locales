@@ -191,7 +191,7 @@ Ctrl+E → "Eres DEVOPS-CONFIGURATOR: Expert en configuración, documentación y
 
 #### ✅ SCRIPTS Y HERRAMIENTAS  
 5. **`scripts/generate-sitemap.ts`** - Generación sitemap
-6. **`scripts/seed.ts`** - Datos ejemplo opcional
+6. **`scripts/indexnow-verify.ts`** - Verificación para SEO
 7. **Setup ESLint + Prettier** - Configuración completa
 
 #### ✅ DOCUMENTACIÓN COMPLETA
