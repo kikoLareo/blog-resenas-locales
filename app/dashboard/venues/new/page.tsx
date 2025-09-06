@@ -123,14 +123,6 @@ export default function NewVenuePage() {
           alert(phoneValidation.error || 'Formato de teléfono no válido');
           return;
         }
-      // Validate website URL if provided
-      if (formData.website && formData.website.trim()) {
-        try {
-          new URL(formData.website.trim());
-        } catch {
-          alert('Por favor, introduce una URL válida (ej: https://www.ejemplo.com)');
-          return;
-        }
       }
 
       const response = await fetch('/api/admin/venues', {
@@ -423,24 +415,14 @@ export default function NewVenuePage() {
                             categories: formData.categories.filter((_, i) => i !== index)
                           })}
                           className="ml-1 text-blue-600 hover:text-blue-800"
-
                         >
-                          {category}
-                          <button
-                            onClick={() => setFormData({
-                              ...formData,
-                              categories: formData.categories.filter((_, i) => i !== index)
-                            })}
-                            className="ml-1 text-blue-600 hover:text-blue-800"
-                          >
-                            ×
-                          </button>
-                        </span>
+                          ×
+                        </button>
+                      </span>
                       ))}
                     </div>
                   )}
                 </div>
-              </div>
             </div>
           </CardContent>
         </Card>
