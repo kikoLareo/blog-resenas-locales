@@ -103,6 +103,19 @@ describe('Venues Form - New Venue Page', () => {
       await user.type(phoneInput, 'invalid-phone');
       await user.click(saveButton);
       
+      // Should show error message for invalid format
+      await waitFor(() => {
+        expect(screen.getByText(/formato de teléfono no válido/i)).toBeInTheDocument();
+      });
+
+      // Clear and test valid Spanish phone format
+      await user.clear(phoneInput);
+      await user.type(phoneInput, '+34 91 123 45 67');
+      
+      // Should not show error for valid format
+      await waitFor(() => {
+        expect(screen.queryByText(/formato de teléfono no válido/i)).not.toBeInTheDocument();
+      });
       // Should show validation error for invalid phone
       // Note: In a real test environment, we would check for the alert or error message
       // For now, we verify the phone input accepts the invalid format but validation should catch it

@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { ArrowLeft, Save, X } from "lucide-react";
+import { validatePhone } from "@/lib/phone-validation";
 import { isValidUrl, getUrlErrorMessage } from "@/lib/validation";
 
 // Phone number validation function
@@ -46,6 +47,19 @@ export default function NewVenuePage() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [phoneError, setPhoneError] = useState<string>("");
+
+  const handlePhoneChange = (value: string) => {
+    setFormData({...formData, phone: value});
+    
+    // Validate phone number on change
+    const validation = validatePhone(value);
+    if (!validation.isValid && validation.error) {
+      setPhoneError(validation.error);
+    } else {
+      setPhoneError("");
+    }
+  };
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
@@ -102,6 +116,13 @@ export default function NewVenuePage() {
         return;
       }
 
+      // Validate phone number if provided
+      if (formData.phone) {
+        const phoneValidation = validatePhone(formData.phone);
+        if (!phoneValidation.isValid) {
+          alert(phoneValidation.error || 'Formato de teléfono no válido');
+          return;
+        }
       // Validate website URL if provided
       if (formData.website && formData.website.trim()) {
         try {
@@ -110,7 +131,6 @@ export default function NewVenuePage() {
           alert('Por favor, introduce una URL válida (ej: https://www.ejemplo.com)');
           return;
         }
-
       }
 
       const response = await fetch('/api/admin/venues', {
@@ -216,6 +236,7 @@ export default function NewVenuePage() {
                   />
                 </div>
               </div>
+
 
               {/* Información de Contacto */}
               <div>
