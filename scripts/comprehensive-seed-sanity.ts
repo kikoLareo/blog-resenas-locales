@@ -18,8 +18,7 @@ const adminClient = createClient({
 async function uploadImageFromUrl(url: string, filename?: string) {
   try {
     const res = await fetch(url, { 
-      headers: { 'User-Agent': 'sanity-seed-script' },
-      timeout: 10000 
+      headers: { 'User-Agent': 'sanity-seed-script' }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     
@@ -161,7 +160,7 @@ const cities = [
       lng: -2.9253
     },
     highlights: ['Casco Viejo pintxero', 'Ensanche gourmet', 'Mercado de la Ribera', 'Abandoibarra moderno', 'Getxo marinero'],
-    cuisineSpecialities: ['Pintxos', 'Bacalao al pil pil', 'Txuleta', 'Marmitako', 'Idiazábal'],
+    cuisineSpecialties: ['Pintxos', 'Bacalao al pil pil', 'Txuleta', 'Marmitako', 'Idiazábal'],
     featured: true,
     order: 5,
     seoTitle: 'Mejores Restaurantes en Bilbao - Capital Gastronómica Vasca 2025',
@@ -866,7 +865,7 @@ export default async function seedSanityData() {
           images
         };
 
-        await adminClient.createOrReplace(venueWithImages);
+        await adminClient.createOrReplace(venueWithImages as any);
         console.log(`✅ Local creado: ${venue.title} (${venue.city._ref})`);
       } catch (error) {
         console.error(`❌ Error creando local ${venue.title}:`, error);
