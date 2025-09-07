@@ -285,4 +285,50 @@ describe('FeaturedItemForm Error Handling', () => {
 
     expect(global.fetch).toHaveBeenCalledTimes(2);
   });
+
+  it('should handle different HTTP error status codes', async () => {
+    // Mock 404 error
+    (global.fetch as any).mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+      statusText: 'Not Found',
+      json: async () => ({ error: 'Not found' })
+    });
+
+    render(<FeaturedItemForm {...defaultProps} />);
+
+    // Change type to trigger API call
+    const typeSelect = screen.getByLabelText(/tipo de contenido/i) as HTMLSelectElement;
+    await userEvent.selectOptions(typeSelect, 'review');
+
+    // Wait for 404-specific error message
+    await waitFor(() => {
+      expect(screen.getByText(/no se encontraron reseñas disponibles/i)).toBeInTheDocument();
+    });
+  });
+
+  it('should clear API errors when user interacts with title field', async () => {
+    // Mock failed API response
+    (global.fetch as any).mockRejectedValueOnce(new Error('Server error'));
+
+    render(<FeaturedItemForm {...defaultProps} />);
+
+    // Trigger API error
+    const typeSelect = screen.getByLabelText(/tipo de contenido/i) as HTMLSelectElement;
+    await userEvent.selectOptions(typeSelect, 'review');
+
+    // Wait for error
+    await waitFor(() => {
+      expect(screen.getByText(/server error/i)).toBeInTheDocument();
+    });
+
+    // Type in title field
+    const titleInput = screen.getByLabelText(/título interno/i);
+    await userEvent.type(titleInput, 'New title');
+
+    // API error should be cleared
+    await waitFor(() => {
+      expect(screen.queryByText(/server error/i)).not.toBeInTheDocument();
+    });
+  });
 });

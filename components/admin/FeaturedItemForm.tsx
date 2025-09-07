@@ -47,22 +47,65 @@ function InlineAlert({ message }: { message: string }) {
 
 // API functions para obtener referencias con mejor manejo de errores
 async function fetchReferences(type: 'review' | 'venue' | 'category' | 'collection' | 'guide', signal?: AbortSignal) {
+  const TIMEOUT_MS = 10000; // 10 second timeout
+  
   try {
-    const response = await fetch(`/api/admin/references?type=${type}`, { signal });
+    // Create a timeout promise
+    const timeoutPromise = new Promise((_, reject) => {
+      const timeoutId = setTimeout(() => {
+        reject(new Error('Tiempo de espera agotado. Verifica tu conexión a internet.'));
+      }, TIMEOUT_MS);
+      
+      // Clear timeout if signal is aborted
+      signal?.addEventListener('abort', () => {
+        clearTimeout(timeoutId);
+      });
+    });
+
+    // Race between fetch and timeout
+    const response = await Promise.race([
+      fetch(`/api/admin/references?type=${type}`, { 
+        signal,
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }),
+      timeoutPromise
+    ]) as Response;
+
     if (!response.ok) {
-      throw new Error(`Error ${response.status}: ${response.statusText}`);
+      const errorMessage = response.status === 404 
+        ? `No se encontraron ${type === 'review' ? 'reseñas' : type === 'venue' ? 'locales' : 'categorías'} disponibles`
+        : response.status >= 500 
+        ? 'Error del servidor. Inténtalo de nuevo más tarde.'
+        : `Error ${response.status}: ${response.statusText}`;
+      
+      throw new Error(errorMessage);
     }
+    
     const data = await response.json();
-    return { data, error: null };
+    return { data: Array.isArray(data) ? data : [], error: null };
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
       return { data: [], error: null }; // Don't treat aborted requests as errors
     }
     console.error('Error fetching references:', error);
-    return { 
-      data: [], 
-      error: error instanceof Error ? error.message : 'Error desconocido al cargar referencias'
-    };
+    
+    // More specific error messages
+    let errorMessage = 'Error desconocido al cargar referencias';
+    if (error instanceof Error) {
+      if (error.message.includes('Tiempo de espera')) {
+        errorMessage = error.message;
+      } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        errorMessage = 'Error de conexión. Verifica tu internet e inténtalo de nuevo.';
+      } else if (error.message.includes('No se encontraron')) {
+        errorMessage = error.message;
+      } else {
+        errorMessage = error.message;
+      }
+    }
+    
+    return { data: [], error: errorMessage };
   }
 }
 
@@ -76,6 +119,8 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
   const [isSubmitting, setIsSubmitting] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const typeChangeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const currentRequestTypeRef = useRef<string>(''); // Track current request type to prevent race conditions
+  const isMountedRef = useRef(true); // Track component mounting state
   const [formData, setFormData] = useState<{
     title: string;
     type: 'review' | 'venue' | 'category' | 'collection' | 'guide';
@@ -96,17 +141,34 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
     selectedReference: ''
   });
 
-  // Cleanup function para cancelar requests pendientes
+  // Cleanup function para cancelar requests pendientes y timeouts
   useEffect(() => {
+    isMountedRef.current = true;
+    
     return () => {
+      isMountedRef.current = false;
+      
+      // Cancel any pending requests
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
+      
+      // Clear any pending timeouts
       if (typeChangeTimeoutRef.current) {
         clearTimeout(typeChangeTimeoutRef.current);
       }
+      
+      // Clear current request type
+      currentRequestTypeRef.current = '';
     };
   }, []);
+
+  const getSelectedReference = useCallback((item: FeaturedItem): string => {
+    if (item.reviewRef) return references.find((r: any) => r.title === item.reviewRef?.title)?._id || '';
+    if (item.venueRef) return references.find((v: any) => v.title === item.venueRef?.title)?._id || '';
+    if (item.categoryRef) return references.find((c: any) => c.title === item.categoryRef?.title)?._id || '';
+    return '';
+  }, [references]);
 
   useEffect(() => {
     if (item) {
@@ -124,28 +186,14 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
       setApiError(null);
       setValidationErrors({});
     }
-  }, [item]);
-
-  // Cargar referencias cuando cambia el tipo (con debouncing)
-  useEffect(() => {
-    if (['review', 'venue', 'category'].includes(formData.type)) {
-      // Clear previous timeout
-      if (typeChangeTimeoutRef.current) {
-        clearTimeout(typeChangeTimeoutRef.current);
-      }
-      
-      // Debounce type changes to prevent rapid API calls
-      typeChangeTimeoutRef.current = setTimeout(() => {
-        loadReferences(formData.type as 'review' | 'venue' | 'category');
-      }, 300);
-    } else {
-      // Clear references for types that don't need them
-      setReferences([]);
-      setApiError(null);
-    }
-  }, [formData.type]);
+  }, [item, getSelectedReference]);
 
   const loadReferences = useCallback(async (type: 'review' | 'venue' | 'category') => {
+    // Don't proceed if component is unmounted
+    if (!isMountedRef.current) {
+      return;
+    }
+    
     // Cancel previous request if it exists
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -154,25 +202,78 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
     // Create new abort controller
     abortControllerRef.current = new AbortController();
     
+    // Track this request type to prevent race conditions
+    currentRequestTypeRef.current = type;
+    
     setLoadingReferences(true);
     setApiError(null);
     
-    const { data, error } = await fetchReferences(type, abortControllerRef.current.signal);
-    
-    // Only update state if component is still mounted and this is the current request
-    if (!abortControllerRef.current.signal.aborted) {
-      setReferences(data);
-      setApiError(error);
-      setLoadingReferences(false);
+    try {
+      const { data, error } = await fetchReferences(type, abortControllerRef.current.signal);
+      
+      // Only update state if this is still the current request and component is mounted
+      if (
+        isMountedRef.current && 
+        currentRequestTypeRef.current === type && 
+        !abortControllerRef.current.signal.aborted
+      ) {
+        setReferences(data);
+        setApiError(error);
+        setLoadingReferences(false);
+      }
+    } catch (error) {
+      // Only update error state if this is still the current request and component is mounted
+      if (
+        isMountedRef.current && 
+        currentRequestTypeRef.current === type && 
+        !abortControllerRef.current.signal.aborted
+      ) {
+        console.error('Unexpected error in loadReferences:', error);
+        setApiError(error instanceof Error ? error.message : 'Error inesperado al cargar referencias');
+        setLoadingReferences(false);
+      }
     }
   }, []);
 
-  const getSelectedReference = (item: FeaturedItem): string => {
-    if (item.reviewRef) return references.find((r: any) => r.title === item.reviewRef?.title)?._id || '';
-    if (item.venueRef) return references.find((v: any) => v.title === item.venueRef?.title)?._id || '';
-    if (item.categoryRef) return references.find((c: any) => c.title === item.categoryRef?.title)?._id || '';
-    return '';
-  };
+  // Cargar referencias cuando cambia el tipo (with improved debouncing and error handling)
+  useEffect(() => {
+    if (!isMountedRef.current) {
+      return;
+    }
+    
+    if (['review', 'venue', 'category'].includes(formData.type)) {
+      // Clear previous timeout
+      if (typeChangeTimeoutRef.current) {
+        clearTimeout(typeChangeTimeoutRef.current);
+      }
+      
+      // Cancel any ongoing request from previous type
+      if (abortControllerRef.current && currentRequestTypeRef.current !== formData.type) {
+        abortControllerRef.current.abort();
+      }
+      
+      // Clear previous API error when type changes
+      setApiError(null);
+      
+      // Debounce type changes to prevent rapid API calls
+      typeChangeTimeoutRef.current = setTimeout(() => {
+        if (isMountedRef.current) {
+          loadReferences(formData.type as 'review' | 'venue' | 'category');
+        }
+      }, 300);
+    } else {
+      // Clear references for types that don't need them
+      setReferences([]);
+      setApiError(null);
+      setLoadingReferences(false);
+      currentRequestTypeRef.current = '';
+      
+      // Cancel any ongoing request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    }
+  }, [formData.type, loadReferences]);
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
@@ -201,8 +302,14 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Don't proceed if component is unmounted or already submitting
+    if (!isMountedRef.current || isSubmitting) {
+      return;
+    }
+    
     // Clear previous validation errors
     setValidationErrors({});
+    setApiError(null);
     
     // Validate form
     if (!validateForm()) {
@@ -216,12 +323,21 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
       let reference = {};
       if (formData.type === 'review') {
         const review = references.find((r: any) => r._id === formData.selectedReference);
+        if (!review && ['review', 'venue', 'category'].includes(formData.type)) {
+          throw new Error('La referencia seleccionada no es válida. Por favor, selecciona otra opción.');
+        }
         reference = { reviewRef: review };
       } else if (formData.type === 'venue') {
         const venue = references.find((v: any) => v._id === formData.selectedReference);
+        if (!venue && ['review', 'venue', 'category'].includes(formData.type)) {
+          throw new Error('La referencia seleccionada no es válida. Por favor, selecciona otra opción.');
+        }
         reference = { venueRef: venue };
       } else if (formData.type === 'category') {
         const category = references.find((c: any) => c._id === formData.selectedReference);
+        if (!category && ['review', 'venue', 'category'].includes(formData.type)) {
+          throw new Error('La referencia seleccionada no es válida. Por favor, selecciona otra opción.');
+        }
         reference = { categoryRef: category };
       }
 
@@ -238,16 +354,52 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
         ...reference
       };
 
-      await onSave(savedItem);
+      // Only proceed if component is still mounted
+      if (isMountedRef.current) {
+        await onSave(savedItem);
+      }
     } catch (error) {
-      console.error('Error saving featured item:', error);
-      setApiError(error instanceof Error ? error.message : 'Error al guardar el elemento destacado');
+      // Only update error state if component is still mounted
+      if (isMountedRef.current) {
+        console.error('Error saving featured item:', error);
+        let errorMessage = 'Error al guardar el elemento destacado';
+        
+        if (error instanceof Error) {
+          if (error.message.includes('referencia seleccionada')) {
+            errorMessage = error.message;
+          } else if (error.message.includes('Network')) {
+            errorMessage = 'Error de conexión. Verifica tu internet e inténtalo de nuevo.';
+          } else if (error.message.includes('timeout') || error.message.includes('Tiempo de espera')) {
+            errorMessage = 'La operación tardó demasiado. Inténtalo de nuevo.';
+          } else if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+            errorMessage = 'No tienes permisos para realizar esta acción. Inicia sesión de nuevo.';
+          } else if (error.message.includes('403') || error.message.includes('Forbidden')) {
+            errorMessage = 'No tienes permisos suficientes para realizar esta acción.';
+          } else if (error.message.includes('500')) {
+            errorMessage = 'Error del servidor. Inténtalo de nuevo más tarde.';
+          } else {
+            errorMessage = error.message;
+          }
+        }
+        
+        setApiError(errorMessage);
+      }
     } finally {
-      setIsSubmitting(false);
+      // Only update loading state if component is still mounted
+      if (isMountedRef.current) {
+        setIsSubmitting(false);
+      }
     }
   };
 
   const handleRetryLoadReferences = () => {
+    if (!isMountedRef.current) {
+      return;
+    }
+    
+    // Clear any existing error state
+    setApiError(null);
+    
     if (['review', 'venue', 'category'].includes(formData.type)) {
       loadReferences(formData.type as 'review' | 'venue' | 'category');
     }
@@ -260,6 +412,11 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
         delete newErrors[fieldName];
         return newErrors;
       });
+    }
+    
+    // Also clear API errors when user starts interacting with the form
+    if (apiError && fieldName === 'title') {
+      setApiError(null);
     }
   };
 
