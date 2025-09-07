@@ -159,6 +159,11 @@ export default function NewVenuePage() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await handleSave();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
