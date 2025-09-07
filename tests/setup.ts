@@ -57,3 +57,49 @@ process.env.SITE_NAME = 'Test Blog';
 process.env.SANITY_PROJECT_ID = 'test-project';
 process.env.SANITY_DATASET = 'test';
 process.env.ADS_PROVIDER = 'none';
+
+// Polyfill Pointer Events capture methods for jsdom (used by Radix UI)
+// jsdom doesn't implement setPointerCapture/hasPointerCapture/releasePointerCapture
+// which causes libraries that call them to throw. Provide no-op implementations.
+(() => {
+  const proto: any = (globalThis.Element || globalThis.HTMLElement).prototype;
+  if (!proto.setPointerCapture) {
+    proto.setPointerCapture = function (_pointerId: number) {
+      // no-op in test env
+    };
+  }
+
+  if (!proto.releasePointerCapture) {
+    proto.releasePointerCapture = function (_pointerId: number) {
+      // no-op in test env
+    };
+  }
+
+  if (!proto.hasPointerCapture) {
+    proto.hasPointerCapture = function (_pointerId: number) {
+      return false;
+    };
+  }
+})();
+
+// Log unhandled errors and promise rejections so tests show full stack traces
+if (typeof window !== 'undefined') {
+  window.addEventListener('error', (event: ErrorEvent) => {
+    // Ensure Vitest picks this up on stderr
+    // eslint-disable-next-line no-console
+    console.error('Unhandled window error in tests:', event.error || event.message);
+  });
+
+  window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
+    // eslint-disable-next-line no-console
+    console.error('Unhandled promise rejection in tests:', event.reason);
+  });
+
+  // Provide a safe default `fetch` implementation for tests.
+  // Some components call `fetch` during module initialization. If a test doesn't
+  // explicitly mock `fetch`, that can lead to `Cannot read properties of undefined (reading 'ok')`.
+  // Use a minimal stub that returns an object with `ok` and a `json()` helper.
+  if (typeof (globalThis as any).fetch === 'undefined') {
+    (globalThis as any).fetch = async () => ({ ok: true, json: async () => [] });
+  }
+}

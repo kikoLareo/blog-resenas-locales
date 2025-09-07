@@ -319,7 +319,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
           <CardTitle>
             {item ? 'Editar Elemento Destacado' : 'Nuevo Elemento Destacado'}
           </CardTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button variant="ghost" size="sm" onClick={onClose} aria-label="cerrar formulario">
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>
@@ -360,6 +360,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
                 }}
                 placeholder="Nombre para identificar en admin"
                 required
+                aria-required="true"
                 className={validationErrors.title ? 'border-destructive' : ''}
               />
               {validationErrors.title && (
@@ -370,7 +371,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
 
             {/* Tipo */}
             <div className="space-y-2">
-              <Label>Tipo de Contenido</Label>
+              <Label htmlFor="type">Tipo de Contenido</Label>
               <Select 
                 value={formData.type} 
                 onValueChange={(value: 'review' | 'venue' | 'category' | 'collection' | 'guide') => {
@@ -384,7 +385,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
                 }}
                 disabled={loadingReferences}
               >
-                <SelectTrigger>
+                <SelectTrigger id="type" aria-required="true">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

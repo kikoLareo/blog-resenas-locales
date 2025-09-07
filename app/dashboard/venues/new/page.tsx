@@ -57,33 +57,26 @@ export default function NewVenuePage() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await handleSave();
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <Link href="/dashboard/venues">
-          <Button variant="outline">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a Locales
-          </Button>
-        </Link>
-        <div className="flex space-x-2">
-          <Button variant="outline" onClick={() => window.location.href = '/dashboard/venues'}>
-            <X className="mr-2 h-4 w-4" />
-            Cancelar
-          </Button>
-          <Button onClick={handleSave} disabled={isLoading}>
-            <Save className="mr-2 h-4 w-4" />
-            {isLoading ? 'Guardando...' : 'Guardar Local'}
-          </Button>
-        </div>
-      </div>
-
-      <Card>
+        <div className="flex items-center justify-between">
+          <Link href="/dashboard/venues">
+            <Button variant="outline">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Volver a Locales
+            </Button>
+          </Link>
+        </div>      <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Nuevo Local</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" role="form">
             {/* Información Básica */}
             <div>
               <h3 className="text-lg font-semibold mb-4">Información Básica</h3>
@@ -92,6 +85,7 @@ export default function NewVenuePage() {
                   <Label htmlFor="title">Nombre del Local *</Label>
                   <Input
                     id="title"
+                    required
                     value={formData.title}
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
                     placeholder="Ej: Pizzería Tradizionale"
@@ -127,6 +121,7 @@ export default function NewVenuePage() {
                   <Label htmlFor="address">Dirección *</Label>
                   <Input
                     id="address"
+                    required
                     value={formData.address}
                     onChange={(e) => setFormData({...formData, address: e.target.value})}
                     placeholder="Calle Mayor, 123"
@@ -145,6 +140,7 @@ export default function NewVenuePage() {
                   <Label htmlFor="website">Sitio Web</Label>
                   <Input
                     id="website"
+                    type="url"
                     value={formData.website}
                     onChange={(e) => setFormData({...formData, website: e.target.value})}
                     placeholder="https://www.ejemplo.com"
@@ -160,7 +156,7 @@ export default function NewVenuePage() {
                 <div>
                   <Label htmlFor="city">Ciudad *</Label>
                   <Select value={formData.city} onValueChange={(value) => setFormData({...formData, city: value})}>
-                    <SelectTrigger>
+                    <SelectTrigger id="city">
                       <SelectValue placeholder="Selecciona una ciudad" />
                     </SelectTrigger>
                     <SelectContent>
@@ -174,8 +170,8 @@ export default function NewVenuePage() {
                 <div>
                   <Label htmlFor="priceRange">Rango de Precios</Label>
                   <Select value={formData.priceRange} onValueChange={(value) => setFormData({...formData, priceRange: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
+                    <SelectTrigger id="priceRange">
+                      <SelectValue placeholder="Selecciona un rango de precios" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="€">Económico (€)</SelectItem>
@@ -199,7 +195,7 @@ export default function NewVenuePage() {
                     }
                   }}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="categories">
                     <SelectValue placeholder="Añadir categoría" />
                   </SelectTrigger>
                   <SelectContent>
@@ -233,7 +229,17 @@ export default function NewVenuePage() {
                 )}
               </div>
             </div>
-          </div>
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button variant="outline" onClick={() => window.location.href = '/dashboard/venues'}>
+                <X className="mr-2 h-4 w-4" />
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                <Save className="mr-2 h-4 w-4" />
+                {isLoading ? 'Guardando...' : 'Guardar Local'}
+              </Button>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </div>

@@ -30,11 +30,16 @@ export default function NewReviewPage() {
     setIsLoading(true);
     try {
       // Aquí iría la lógica para guardar en Sanity
-      console.log('Guardando nueva reseña:', formData);
+      // console.log('Guardando nueva reseña:', formData);
+      
+      // Simular un delay para mostrar el estado de carga
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       // Redirigir a la lista de reseñas después de guardar
       window.location.href = '/dashboard/reviews';
     } catch (error) {
-      console.error('Error al guardar:', error);
+      // console.error('Error al guardar:', error);
+      // Handle error appropriately
     } finally {
       setIsLoading(false);
     }
@@ -75,6 +80,7 @@ export default function NewReviewPage() {
                   <Label htmlFor="title">Título de la Reseña *</Label>
                   <Input
                     id="title"
+                    required
                     value={formData.title}
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
                     placeholder="Ej: Pizza Margherita - La mejor de Madrid"
@@ -84,6 +90,7 @@ export default function NewReviewPage() {
                   <Label htmlFor="slug">Slug *</Label>
                   <Input
                     id="slug"
+                    required
                     value={formData.slug}
                     onChange={(e) => setFormData({...formData, slug: e.target.value})}
                     placeholder="pizza-margherita-madrid"
@@ -108,7 +115,7 @@ export default function NewReviewPage() {
               <div>
                 <Label htmlFor="venue">Seleccionar Local *</Label>
                 <Select value={formData.venue} onValueChange={(value) => setFormData({...formData, venue: value})}>
-                  <SelectTrigger>
+                  <SelectTrigger id="venue">
                     <SelectValue placeholder="Selecciona un local" />
                   </SelectTrigger>
                   <SelectContent>
@@ -126,79 +133,59 @@ export default function NewReviewPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                   <Label htmlFor="food">Comida</Label>
-                  <Select 
-                    value={formData.ratings.food.toString()} 
-                    onValueChange={(value) => setFormData({
-                      ...formData, 
-                      ratings: {...formData.ratings, food: parseInt(value)}
+                  <Input
+                    id="food"
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={formData.ratings.food.toString()}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      ratings: {...formData.ratings, food: parseInt(e.target.value) || 5}
                     })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[1,2,3,4,5].map(num => (
-                        <SelectItem key={num} value={num.toString()}>{num}/5</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
                 <div>
                   <Label htmlFor="service">Servicio</Label>
-                  <Select 
-                    value={formData.ratings.service.toString()} 
-                    onValueChange={(value) => setFormData({
-                      ...formData, 
-                      ratings: {...formData.ratings, service: parseInt(value)}
+                  <Input
+                    id="service"
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={formData.ratings.service.toString()}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      ratings: {...formData.ratings, service: parseInt(e.target.value) || 5}
                     })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[1,2,3,4,5].map(num => (
-                        <SelectItem key={num} value={num.toString()}>{num}/5</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
                 <div>
                   <Label htmlFor="ambience">Ambiente</Label>
-                  <Select 
-                    value={formData.ratings.ambience.toString()} 
-                    onValueChange={(value) => setFormData({
-                      ...formData, 
-                      ratings: {...formData.ratings, ambience: parseInt(value)}
+                  <Input
+                    id="ambience"
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={formData.ratings.ambience.toString()}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      ratings: {...formData.ratings, ambience: parseInt(e.target.value) || 5}
                     })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[1,2,3,4,5].map(num => (
-                        <SelectItem key={num} value={num.toString()}>{num}/5</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
                 <div>
                   <Label htmlFor="value">Relación Calidad-Precio</Label>
-                  <Select 
-                    value={formData.ratings.value.toString()} 
-                    onValueChange={(value) => setFormData({
-                      ...formData, 
-                      ratings: {...formData.ratings, value: parseInt(value)}
+                  <Input
+                    id="value"
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={formData.ratings.value.toString()}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      ratings: {...formData.ratings, value: parseInt(e.target.value) || 5}
                     })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[1,2,3,4,5].map(num => (
-                        <SelectItem key={num} value={num.toString()}>{num}/5</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
               </div>
             </div>
@@ -212,7 +199,7 @@ export default function NewReviewPage() {
                   value={formData.status} 
                   onValueChange={(value: "draft" | "published") => setFormData({...formData, status: value})}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="status">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
