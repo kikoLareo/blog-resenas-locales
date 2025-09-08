@@ -26,17 +26,20 @@ Object.defineProperty(window, 'location', {
   writable: true,
 });
 
-// Mock alert
+// Mock alert on both window and globalThis to ensure tests observe calls
 const mockAlert = vi.fn();
 Object.defineProperty(window, 'alert', {
   value: mockAlert,
   writable: true,
 });
+(globalThis as any).alert = mockAlert;
 
 describe('URL Validation Fix', () => {
   beforeEach(() => {
     mockLocation.href = '';
-    mockAlert.mockClear();
+  mockAlert.mockClear();
+  // Ensure global alert spy is fresh
+  (globalThis as any).alert = mockAlert;
     vi.clearAllMocks();
   });
 

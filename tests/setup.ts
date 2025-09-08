@@ -117,7 +117,31 @@ if (typeof window !== 'undefined') {
   // Some components call `fetch` during module initialization. If a test doesn't
   // explicitly mock `fetch`, that can lead to `Cannot read properties of undefined (reading 'ok')`.
   // Use a minimal stub that returns an object with `ok` and a `json()` helper.
-  if (typeof (globalThis as any).fetch === 'undefined') {
-    (globalThis as any).fetch = async () => ({ ok: true, json: async () => [] });
-  }
+  // Wrap/override global fetch to make tests tolerant of relative URLs and
+  // to return safe defaults when the test doesn't mock a specific endpoint.
+  const originalFetch = (globalThis as any).fetch;
+  (globalThis as any).fetch = async (input: RequestInfo, init?: RequestInit) => {
+    let url = typeof input === 'string' ? input : (input as Request).url;
+    try {
+      new URL(url);
+    } catch (e) {
+      // assume relative URL
+      url = `${process.env.SITE_URL || 'http://localhost:3000'}${url}`;
+    }
+
+    // Provide a canned response for the venues endpoint which many tests expect.
+    if (url.endsWith('/api/admin/venues')) {
+      const venues = [
+        { _id: 'venue-1', title: 'Pizzería Tradizionale', slug: { current: 'pizzeria-tradizionale' } },
+      ];
+      return { ok: true, json: async () => venues } as unknown as Response;
+    }
+
+    // Delegate to original fetch if available (real network calls shouldn't happen in tests),
+    // otherwise return a safe default.
+    if (typeof originalFetch === 'function') {
+      return originalFetch(url, init);
+    }
+    return { ok: true, json: async () => [] } as unknown as Response;
+  };
 }

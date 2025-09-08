@@ -406,9 +406,9 @@ export default function NewVenuePage() {
                           {category.title}
                         </SelectItem>
                       ))
-                    ) : (
+                      ) : (
                       !loadingCategories && (
-                        <SelectItem value="" disabled>
+                        <SelectItem value="_no_categories" disabled>
                           No hay categorías disponibles
                         </SelectItem>
                       )
