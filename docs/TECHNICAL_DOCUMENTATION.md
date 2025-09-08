@@ -258,7 +258,7 @@ export default async function VenuePage({ params }: { params: Promise<{ slug: st
 export default function VenueForm({ venue }: { venue: Venue }) {
   const [formData, setFormData] = useState(venue);
   
-  return <form onSubmit={handleSubmit}>...</form>;
+  return <form role="form" onSubmit={handleSubmit}>...</form>;
 }
 ```
 

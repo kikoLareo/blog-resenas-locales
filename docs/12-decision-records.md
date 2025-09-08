@@ -10,12 +10,12 @@ Para cada archivo clave: qué hace, por qué existe y cómo validarlo.
 ### app/page.tsx (Home)
 - Qué: RSC que hace `sanityFetch(homepageQuery)` y pasa datos a UI.
 - Por qué: SSR para SEO y performance; desacople datos/UI.
-- Validación: ver `GET /` en dev, y que lista contenido de Sanity tras el seed.
+- Validación: ver `GET /` en dev, y que lista contenido real de Sanity.
 
 ### app/(public)/[city] / [venue] / review/[slug]
-- Qué: páginas de ciudad/local/reseña (actualmente con mocks de transición).
-- Por qué: scaffold estable mientras conectamos GROQ por partes.
-- Validación: build OK; al conectar, sustituir mocks por consultas de `sanity/lib/queries.ts`.
+- Qué: páginas de ciudad/local/reseña conectadas directamente con Sanity.
+- Por qué: usar datos reales únicamente, sin mocks de transición.
+- Validación: build OK; consultas GROQ funcionando desde `sanity/lib/queries.ts`.
 
 ### app/studio/[[...tool]]/page.tsx
 - Qué: montaje del Studio (dev only), dinámico (sin SSR) para evitar conflictos de build.

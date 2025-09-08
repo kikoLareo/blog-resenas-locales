@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminSanityClient } from '@/lib/admin-sanity';
+import { adminSanityClient, adminSanityWriteClient } from '@/lib/admin-sanity';
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       status: 'pending', // pending, processed, archived
     };
 
-    const result = await adminSanityClient.create(feedbackData);
+    const result = await adminSanityWriteClient.create(feedbackData);
 
     // Actualizar el contador de usos del código QR
     const qrCodeDoc = await adminSanityClient.fetch(
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     );
 
     if (qrCodeDoc) {
-      await adminSanityClient
+      await adminSanityWriteClient
         .patch(qrCodeDoc._id)
         .set({
           currentUses: (qrCodeDoc.currentUses || 0) + 1,

@@ -6,11 +6,12 @@ import { VenueBreadcrumbs } from '@/components/Breadcrumbs';
 import LocalInfo from '@/components/LocalInfo';
 import Gallery from '@/components/Gallery';
 import { MultiScore, CompactScore } from '@/components/ScoreBar';
-import FAQ from '@/components/FAQ';
+import FAQ from '@/components/Faq';
 import { SidebarAd, InArticleAd } from '@/components/AdSlot';
 import { Venue, Review } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';
 import { venuePageJsonLd } from '@/lib/schema';
+import { sanityFetch } from '@/lib/sanity.client';
 
 type VenuePageProps = {
   params: Promise<{
@@ -19,90 +20,88 @@ type VenuePageProps = {
   }>;
 };
 
-// Datos temporales hardcodeados para desarrollo
-const mockVenue: Venue = {
-  _id: 'venue-madrid-cafe-encanto',
-  title: 'Café con Encanto',
-  slug: { current: 'cafe-con-encanto' },
-  description: 'Un acogedor café en el corazón de Madrid que ofrece la mejor experiencia gastronómica con un ambiente único y personalizado.',
-  address: 'Calle Gran Vía, 123',
-  postalCode: '28013',
-  phone: '+34 91 123 45 67',
-  website: 'https://cafeconencanto.com',
-  openingHours: [
-    'Monday 08:00-22:00',
-    'Tuesday 08:00-22:00',
-    'Wednesday 08:00-22:00',
-    'Thursday 08:00-23:00',
-    'Friday 08:00-23:00',
-    'Saturday 09:00-23:00',
-    'Sunday 09:00-21:00'
-  ],
-  priceRange: '€€',
-  schemaType: 'CafeOrCoffeeShop',
-  images: [
-    {
-      _type: 'image',
-      asset: {
-        _id: 'image-1',
-        url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop',
-        metadata: {
-          dimensions: {
-            width: 800,
-            height: 600,
-            aspectRatio: 1.33
-          }
-        }
-      },
-      alt: 'Interior del café'
-    }
-  ],
-  geo: {
-    lat: 40.4168,
-    lng: -3.7038
-  },
-  social: {
-    instagram: '@cafeconencanto',
-    facebook: 'cafeconencanto'
-  },
-  city: {
-    _id: 'city-madrid',
-    title: 'Madrid',
-    slug: { current: 'madrid' },
-    region: 'Comunidad de Madrid'
-  },
-  categories: [
-    {
-      _id: 'cat-cafe',
-      title: 'Cafeterías',
-      slug: { current: 'cafeterias' },
-      icon: 'coffee',
-      color: '#8B4513'
-    },
-    {
-      _id: 'cat-brunch',
-      title: 'Brunch',
-      slug: { current: 'brunch' },
-      icon: 'egg',
-      color: '#FFD700'
-    }
-  ],
-  reviews: []
-};
-
 export default async function VenuePage({ params }: VenuePageProps) {
   const { city, slug } = await params;
   
-  // Para desarrollo, usar datos mock si es el venue específico
-  let venueData = mockVenue;
+  // Query para obtener venue completo con reseñas
+  const venueDetailQuery = `
+    *[_type == "venue" && slug.current == $slug && city->slug.current == $citySlug][0] {
+      _id,
+      title,
+      slug,
+      description,
+      address,
+      postalCode,
+      phone,
+      website,
+      openingHours,
+      priceRange,
+      schemaType,
+      images[] {
+        _type,
+        asset-> {
+          _id,
+          url,
+          metadata {
+            dimensions {
+              width,
+              height
+            }
+          }
+        },
+        alt,
+        caption
+      },
+      geo,
+      social,
+      city-> {
+        _id,
+        title,
+        slug,
+        region
+      },
+      categories[]-> {
+        _id,
+        title,
+        slug,
+        icon,
+        color
+      },
+      "reviews": *[_type == "review" && venue._ref == ^._id] | order(publishedAt desc) {
+        _id,
+        title,
+        slug,
+        visitDate,
+        publishedAt,
+        ratings,
+        avgTicket,
+        highlights,
+        pros,
+        cons,
+        tldr,
+        author,
+        gallery[] {
+          asset-> {
+            _id,
+            url
+          },
+          alt,
+          caption
+        },
+        tags
+      },
+      "averageRating": math::avg(*[_type == "review" && venue._ref == ^._id].ratings.overall),
+      "reviewCount": count(*[_type == "review" && venue._ref == ^._id])
+    }
+  `;
   
-  // En producción, aquí se obtendrían los datos reales de Sanity
-  // const venueData = await sanityFetch<Venue | null>({ 
-  //   query: venueQuery, 
-  //   params: { slug }, 
-  //   tags: ['venues'], 
-  //   revalidate: 0 
-  // });
+  // Obtener datos reales de Sanity
+  const venueData = await sanityFetch<Venue | null>({ 
+    query: venueDetailQuery, 
+    params: { slug, citySlug: city }, 
+    tags: ['venue'], 
+    revalidate: 0 
+  });
 
   if (!venueData) {
     notFound();

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { adminSanityClient } from '@/lib/admin-sanity';
+import { adminSanityClient, adminSanityWriteClient } from '@/lib/admin-sanity';
 import { revalidateTag } from 'next/cache';
 
 // GET - Fetch all venues
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create venue document
-    const venue = await adminSanityClient.create({
+    const venue = await adminSanityWriteClient.create({
       _type: 'venue',
       title: data.title,
       slug: {
@@ -130,7 +130,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Update venue document
-    const venue = await adminSanityClient
+    const venue = await adminSanityWriteClient
       .patch(data._id)
       .set({
         title: data.title,
@@ -205,7 +205,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Delete venue
-    await adminSanityClient.delete(venueId);
+    await adminSanityWriteClient.delete(venueId);
 
     // Revalidate relevant pages
     revalidateTag('venues');

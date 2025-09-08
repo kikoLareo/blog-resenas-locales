@@ -1,42 +1,21 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_CONFIG } from '@/lib/constants';
+import { sanityFetch } from '@/lib/sanity.client';
 
-// Mock data - En producción, obtener de Sanity
-const mockCategories = [
-  {
-    _id: '1',
-    title: 'Restaurantes',
-    slug: { current: 'restaurantes' },
-    description: 'Los mejores restaurantes de la ciudad',
-    venueCount: 45,
-    reviewCount: 128,
-  },
-  {
-    _id: '2', 
-    title: 'Bares',
-    slug: { current: 'bares' },
-    description: 'Bares con ambiente y buenas tapas',
-    venueCount: 32,
-    reviewCount: 89,
-  },
-  {
-    _id: '3',
-    title: 'Cafeterías',
-    slug: { current: 'cafeterias' },
-    description: 'Cafeterías con encanto para cualquier momento',
-    venueCount: 28,
-    reviewCount: 67,
-  },
-  {
-    _id: '4',
-    title: 'Tapas',
-    slug: { current: 'tapas' },
-    description: 'Los mejores lugares para tapear',
-    venueCount: 38,
-    reviewCount: 95,
-  },
-];
+// Query para obtener todas las categorías con estadísticas
+const categoriesQuery = `
+  *[_type == "category"] | order(title asc) {
+    _id,
+    title,
+    slug,
+    description,
+    icon,
+    color,
+    "venueCount": count(*[_type == "venue" && ^._id in categories[]._ref]),
+    "reviewCount": count(*[_type == "review" && ^._id in venue->categories[]._ref])
+  }
+`;
 
 export const metadata: Metadata = {
   title: 'Categorías',
@@ -52,7 +31,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CategoriasPage() {
+export default async function CategoriasPage() {
+  // Obtener categorías reales de Sanity
+  const categories = await sanityFetch({
+    query: categoriesQuery,
+    tags: ['category'],
+  });
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container-wide py-12">
@@ -67,49 +52,65 @@ export default function CategoriasPage() {
         </div>
 
         {/* Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {mockCategories.map((category) => (
-            <Link
-              key={category._id}
-              href={`/categorias/${category.slug.current}`}
-              className="group"
-            >
-              <article className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-lg overflow-hidden h-full">
-                <div className="p-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
-                    {category.title}
-                  </h2>
-                  
-                  {category.description && (
-                    <p className="text-gray-600 mb-6 leading-relaxed">
-                      {category.description}
-                    </p>
-                  )}
+        {categories?.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {categories.map((category) => (
+              <Link
+                key={category._id}
+                href={`/categorias/${category.slug.current}`}
+                className="group"
+              >
+                <article className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-lg overflow-hidden h-full">
+                  <div className="p-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
+                      {category.title}
+                    </h2>
+                    
+                    {category.description && (
+                      <p className="text-gray-600 mb-6 leading-relaxed">
+                        {category.description}
+                      </p>
+                    )}
 
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <div className="flex items-center space-x-4">
-                      <span className="flex items-center">
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                        {category.venueCount} locales
-                      </span>
-                      <span className="flex items-center">
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                        </svg>
-                        {category.reviewCount} reseñas
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <div className="flex items-center space-x-4">
+                        <span className="flex items-center">
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                          {category.venueCount || 0} locales
+                        </span>
+                        <span className="flex items-center">
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                          </svg>
+                          {category.reviewCount || 0} reseñas
+                        </span>
+                      </div>
+                      <span className="text-primary-600 group-hover:text-primary-700 font-medium">
+                        Explorar →
                       </span>
                     </div>
-                    <span className="text-primary-600 group-hover:text-primary-700 font-medium">
-                      Explorar →
-                    </span>
                   </div>
-                </div>
-              </article>
-            </Link>
-          ))}
-        </div>
+                </article>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <div className="max-w-md mx-auto">
+              <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No hay categorías disponibles
+              </h3>
+              <p className="text-gray-600">
+                Las categorías se mostrarán aquí una vez que sean creadas en el sistema.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* CTA Section */}
         <div className="text-center mt-16">
