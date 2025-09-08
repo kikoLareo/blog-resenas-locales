@@ -270,8 +270,8 @@ const ADMIN_EMAILS = [
 
 - `lib/auth.ts` - Configuración principal de Auth.js
 - `middleware.ts` - Protección de rutas
-- `app/admin/login/page.tsx` - Página de login
-- `app/admin/layout.tsx` - Layout protegido
+- `app/dashboard/login/page.tsx` - Página de login
+- `app/dashboard/layout.tsx` - Layout protegido
 - `scripts/generate-password.js` - Generador de contraseñas
 - `.env` - Variables de entorno (no committear)
 

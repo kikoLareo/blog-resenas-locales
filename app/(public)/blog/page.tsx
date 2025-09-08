@@ -4,6 +4,7 @@ import { SITE_CONFIG } from '@/lib/constants';
 import { Post } from '@/lib/types';
 import { blogPageJsonLd } from '@/lib/schema';
 import { sanityFetch } from '@/lib/sanity.client';
+import Image from 'next/image';
 
 // Query para obtener posts del blog
 const blogPostsQuery = `
@@ -95,10 +96,10 @@ export default async function BlogPage() {
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
               <div className="grid grid-cols-1 lg:grid-cols-2">
                 <div className="aspect-video lg:aspect-auto bg-gray-100">
-                  {posts[0].heroImage ? (
-                    <img
-                      src={posts[0].heroImage.asset.url}
-                      alt={posts[0].heroImage.alt || posts[0].title}
+                  {posts[0].cover ? (
+                    <Image
+                      src={posts[0].cover.asset.url}
+                      alt={posts[0].cover.alt || posts[0].title}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -159,10 +160,10 @@ export default async function BlogPage() {
                 <article key={post._id} className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
                   {/* Image */}
                   <div className="aspect-video bg-gray-100">
-                    {post.heroImage ? (
-                      <img
-                        src={post.heroImage.asset.url}
-                        alt={post.heroImage.alt || post.title}
+                    {post.cover ? (
+                      <Image
+                        src={post.cover.asset.url}
+                        alt={post.cover.alt || post.title}
                         className="w-full h-full object-cover"
                       />
                     ) : (
