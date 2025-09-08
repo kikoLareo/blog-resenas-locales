@@ -51,12 +51,14 @@ export default function NewReviewPage() {
   }, [formData.title, isSlugManuallyEdited]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({...formData, title: e.target.value});
+    setFormData(prev => ({ ...prev, title: e.target.value }));
   };
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({...formData, slug: e.target.value});
-    setIsSlugManuallyEdited(true);
+  // Mark as manually edited first to prevent the title effect from
+  // overwriting user's input while they type.
+  setIsSlugManuallyEdited(true);
+  setFormData(prev => ({ ...prev, slug: e.target.value }));
   };
   const [errors, setErrors] = useState<{[key: string]: string}>({});
 
@@ -193,7 +195,7 @@ export default function NewReviewPage() {
                       id="title"
                       required
                       value={formData.title}
-                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="Ej: Pizza Margherita - La mejor de Madrid"
                       className={errors.title ? "border-red-500" : ""}
                     />
@@ -207,7 +209,7 @@ export default function NewReviewPage() {
                       id="slug"
                       required
                       value={formData.slug}
-                      onChange={(e) => setFormData({...formData, slug: e.target.value})}
+                      onChange={handleSlugChange}
                       placeholder="pizza-margherita-madrid"
                       className={errors.slug ? "border-red-500" : ""}
                     />
@@ -231,8 +233,8 @@ export default function NewReviewPage() {
               {/* Local */}
               <div>
                 <Label htmlFor="venue">Seleccionar Local *</Label>
-                <Select value={formData.venue} onValueChange={(value) => setFormData({...formData, venue: value})}>
-                  <SelectTrigger>
+                <Select value={formData.venue} onValueChange={(value) => setFormData(prev => ({ ...prev, venue: value }))}>
+                  <SelectTrigger id="venue">
                     <SelectValue placeholder={venuesLoading ? "Cargando locales..." : "Selecciona un local"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -251,6 +253,9 @@ export default function NewReviewPage() {
                     )}
                   </SelectContent>
                 </Select>
+                {errors.venue && (
+                  <span className="text-red-500 text-sm mt-1">{errors.venue}</span>
+                )}
               </div>
             </div>
 
