@@ -132,6 +132,11 @@ export default function NewVenuePage() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await handleSave();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -378,9 +383,9 @@ export default function NewVenuePage() {
                           {category.title}
                         </SelectItem>
                       ))
-                    ) : (
+                      ) : (
                       !loadingCategories && (
-                        <SelectItem value="no-categories" disabled>
+                        <SelectItem value="_no_categories" disabled>
                           No hay categorías disponibles
                         </SelectItem>
                       )
