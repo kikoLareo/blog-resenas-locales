@@ -64,7 +64,6 @@ function CityDetailClient({ city }: { city: CityWithDetails }) {
 
   const handleSave = () => {
     // Aquí iría la lógica para guardar en Sanity
-    console.log('Guardando cambios:', formData);
     setIsEditModalOpen(false);
   };
 

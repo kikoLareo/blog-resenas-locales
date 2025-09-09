@@ -84,7 +84,6 @@ function CategoryDetailClient({ category }: { category: CategoryWithDetails }) {
 
   const handleSave = () => {
     // Aquí iría la lógica para guardar en Sanity
-    console.log('Guardando cambios:', formData);
     setIsEditModalOpen(false);
   };
 

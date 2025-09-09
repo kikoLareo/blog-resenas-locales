@@ -48,7 +48,6 @@ export async function GET(
 
     return NextResponse.json(venue);
   } catch (error) {
-    console.error('Error fetching venue:', error);
     return NextResponse.json(
       { error: 'Error al obtener local' }, 
       { status: 500 }
@@ -128,7 +127,6 @@ export async function PUT(
       message: 'Local actualizado exitosamente' 
     });
   } catch (error) {
-    console.error('Error updating venue:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' }, 
       { status: 500 }
@@ -189,7 +187,6 @@ export async function DELETE(
       message: 'Local eliminado exitosamente' 
     });
   } catch (error) {
-    console.error('Error deleting venue:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' }, 
       { status: 500 }

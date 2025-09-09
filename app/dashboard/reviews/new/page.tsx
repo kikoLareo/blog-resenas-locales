@@ -96,7 +96,6 @@ export default function NewReviewPage() {
         const venuesData = await response.json();
         setVenues(venuesData);
       } catch (error) {
-        console.error('Error fetching venues:', error);
         setVenuesError(error instanceof Error ? error.message : 'Error al cargar los locales');
       } finally {
         setVenuesLoading(false);
@@ -134,7 +133,6 @@ export default function NewReviewPage() {
       // Redirect to reviews list on success
       router.push('/dashboard/reviews');
     } catch (error) {
-      console.error('Error al guardar:', error);
       setErrors({ submit: error instanceof Error ? error.message : 'Error al guardar la reseña' });
     } finally {
       // Mantener isLoading un poco más por si el test está observando la transición

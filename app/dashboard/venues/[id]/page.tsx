@@ -146,7 +146,6 @@ function VenueDetailClient({ venue }: { venue: VenueWithDetails }) {
         alert(result.error || 'Error al actualizar el local');
       }
     } catch (error) {
-      console.error('Error al guardar:', error);
       alert('Error al guardar el local');
     } finally {
       setIsLoading(false);

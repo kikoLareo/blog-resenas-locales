@@ -39,7 +39,6 @@ export async function getHomepageConfiguration(): Promise<HomepageConfiguration 
     const result = await adminSanityClient.fetch(query);
     return result;
   } catch (error) {
-    console.error('Error fetching homepage configuration:', error);
     return null;
   }
 }
@@ -75,7 +74,6 @@ export async function saveHomepageConfiguration(config: HomepageSectionConfig[])
 
     return true;
   } catch (error) {
-    console.error('Error saving homepage configuration:', error);
     return false;
   }
 }
@@ -171,7 +169,6 @@ export async function revalidateHomepage() {
 
     return true;
   } catch (error) {
-    console.error('Error revalidating homepage:', error);
     return false;
   }
 }

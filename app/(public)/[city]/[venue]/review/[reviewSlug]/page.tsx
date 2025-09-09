@@ -103,7 +103,6 @@ async function getReview(
     });
     return review;
   } catch (error) {
-    console.error('Error fetching review:', error);
     return null;
   }
 }

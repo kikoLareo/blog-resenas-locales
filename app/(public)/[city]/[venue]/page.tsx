@@ -100,7 +100,6 @@ async function getVenue(citySlug: string, venueSlug: string): Promise<VenueWithR
     });
     return venue;
   } catch (error) {
-    console.error('Error fetching venue:', error);
     return null;
   }
 }

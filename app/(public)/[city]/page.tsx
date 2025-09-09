@@ -324,7 +324,6 @@ export default async function CityPage({ params }: CityPageProps) {
       </>
     );
   } catch (error) {
-    console.error('Error loading city page:', error);
     notFound();
   }
 }

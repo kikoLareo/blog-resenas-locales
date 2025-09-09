@@ -317,12 +317,10 @@ export default function HomepageSectionsPage() {
   const saveChanges = async () => {
     try {
       // Aquí enviarías los cambios a Sanity
-      console.log('Guardando secciones:', sections);
       setHasChanges(false);
       // TODO: Implementar guardado en Sanity
       // await saveSectionsToSanity(sections);
     } catch (error) {
-      console.error('Error guardando:', error);
     }
   };
 

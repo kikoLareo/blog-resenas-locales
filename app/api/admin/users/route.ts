@@ -46,7 +46,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ user: created }, { status: 201 });
   } catch (err: any) {
-    console.error('Error creating user', err);
     return NextResponse.json({ error: 'internal_error' }, { status: 500 });
   }
 }

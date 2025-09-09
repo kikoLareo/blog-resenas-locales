@@ -54,7 +54,6 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
 
   const handleSave = () => {
     // Aquí iría la lógica para guardar en Sanity
-    console.log('Guardando cambios:', formData);
     setIsEditModalOpen(false);
   };
 

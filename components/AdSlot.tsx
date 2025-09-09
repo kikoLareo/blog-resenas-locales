@@ -59,10 +59,8 @@ export default function AdSlot({ slot, className = '', priority = false }: AdSlo
         
         // For now, we just mark as loaded to prevent CLS
         // eslint-disable-next-line no-console
-        console.log(`Ad slot ${slotId} loaded`);
               } catch (error) {
           // eslint-disable-next-line no-console
-          console.error(`Failed to load ad slot ${slotId}:`, error);
         setHasError(true);
         setIsLoaded(false);
       }

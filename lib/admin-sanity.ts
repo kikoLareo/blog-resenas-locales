@@ -7,14 +7,6 @@ const apiVersion = process.env.SANITY_API_VERSION || '2024-01-01';
 const readToken = process.env.SANITY_API_READ_TOKEN || '';
 const writeToken = process.env.SANITY_API_WRITE_TOKEN || '';
 
-console.log('🔧 Configuración de Sanity:', {
-  projectId,
-  dataset,
-  apiVersion,
-  hasReadToken: !!readToken,
-  hasWriteToken: !!writeToken
-});
-
 export const adminSanityClient = createClient({
   projectId,
   dataset,

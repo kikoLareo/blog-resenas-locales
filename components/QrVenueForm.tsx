@@ -54,7 +54,6 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
         throw new Error('Error al enviar la información');
       }
     } catch (error) {
-      console.error('Error submitting form:', error);
       alert('Error al enviar la información. Por favor, inténtalo de nuevo.');
     } finally {
       setSubmitting(false);

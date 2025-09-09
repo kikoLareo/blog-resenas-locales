@@ -238,6 +238,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     } catch (error) {
       // Silently handle errors in production, log in development
       if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
         console.error('Error en búsqueda:', error);
       }
       results = [];

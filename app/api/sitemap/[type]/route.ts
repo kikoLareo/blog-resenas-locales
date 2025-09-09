@@ -163,7 +163,6 @@ export async function GET(
 
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Error generando sitemap:', error);
     
     return NextResponse.json(
       { 

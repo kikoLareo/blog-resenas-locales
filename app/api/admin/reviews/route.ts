@@ -30,7 +30,6 @@ export async function GET() {
 
     return NextResponse.json(reviews);
   } catch (error) {
-    console.error('Error fetching reviews:', error);
     return NextResponse.json(
       { error: 'Error al obtener reseñas' }, 
       { status: 500 }
@@ -97,7 +96,6 @@ export async function POST(request: NextRequest) {
       message: 'Reseña creada exitosamente' 
     });
   } catch (error) {
-    console.error('Error creating review:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' }, 
       { status: 500 }

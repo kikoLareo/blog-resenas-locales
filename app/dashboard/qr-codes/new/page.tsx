@@ -39,7 +39,6 @@ export default function NewQRCodePage() {
         const data = await adminSanityClient.fetch<Venue[]>(venuesListQuery);
         setVenues(data);
       } catch (error) {
-        console.error('Error fetching venues:', error);
       } finally {
         setLoading(false);
       }
@@ -74,7 +73,6 @@ export default function NewQRCodePage() {
       
       router.push('/dashboard/qr-codes');
     } catch (error) {
-      console.error('Error creating QR code:', error);
       alert('Error al crear el código QR');
     } finally {
       setSaving(false);
