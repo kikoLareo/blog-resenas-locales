@@ -41,14 +41,18 @@ export async function submitToIndexNow(urls: string[]): Promise<number> {
 
   // Skip if configuration is incomplete
   if (!host || !key || !keyLocation) {
-    // eslint-disable-next-line no-console
-    console.log('IndexNow: Configuración incompleta, saltando envío');
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log('IndexNow: Configuración incompleta, saltando envío');
+    }
     return 0;
   }
 
   if (urls.length === 0) {
-    // eslint-disable-next-line no-console
-    console.log('IndexNow: No hay URLs para enviar');
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log('IndexNow: No hay URLs para enviar');
+    }
     return 0;
   }
 
@@ -57,8 +61,10 @@ export async function submitToIndexNow(urls: string[]): Promise<number> {
   
   if (isDryRun) {
     const payload = buildIndexNowPayload(urls, key, host, keyLocation);
-    // eslint-disable-next-line no-console
-    console.log('IndexNow (dry-run):', JSON.stringify(payload, null, 2));
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log('IndexNow (dry-run):', JSON.stringify(payload, null, 2));
+    }
     return urls.length;
   }
 
@@ -75,17 +81,23 @@ export async function submitToIndexNow(urls: string[]): Promise<number> {
     });
 
     if (response.ok) {
-      // eslint-disable-next-line no-console
-      console.log(`IndexNow: Enviadas ${urls.length} URLs exitosamente (${response.status})`);
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.log(`IndexNow: Enviadas ${urls.length} URLs exitosamente (${response.status})`);
+      }
       return urls.length;
     } else {
-      // eslint-disable-next-line no-console
-      console.error(`IndexNow: Error ${response.status}: ${response.statusText}`);
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error(`IndexNow: Error ${response.status}: ${response.statusText}`);
+      }
       return 0;
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('IndexNow: Error al enviar URLs:', error);
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('IndexNow: Error al enviar URLs:', error);
+    }
     return 0;
   }
 }

@@ -24,11 +24,9 @@ export default function NewBlogPostPage() {
     setIsLoading(true);
     try {
       // Aquí iría la lógica para guardar en Sanity
-      console.log('Guardando nuevo artículo:', formData);
       // Redirigir a la lista de artículos después de guardar
       window.location.href = '/dashboard/blog';
     } catch (error) {
-      console.error('Error al guardar:', error);
     } finally {
       setIsLoading(false);
     }

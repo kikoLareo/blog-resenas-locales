@@ -30,7 +30,6 @@ export async function GET() {
     const config = await getHomepageConfiguration();
     return NextResponse.json(config);
   } catch (error) {
-    console.error('Error fetching homepage config:', error);
     return NextResponse.json(
       { error: 'Error al obtener configuración' }, 
       { status: 500 }
@@ -81,7 +80,6 @@ export async function POST(request: NextRequest) {
       message: 'Configuración guardada exitosamente' 
     });
   } catch (error) {
-    console.error('Error saving homepage config:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' }, 
       { status: 500 }

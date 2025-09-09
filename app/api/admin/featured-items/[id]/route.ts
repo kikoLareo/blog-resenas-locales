@@ -24,7 +24,6 @@ export async function GET(
 
     return NextResponse.json(item);
   } catch (error) {
-    console.error('Error in GET /api/admin/featured-items/[id]:', error);
     return NextResponse.json(
       { error: 'Error fetching featured item' },
       { status: 500 }
@@ -53,7 +52,6 @@ export async function PUT(
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error in PUT /api/admin/featured-items/[id]:', error);
     return NextResponse.json(
       { error: 'Error updating featured item' },
       { status: 500 }
@@ -79,7 +77,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in DELETE /api/admin/featured-items/[id]:', error);
     return NextResponse.json(
       { error: 'Error deleting featured item' },
       { status: 500 }
@@ -114,7 +111,6 @@ export async function PATCH(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in PATCH /api/admin/featured-items/[id]:', error);
     return NextResponse.json(
       { error: 'Error updating featured item status' },
       { status: 500 }

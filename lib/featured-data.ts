@@ -77,7 +77,6 @@ export async function getFeaturedItemsData(): Promise<{
     };
     
   } catch (error) {
-    console.error('Error fetching featured items from Sanity:', error);
     
     // En caso de error, usar fallback
     return {
@@ -94,7 +93,6 @@ export async function getStaticFeaturedItems(): Promise<FeaturedItem[]> {
     const { items } = await getFeaturedItemsData();
     return items;
   } catch (error) {
-    console.error('Error in getStaticFeaturedItems:', error);
     return fallbackFeaturedItems;
   }
 }

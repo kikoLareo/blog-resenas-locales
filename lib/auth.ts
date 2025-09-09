@@ -7,16 +7,12 @@ if (!process.env.NEXTAUTH_SECRET) {
   // Don't throw here to avoid breaking build-time collection and server-side
   // code analysis in environments where auth isn't configured (CI/local).
   // Individual API routes should guard usage of auth as needed.
-  console.warn("NEXTAUTH_SECRET is not set — authentication will be disabled in this environment.");
 }
 
 // Valores por defecto para desarrollo
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@example.com";
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || "$2b$10$nqdaPIhyOycDi1Ze18PkqOygPVAQaBUijDno6vknoF0JmEkl7Zgki";
 
-console.log("🔧 Configuración de autenticación:");
-console.log("ADMIN_EMAIL:", ADMIN_EMAIL);
-console.log("ADMIN_PASSWORD_HASH:", ADMIN_PASSWORD_HASH ? "Configurado" : "No configurado");
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -27,10 +23,8 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        console.log("🔐 Intentando autenticar:", { email: credentials?.email });
 
         if (!credentials?.email || !credentials?.password) {
-          console.log("❌ Credenciales faltantes");
           return null;
         }
 
@@ -41,11 +35,9 @@ export const authOptions: NextAuthOptions = {
         try {
           const userRecord = await prisma.user.findUnique({ where: { email } });
           if (userRecord) {
-            console.log('ℹ️ Usuario encontrado en DB:', { email, id: userRecord.id });
             if (userRecord.passwordHash) {
               const ok = await bcrypt.compare(password, userRecord.passwordHash);
               if (ok) {
-                console.log('✅ Autenticación vía DB exitosa para', email);
                 return {
                   id: String(userRecord.id),
                   email,
@@ -53,29 +45,23 @@ export const authOptions: NextAuthOptions = {
                   role: userRecord.role ?? 'ADMIN',
                 };
               }
-              console.log('❌ Contraseña inválida para usuario en DB:', email);
               return null;
             }
-            console.log('⚠️ Usuario en DB no tiene passwordHash, no se puede autenticar via DB');
           }
         } catch (dbErr) {
-          console.error('Error comprobando usuario en DB:', dbErr);
           // proceed to fallback
         }
 
         // 2) Fallback: check environment-stored admin credentials
         if (email !== ADMIN_EMAIL) {
-          console.log('❌ Email no coincide con ADMIN_EMAIL env:', { provided: email, expected: ADMIN_EMAIL });
           return null;
         }
 
         const isValidPassword = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
         if (!isValidPassword) {
-          console.log('❌ Contraseña incorrecta para ADMIN_EMAIL');
           return null;
         }
 
-        console.log('✅ Autenticación exitosa vía env para:', email);
         return {
           id: 'admin',
           email,

@@ -23,7 +23,6 @@ export default function NewCategoryPage() {
   // allow state to flush so the UI shows loading text before navigating
       await new Promise((res) => setTimeout(res, 0));
       // Aquí iría la lógica para guardar en Sanity
-      console.log("Guardando nueva categoría:", formData);
       // In test environments we avoid performing a real navigation so tests can
       // observe the transient loading UI. In production we redirect after save.
       const isTestEnv =
@@ -38,7 +37,6 @@ export default function NewCategoryPage() {
         setTimeout(() => setIsLoading(false), 50);
       }
     } catch (error) {
-      console.error('Error al guardar:', error);
     } finally {
       // Only clear loading here when not in the test env. In test env we
       // scheduled clearing above to ensure assertions can observe the state.

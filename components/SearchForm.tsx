@@ -37,7 +37,6 @@ export default function SearchForm({
         router.push(`/buscar?q=${encodeURIComponent(searchTerm.trim())}`);
       }
     } catch (error) {
-      console.error('Error en búsqueda:', error);
     } finally {
       setIsLoading(false);
     }

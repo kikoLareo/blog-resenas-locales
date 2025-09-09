@@ -46,7 +46,6 @@ export async function generateQRCode(data: QRCodeData): Promise<string> {
     
     return qrCodeDataURL;
   } catch (error) {
-    console.error('Error generating QR code:', error);
     throw new Error('No se pudo generar el código QR');
   }
 }
@@ -97,7 +96,6 @@ export async function recordQRUsage(code: string, venueId: string, request?: Req
   };
 
   // Aquí se podría guardar en una base de datos o enviar a un servicio de analytics
-  console.log('QR Code usage recorded:', usage);
 }
 
 /**

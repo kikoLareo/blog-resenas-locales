@@ -24,7 +24,6 @@ export default async function DashboardPage() {
   try {
     data = await adminSanityClient.fetch(dashboardStatsQuery);
   } catch (error) {
-    console.error('Error fetching Sanity data:', error);
     sanityError = true;
     // Datos por defecto cuando Sanity falla
     data = {

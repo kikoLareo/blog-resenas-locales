@@ -18,7 +18,6 @@ export async function getHomepageReviews(limit: number = 4): Promise<Review[]> {
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Error fetching homepage reviews:', error);
     return [];
   }
 }
@@ -34,7 +33,6 @@ export async function getHomepagePosts(limit: number = 3): Promise<Post[]> {
     return posts.slice(0, limit);
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Error fetching homepage posts:', error);
     return [];
   }
 }
@@ -49,7 +47,6 @@ export async function getFeaturedCategories(): Promise<Category[]> {
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Error fetching categories:', error);
     return [];
   }
 }
@@ -64,7 +61,6 @@ export async function getSiteStats() {
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Error fetching site stats:', error);
     return {
       totalVenues: 0,
       totalReviews: 0,
@@ -113,7 +109,6 @@ export async function getCategoryData(slug: string) {
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Error fetching category data:', error);
     return null;
   }
 }
@@ -143,7 +138,6 @@ export async function getPostData(slug: string) {
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Error fetching post data:', error);
     return null;
   }
 }

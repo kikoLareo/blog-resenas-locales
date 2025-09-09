@@ -81,21 +81,12 @@ export async function POST(req: NextRequest) {
     );
 
     if (!isValidSignature) {
-      // eslint-disable-next-line no-console
-      console.error('Webhook no autorizado - firma inválida');
       return NextResponse.json({ message: 'Invalid signature' }, { status: 401 });
     }
 
     if (!body?._type) {
       return NextResponse.json({ message: 'Bad Request' }, { status: 400 });
     }
-
-    // eslint-disable-next-line no-console
-    console.log('Webhook recibido:', {
-      type: body._type,
-      id: body._id,
-      slug: body.slug?.current,
-    });
 
     // Revalidar por tags usando REVALIDATE_TAGS
     revalidateTag('content');
@@ -105,7 +96,6 @@ export async function POST(req: NextRequest) {
     if (tagToRevalidate) {
       revalidateTag(tagToRevalidate);
       // eslint-disable-next-line no-console
-      console.log(`Tag revalidado: ${tagToRevalidate}`);
     }
 
     // Revalidaciones específicas por tipo
@@ -146,11 +136,9 @@ export async function POST(req: NextRequest) {
       try {
         revalidatePath(path);
         // eslint-disable-next-line no-console
-        console.log(`Path revalidado: ${path}`);
         return { path, success: true };
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.error(`Error revalidando path ${path}:`, error);
         return { path, success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
       }
     });
@@ -160,14 +148,11 @@ export async function POST(req: NextRequest) {
       revalidatePath('/sitemap.xml');
       revalidatePath('/api/sitemap');
       // eslint-disable-next-line no-console
-      console.log('Sitemap revalidado');
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error('Error revalidando sitemap:', error);
     }
 
     // eslint-disable-next-line no-console
-    console.log(`✅ Revalidated: ${body._type} - ${body._id}`);
 
     // IndexNow integration - enviar URLs actualizadas sin bloquear la respuesta
     let indexnowSubmitted = 0;
@@ -178,17 +163,14 @@ export async function POST(req: NextRequest) {
         .then((count) => {
           if (count > 0) {
             // eslint-disable-next-line no-console
-            console.log(`IndexNow: ${count} URLs enviadas exitosamente`);
           }
         })
         .catch((error) => {
           // eslint-disable-next-line no-console
-          console.error('IndexNow: Error en envío asíncrono:', error);
         });
       indexnowSubmitted = absoluteUrls.length;
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error('IndexNow: Error preparando URLs:', error);
     }
 
     return NextResponse.json({
@@ -205,7 +187,6 @@ export async function POST(req: NextRequest) {
 
   } catch (err: unknown) {
     // eslint-disable-next-line no-console
-    console.error('❌ Revalidation error:', err);
     return NextResponse.json(
       { 
         error: 'Error interno del servidor',
