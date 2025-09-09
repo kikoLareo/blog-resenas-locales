@@ -44,14 +44,17 @@ export function ImageWithFallback({
     }
   };
 
-  // Si es una imagen de error, usar img normal
+  // Si es una imagen de error, usar next/image también
   if (hasError || currentSrc === ERROR_IMG_SRC) {
     return (
-      <img
+      <Image
         src={currentSrc}
         alt={alt}
+        width={width || 88}
+        height={height || 88}
         className={className}
         style={{ objectFit: 'cover' }}
+        unoptimized={true}
         {...rest}
       />
     );
