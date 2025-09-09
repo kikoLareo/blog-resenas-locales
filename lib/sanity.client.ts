@@ -98,7 +98,10 @@ export async function sanityFetch<T = unknown>({
       url.searchParams.set('params', JSON.stringify(params))
     }
 
-    const res = await fetch(url.toString())
+    const res = await fetch(url.toString(), {
+      // Add timeout for build environments
+      signal: AbortSignal.timeout(30000) // 30 second timeout
+    })
     if (!res.ok) {
       const text = await res.text().catch(() => '')
       throw new Error(`Sanity proxy error: ${res.status} ${text}`)
@@ -110,12 +113,25 @@ export async function sanityFetch<T = unknown>({
   // Server-side: use the real client (supports Next.js caching and preview)
   const clientInstance = getClient(preview);
 
-  return clientInstance.fetch(query, params, {
-    next: {
-      revalidate: preview ? 0 : revalidate,
-      tags: preview ? [] : tags,
-    },
-  });
+  // Add timeout and error handling for build environments
+  try {
+    const fetchPromise = clientInstance.fetch(query, params, {
+      next: {
+        revalidate: preview ? 0 : revalidate,
+        tags: preview ? [] : tags,
+      },
+    });
+
+    // Add timeout for build environments
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Sanity fetch timeout')), 30000);
+    });
+
+    return await Promise.race([fetchPromise, timeoutPromise]) as T;
+  } catch (error) {
+    console.warn(`Sanity fetch failed for query: ${query.substring(0, 100)}...`, error);
+    throw error;
+  }
 }
 
 // Client for real-time preview (mantenido para compatibilidad)

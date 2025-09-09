@@ -4,6 +4,8 @@ const nextConfig = {
     typedRoutes: false,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
+  // Improve build performance and handle network timeouts
+  staticPageGenerationTimeout: 60,
   images: {
     remotePatterns: [
       {
