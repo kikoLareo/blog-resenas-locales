@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npx prisma generate && tsx scripts/indexnow-verify.ts",
+    "postinstall": "node scripts/prisma-setup.js",
+    "prebuild": "tsx scripts/indexnow-verify.ts",
     "generate-admin": "node scripts/generate-admin-password.js",
     "build": "next build",
     "start": "next start",

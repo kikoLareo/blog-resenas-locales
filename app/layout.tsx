@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import '@/styles/globals.css';
 
@@ -9,13 +8,8 @@ import { SITE_CONFIG, SEO_DEFAULTS } from '@/lib/constants';
 import { websiteJsonLd, organizationJsonLd } from '@/lib/schema';
 import ConsentBanner from '@/components/ConsentBanner';
 
-// Optimización de fuentes con display=swap para evitar CLS
-const inter = Inter({ 
-  subsets: ['latin'],
-  display: 'swap',
-  preload: true,
-  fallback: ['system-ui', 'arial'],
-});
+// Use system fonts as primary, with Inter as enhancement
+// This avoids build failures when Google Fonts is not accessible
 
 export const metadata: Metadata = {
   title: {
@@ -111,7 +105,7 @@ export default function RootLayout({
         {/* Performance optimizations */}
         <meta httpEquiv="X-DNS-Prefetch-Control" content="on" />
       </head>
-      <body className={`${inter.className} antialiased  bg-black`}>
+      <body className="antialiased bg-black font-sans">
         <AuthProvider>
           <GoogleAnalytics gaId={process.env.GA_MEASUREMENT_ID || 'G-XSLBYXBEZJ'} />
           <PerformanceMonitor />
