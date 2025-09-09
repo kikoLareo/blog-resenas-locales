@@ -14,7 +14,7 @@ import {
 import { SITE_CONFIG } from './constants';
 
 /**
- * Generate LocalBusiness JSON-LD for venues
+ * Generate LocalBusiness JSON-LD for venues with AEO optimizations
  */
 export function localBusinessJsonLd(venue: Venue): LocalBusinessJsonLd {
   const baseUrl = SITE_CONFIG.url;
@@ -46,7 +46,11 @@ export function localBusinessJsonLd(venue: Venue): LocalBusinessJsonLd {
     openingHours: venue.openingHours,
     priceRange: venue.priceRange,
     servesCuisine,
-  };
+  } as LocalBusinessJsonLd;
+
+  // Add AEO optimizations as additional properties
+  (schema as any).knowsAbout = servesCuisine.concat(['gastronomía', 'restaurante', 'comida local']);
+  (schema as any).keywords = [venue.title, venue.city.title, ...servesCuisine].join(', ');
 
   // Agregar coordenadas GPS si están disponibles
   if (venue.geo) {
@@ -85,7 +89,7 @@ export function localBusinessJsonLd(venue: Venue): LocalBusinessJsonLd {
 }
 
 /**
- * Generate Review JSON-LD
+ * Generate Review JSON-LD with AEO optimizations
  */
 export function reviewJsonLd(review: Review, venue: Venue): ReviewJsonLd {
   // Calcular rating promedio (normalizado a 1-5)
@@ -99,7 +103,7 @@ export function reviewJsonLd(review: Review, venue: Venue): ReviewJsonLd {
   const baseUrl = SITE_CONFIG.url;
   const reviewUrl = `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}/review/${review.slug.current}`;
 
-  return {
+  const reviewSchema = {
     '@context': 'https://schema.org',
     '@type': 'Review',
     '@id': `${reviewUrl}#review`,
@@ -136,17 +140,31 @@ export function reviewJsonLd(review: Review, venue: Venue): ReviewJsonLd {
       name: SITE_CONFIG.name,
       url: SITE_CONFIG.url,
     },
+  } as ReviewJsonLd;
+  
+  // Add AEO optimizations as additional properties
+  (reviewSchema as any).keywords = [venue.title, venue.city.title, 'reseña', 'opinión', 'experiencia'].join(', ');
+  (reviewSchema as any).about = {
+    '@type': 'Thing',
+    name: `${venue.title} en ${venue.city.title}`,
+    sameAs: `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}`,
   };
+  (reviewSchema as any).speakable = {
+    '@type': 'SpeakableSpecification',
+    cssSelector: ['.tldr-section', '.review-summary'],
+  };
+  
+  return reviewSchema;
 }
 
 /**
- * Generate Article/BlogPosting JSON-LD for posts
+ * Generate Article/BlogPosting JSON-LD for posts with AEO optimizations
  */
 export function articleJsonLd(post: Post): ArticleJsonLd {
   const baseUrl = SITE_CONFIG.url;
   const url = `${baseUrl}/blog/${post.slug.current}`;
 
-  return {
+  const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     '@id': `${url}#article`,
@@ -172,27 +190,269 @@ export function articleJsonLd(post: Post): ArticleJsonLd {
     },
     url,
     keywords: post.tags?.join(', '),
+  } as ArticleJsonLd;
+  
+  // Add AEO optimizations as additional properties
+  if (post.tags) {
+    (articleSchema as any).about = post.tags.map(tag => ({
+      '@type': 'Thing',
+      name: tag,
+    }));
+    (articleSchema as any).mentions = post.tags.map(tag => ({
+      '@type': 'Thing',
+      name: tag,
+    }));
+  }
+  
+  // Voice search optimization
+  (articleSchema as any).speakable = {
+    '@type': 'SpeakableSpecification',
+    cssSelector: ['.tldr-section', '.article-summary', 'h1', 'h2'],
+  };
+  
+  // AEO: Indicate this content answers questions
+  (articleSchema as any).potentialAction = {
+    '@type': 'ReadAction',
+    target: url,
+  };
+  
+  return articleSchema;
+}
+
+/**
+ * Generate QAPage JSON-LD for voice search optimization
+ */
+export function qaPageJsonLd(
+  mainQuestion: string,
+  mainAnswer: string,
+  relatedQuestions?: { question: string; answer: string }[],
+  url?: string
+) {
+  const baseUrl = SITE_CONFIG.url;
+  
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'QAPage',
+    mainEntity: {
+      '@type': 'Question',
+      name: mainQuestion,
+      text: mainQuestion,
+      answerCount: 1,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: mainAnswer,
+        // AEO: Mark as speakable for voice search
+        speakable: {
+          '@type': 'SpeakableSpecification',
+          cssSelector: ['.answer-text', '.qa-answer'],
+        },
+      },
+    },
+    // AEO: Related questions for "People also ask"
+    ...(relatedQuestions && relatedQuestions.length > 0 && {
+      mentions: relatedQuestions.map(qa => ({
+        '@type': 'Question',
+        name: qa.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: qa.answer,
+        },
+      })),
+    }),
+    ...(url && { url }),
+  };
+
+  return schema;
+}
+
+/**
+ * Generate HowTo JSON-LD for step-by-step guides (restaurant visits, etc.)
+ */
+export function howToJsonLd(
+  name: string,
+  description: string,
+  steps: Array<{ name: string; text: string; image?: string }>,
+  totalTime?: string,
+  url?: string
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name,
+    description,
+    ...(totalTime && { totalTime }),
+    ...(url && { url }),
+    supply: [],
+    tool: [],
+    step: steps.map((step, index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name: step.name,
+      text: step.text,
+      ...(step.image && {
+        image: {
+          '@type': 'ImageObject',
+          url: step.image,
+        },
+      }),
+    })),
+    // AEO: Voice search optimization
+    speakable: {
+      '@type': 'SpeakableSpecification',
+      cssSelector: ['.how-to-step', '.step-description'],
+    },
   };
 }
 
 /**
- * Generate FAQPage JSON-LD
+ * Generate MenuSection JSON-LD for restaurant menus
+ */
+export function menuSectionJsonLd(
+  venue: Venue,
+  sections: Array<{
+    name: string;
+    description?: string;
+    items: Array<{
+      name: string;
+      description?: string;
+      price?: number;
+      image?: string;
+    }>;
+  }>
+) {
+  const baseUrl = SITE_CONFIG.url;
+  
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Menu',
+    name: `Carta de ${venue.title}`,
+    description: `Menú completo de ${venue.title} en ${venue.city.title}`,
+    provider: {
+      '@type': venue.schemaType || 'LocalBusiness',
+      name: venue.title,
+      url: `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}`,
+    },
+    hasMenuSection: sections.map(section => ({
+      '@type': 'MenuSection',
+      name: section.name,
+      ...(section.description && { description: section.description }),
+      hasMenuItem: section.items.map(item => ({
+        '@type': 'MenuItem',
+        name: item.name,
+        ...(item.description && { description: item.description }),
+        ...(item.price && {
+          offers: {
+            '@type': 'Offer',
+            price: item.price,
+            priceCurrency: 'EUR',
+          },
+        }),
+        ...(item.image && {
+          image: {
+            '@type': 'ImageObject',
+            url: item.image,
+          },
+        }),
+      })),
+    })),
+  };
+}
+
+/**
+ * Generate Event JSON-LD for restaurant events and promotions
+ */
+export function eventJsonLd(
+  name: string,
+  description: string,
+  startDate: string,
+  endDate: string,
+  venue: Venue,
+  offers?: { price?: number; availability?: string }
+) {
+  const baseUrl = SITE_CONFIG.url;
+  
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name,
+    description,
+    startDate,
+    endDate,
+    location: {
+      '@type': 'Place',
+      name: venue.title,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: venue.address,
+        addressLocality: venue.city.title,
+        addressRegion: venue.city.region,
+        addressCountry: 'ES',
+      },
+      ...(venue.geo && {
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: venue.geo.lat,
+          longitude: venue.geo.lng,
+        },
+      }),
+    },
+    organizer: {
+      '@type': 'Organization',
+      name: venue.title,
+      url: `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}`,
+    },
+    ...(offers && {
+      offers: {
+        '@type': 'Offer',
+        ...(offers.price && { price: offers.price, priceCurrency: 'EUR' }),
+        ...(offers.availability && { availability: `https://schema.org/${offers.availability}` }),
+      },
+    }),
+    // AEO: Event information for voice search
+    about: {
+      '@type': 'Thing',
+      name: `Evento en ${venue.title}`,
+    },
+  };
+}
+
+/**
+ * Generate enhanced FAQ JSON-LD with voice search patterns
  */
 export function faqJsonLd(faqs: FAQ[]): FAQJsonLd | null {
   if (!faqs || faqs.length === 0) return null;
 
-  return {
+  const faqSchema = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     mainEntity: faqs.map((faq) => ({
       '@type': 'Question',
       name: faq.question,
+      text: faq.question,
+      answerCount: 1,
       acceptedAnswer: {
         '@type': 'Answer',
         text: faq.answer,
+        // AEO: Mark answers as speakable for voice assistants
+        speakable: {
+          '@type': 'SpeakableSpecification',
+          cssSelector: ['.faq-answer', '.answer-text'],
+        },
       },
     })),
+  } as FAQJsonLd;
+  
+  // Add AEO optimizations as additional properties
+  (faqSchema as any).speakable = {
+    '@type': 'SpeakableSpecification',
+    cssSelector: ['.faq-section', '.faq-question', '.faq-answer'],
   };
+  (faqSchema as any).about = {
+    '@type': 'Thing',
+    name: 'Preguntas frecuentes',
+  };
+  
+  return faqSchema;
 }
 
 /**
