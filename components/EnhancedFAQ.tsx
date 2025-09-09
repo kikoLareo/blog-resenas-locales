@@ -111,7 +111,7 @@ export default function EnhancedFAQ({
               <div className="text-xs text-blue-700 space-y-1">
                 {voiceSearchExamples.slice(0, 2).map((example, index) => (
                   <div key={index} className="italic">
-                    "Hey Google, {example}"
+                    &ldquo;Hey Google, {example}&rdquo;
                   </div>
                 ))}
               </div>
@@ -236,7 +236,7 @@ export default function EnhancedFAQ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-600">
                 {voiceSearchExamples.map((example, index) => (
                   <div key={index} className="italic bg-gray-50 p-2 rounded">
-                    "{example}"
+                    &ldquo;{example}&rdquo;
                   </div>
                 ))}
               </div>

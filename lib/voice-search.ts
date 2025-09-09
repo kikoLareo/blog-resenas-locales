@@ -81,10 +81,15 @@ export function generateVoiceSearchDescription(venue: Venue): string {
   const categoryText = venue.categories.map(c => c.title.toLowerCase()).join(' y ');
   const priceText = getPriceText(venue.priceRange);
   
-  return `¿Buscas un buen ${categoryText} en ${venue.city.title}? ` +
+  let description = `¿Buscas un buen ${categoryText} en ${venue.city.title}? ` +
          `${venue.title} es ${priceText} y está ubicado en ${venue.address}. ` +
-         `Descubre horarios, precios, cómo llegar y reseñas honestas. ` +
-         `${venue.phone ? 'Teléfono para reservas incluido.' : ''}`.slice(0, 160);
+         `Descubre horarios, precios, cómo llegar y reseñas honestas.`;
+         
+  if (venue.phone) {
+    description += ` Tel: ${venue.phone}`;
+  }
+  
+  return description.slice(0, 160);
 }
 
 /**
