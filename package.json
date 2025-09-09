@@ -20,8 +20,13 @@
     "create-admin": "tsx scripts/create-admin.ts",
     "generate-password": "node scripts/generate-password.js",
     "performance": "node scripts/performance-test.js",
+    "performance:monitor": "node scripts/performance-monitor.js",
+    "performance:bundle": "node scripts/performance-monitor.js bundle",
     "check-env": "node scripts/check-env.js",
-    "generate-secret": "node scripts/generate-nextauth-secret.js"
+    "generate-secret": "node scripts/generate-nextauth-secret.js",
+    "analyze": "ANALYZE=true npm run build",
+    "analyze:server": "BUNDLE_ANALYZE=server npm run build",
+    "analyze:browser": "BUNDLE_ANALYZE=browser npm run build"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
@@ -69,6 +74,7 @@
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^15.5.2",
     "@playwright/test": "^1.46.1",
     "@tailwindcss/typography": "^0.5.16",
     "@testing-library/dom": "^10.4.1",
@@ -94,6 +100,7 @@
     "tailwindcss": "^3.4.9",
     "tsx": "^4.20.4",
     "typescript": "^5.5.4",
-    "vitest": "^2.0.5"
+    "vitest": "^2.0.5",
+    "webpack-bundle-analyzer": "^4.10.2"
   }
 }
