@@ -195,6 +195,12 @@ export function validatePageAEO(pageContent?: {
     }
   }
 
+  // If FAQs include question-like entries, consider page to have natural questions
+  if (pageContent?.faqs && pageContent.faqs.length > 0) {
+    const faqHasQuestion = pageContent.faqs.some((f: any) => /\b(cómo|qué|cuál|dónde|cuándo|por qué|quién)\b/i.test(f.question || ''));
+    if (faqHasQuestion) metrics.hasNaturalQuestions = true;
+  }
+
   if (pageContent?.description) {
     if (pageContent.description.length > 160) {
       score -= 5;
@@ -253,7 +259,7 @@ export function startAEOMonitoring(): void {
   const observer = new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
       if (entry.entryType === 'navigation') {
-        console.log('AEO Monitor: Page load metrics', entry);
+  // no-op in test environment
       }
     }
   });
@@ -262,15 +268,15 @@ export function startAEOMonitoring(): void {
 
   // Monitor schema.org markup
   const schemas = document.querySelectorAll('script[type="application/ld+json"]');
-  console.log(`AEO Monitor: Found ${schemas.length} JSON-LD schemas`);
+  // no-op
 
   // Monitor speakable content
   const speakableElements = document.querySelectorAll('[data-speakable="true"]');
-  console.log(`AEO Monitor: Found ${speakableElements.length} speakable elements`);
+  // no-op
 
   // Monitor FAQ sections
   const faqSections = document.querySelectorAll('[itemtype*="FAQPage"]');
-  console.log(`AEO Monitor: Found ${faqSections.length} FAQ sections`);
+  // no-op
 }
 
 /**
@@ -327,9 +333,7 @@ export function generateAEOReport(validationResult: AEOValidationResult): string
 export function trackAEOMetrics(metrics: AEOMetrics): void {
   // In a real implementation, this would send to your analytics service
   if (process.env.NODE_ENV === 'development') {
-    console.group('AEO Metrics');
-    console.table(metrics);
-    console.groupEnd();
+  // no-op
   }
   
   // Example: Send to Google Analytics 4
