@@ -276,8 +276,9 @@ export function qaPageJsonLd(
 
 /**
  * Generate HowTo JSON-LD for step-by-step guides (restaurant visits, etc.)
+ * Renamed to avoid duplicate export.
  */
-export function howToJsonLd(
+export function basicHowToJsonLd(
   name: string,
   description: string,
   steps: Array<{ name: string; text: string; image?: string }>,
@@ -370,7 +371,7 @@ export function menuSectionJsonLd(
 /**
  * Generate Event JSON-LD for restaurant events and promotions
  */
-export function eventJsonLd(
+export function basicEventJsonLd(
   name: string,
   description: string,
   startDate: string,
@@ -925,7 +926,12 @@ export function enhancedLocalBusinessJsonLd(venue: Venue): LocalBusinessJsonLd &
   const baseSchema = localBusinessJsonLd(venue);
   
   // Add voice search optimization
-  const enhanced = {
+  const enhanced: LocalBusinessJsonLd & {
+    speakable?: SpeakableSpecificationJsonLd;
+    contactPoint?: ContactPointJsonLd[];
+    openingHoursSpecification?: OpeningHoursSpecificationJsonLd[];
+    serviceArea?: ServiceAreaJsonLd;
+  } = {
     ...baseSchema,
     speakable: speakableSpecificationJsonLd(),
   };
@@ -1013,7 +1019,9 @@ export function menuJsonLd(
     name: `Menú de ${venue.title}`,
     description: `Carta completa del restaurante ${venue.title} en ${venue.city.title}`,
     provider: {
-      '@type': venue.schemaType,
+      '@type': venue.schemaType === 'Restaurant' || venue.schemaType === 'LocalBusiness'
+        ? venue.schemaType
+        : 'LocalBusiness',
       name: venue.title,
     },
     hasMenuSection: menuData.sections.map(section => ({
