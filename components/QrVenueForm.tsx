@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { validatePhone } from "@/lib/phone-validation";
 
 interface QRVenueFormProps {
   venueId: string;
@@ -28,9 +29,20 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
 
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate phone before submitting
+    if (formData.phone.trim()) {
+      const phoneValidation = validatePhone(formData.phone);
+      if (!phoneValidation.isValid) {
+        setPhoneError(phoneValidation.error || "Formato de teléfono no válido");
+        return;
+      }
+    }
+    
     setSubmitting(true);
 
     try {
@@ -79,11 +91,19 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
     );
   }
 
+  const handlePhoneChange = (value: string) => {
+    setFormData({ ...formData, phone: value });
+    // Clear phone error when user starts typing
+    if (phoneError) {
+      setPhoneError("");
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" role="form" aria-labelledby="qr-form-title">
       {/* Información personal */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
+        <h3 id="qr-form-title" className="text-lg font-semibold text-gray-900 border-b pb-2">
           Información personal
         </h3>
         
@@ -96,6 +116,8 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="Tu nombre completo"
               required
+              aria-required="true"
+              aria-describedby="name-error"
             />
           </div>
 
@@ -107,7 +129,9 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               placeholder="tu@email.com"
+              aria-describedby="email-help"
             />
+            <p id="email-help" className="text-sm text-gray-500">Opcional - para confirmaciones</p>
           </div>
 
           <div>
@@ -116,9 +140,19 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
               id="phone"
               type="tel"
               value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              onChange={(e) => handlePhoneChange(e.target.value)}
               placeholder="+34 600 000 000"
+              aria-describedby="phone-help phone-error"
+              aria-invalid={phoneError ? "true" : "false"}
             />
+            <p id="phone-help" className="text-sm text-gray-500">
+              Opcional - Formato: +34 XXX XXX XXX (España) o +XX XXX XXX XXX (internacional)
+            </p>
+            {phoneError && (
+              <p id="phone-error" className="text-sm text-red-600" role="alert">
+                {phoneError}
+              </p>
+            )}
           </div>
 
           <div>
@@ -128,7 +162,11 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
               onValueChange={(value) => setFormData({ ...formData, partySize: value })}
               required
             >
-              <SelectTrigger>
+              <SelectTrigger 
+                id="partySize"
+                aria-required="true"
+                aria-describedby="partySize-error"
+              >
                 <SelectValue placeholder="Seleccionar" />
               </SelectTrigger>
               <SelectContent>
@@ -160,6 +198,7 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
               value={formData.visitDate}
               onChange={(e) => setFormData({ ...formData, visitDate: e.target.value })}
               required
+              aria-required="true"
             />
           </div>
 
@@ -170,7 +209,9 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
               type="time"
               value={formData.visitTime}
               onChange={(e) => setFormData({ ...formData, visitTime: e.target.value })}
+              aria-describedby="visitTime-help"
             />
+            <p id="visitTime-help" className="text-sm text-gray-500">Opcional</p>
           </div>
 
           <div>
@@ -179,7 +220,7 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
               value={formData.occasion}
               onValueChange={(value) => setFormData({ ...formData, occasion: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger id="occasion" aria-describedby="occasion-help">
                 <SelectValue placeholder="Seleccionar ocasión" />
               </SelectTrigger>
               <SelectContent>
@@ -191,6 +232,7 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
                 <SelectItem value="other">Otra</SelectItem>
               </SelectContent>
             </Select>
+            <p id="occasion-help" className="text-sm text-gray-500">Opcional</p>
           </div>
 
           <div>
@@ -199,7 +241,7 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
               value={formData.rating}
               onValueChange={(value) => setFormData({ ...formData, rating: value })}
             >
-              <SelectTrigger>
+              <SelectTrigger id="rating" aria-describedby="rating-help">
                 <SelectValue placeholder="Seleccionar" />
               </SelectTrigger>
               <SelectContent>
@@ -209,6 +251,7 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
                 <SelectItem value="frequent">Cliente frecuente</SelectItem>
               </SelectContent>
             </Select>
+            <p id="rating-help" className="text-sm text-gray-500">Opcional</p>
           </div>
         </div>
       </div>
@@ -227,7 +270,11 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
             onChange={(e) => setFormData({ ...formData, specialRequests: e.target.value })}
             placeholder="Alergias, preferencias de mesa, ocasión especial, etc."
             rows={3}
+            aria-describedby="specialRequests-help"
           />
+          <p id="specialRequests-help" className="text-sm text-gray-500">
+            Opcional - Compártenos cualquier información que nos ayude a mejorar tu experiencia
+          </p>
         </div>
       </div>
 
@@ -245,7 +292,11 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
             onChange={(e) => setFormData({ ...formData, feedback: e.target.value })}
             placeholder="¿Qué te gustaría ver mejorado? ¿Alguna sugerencia?"
             rows={3}
+            aria-describedby="feedback-help"
           />
+          <p id="feedback-help" className="text-sm text-gray-500">
+            Opcional - Tu opinión es muy valiosa para nosotros
+          </p>
         </div>
       </div>
 
@@ -255,9 +306,13 @@ export default function QRVenueForm({ venueId, venueName, qrCode }: QRVenueFormP
           type="submit"
           disabled={submitting}
           className="bg-blue-600 hover:bg-blue-700 text-white"
+          aria-describedby="submit-help"
         >
           {submitting ? "Enviando..." : "Enviar información"}
         </Button>
+        <p id="submit-help" className="sr-only">
+          Enviar formulario de información para mejorar tu experiencia en {venueName}
+        </p>
       </div>
 
       <div className="text-xs text-gray-500 text-center">
