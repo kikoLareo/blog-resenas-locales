@@ -16,6 +16,7 @@ interface EnhancedFAQProps extends React.HTMLAttributes<HTMLElement> {
   contextData?: { name?: string; cityName?: string };
   showVoiceSearchHint?: boolean;
   showStructuredData?: boolean;
+  'data-testid'?: string;
 }
 
 export default function EnhancedFAQ({ 
@@ -78,16 +79,16 @@ export default function EnhancedFAQ({
     '¿Necesito reserva para este restaurante?'
   ];
 
-  return (
     <section 
       className={`enhanced-faq ${className}`}
       aria-labelledby="faq-heading"
       role="region"
       itemScope
       itemType="https://schema.org/FAQPage"
-      data-testid={rest['data-testid'] as string ?? 'enhanced-faq'}
+      data-testid={rest['data-testid'] ?? 'enhanced-faq'}
       {...rest}
     >
+    
       {/* JSON-LD Schema for Voice Search */}
       {faqSchema && (
         <script
