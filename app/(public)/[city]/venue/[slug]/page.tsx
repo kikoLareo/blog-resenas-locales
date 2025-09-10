@@ -6,7 +6,7 @@ import { VenueBreadcrumbs } from '@/components/Breadcrumbs';
 import LocalInfo from '@/components/LocalInfo';
 import Gallery from '@/components/Gallery';
 import { MultiScore, CompactScore } from '@/components/ScoreBar';
-import FAQ from '@/components/Faq';
+import FAQ from '@/components/FAQ';
 import { SidebarAd, InArticleAd } from '@/components/AdSlot';
 import { Venue, Review } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';

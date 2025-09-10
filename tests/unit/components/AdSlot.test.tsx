@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import AdSlot, { HeaderAd, SidebarAd, InArticleAd, FooterAd } from '@/components/AdSlot';
+import AdSlot, { HeaderAd, SidebarAd, InArticleAd, FooterAd } from '../../../components/AdSlot';
 
 // Mock consent system
 vi.mock('@/lib/consent', () => ({
@@ -88,7 +88,7 @@ describe('AdSlot Component - CLS Prevention & Consent', () => {
 
   describe('With Consent', () => {
     beforeEach(async () => {
-      const { hasConsent } = await import('@/lib/consent');
+      const { hasConsent } = await import('../../../lib/consent');
       vi.mocked(hasConsent).mockReturnValue(true);
     });
 
@@ -136,7 +136,7 @@ describe('AdSlot Component - CLS Prevention & Consent', () => {
 
   describe('Higher-order Components', () => {
     beforeEach(async () => {
-      const { hasConsent } = await import('@/lib/consent');
+      const { hasConsent } = await import('../../../lib/consent');
       vi.mocked(hasConsent).mockReturnValue(false); // Test without consent
     });
 
