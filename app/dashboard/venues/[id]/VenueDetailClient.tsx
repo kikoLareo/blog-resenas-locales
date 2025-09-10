@@ -83,18 +83,41 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
   const handleSave = async () => {
     setIsLoading(true);
     try {
+      // Validate required fields
+      if (!formData.title || !formData.title.toString().trim() || !formData.address || !formData.address.toString().trim()) {
+        setIsLoading(false);
+        window.alert('Título y dirección son campos requeridos');
+        return;
+      }
+
       // Validate phone number
       if (formData.phone && !validatePhoneNumber(formData.phone)) {
-        setPhoneError("Formato de teléfono inválido");
+        setPhoneError('Formato de teléfono inválido');
         setIsLoading(false);
         return;
       }
-      setPhoneError("");
+      setPhoneError('');
 
-      // Here would go the logic to save to Sanity
+      // Call API to update venue
+      const res = await fetch(`/api/admin/venues/${venue._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...formData, images }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        window.alert(data?.error || 'Error al actualizar');
+        return;
+      }
+
+      // Close modal on success
       setIsEditModalOpen(false);
     } catch (error) {
-      console.error('Error saving venue:', error);
+      window.alert((error as any)?.message || 'Error al actualizar');
     } finally {
       setIsLoading(false);
     }
