@@ -75,10 +75,8 @@ export default function NewVenuePage() {
           const data = await response.json();
           setCategories(data);
         } else {
-          console.error('Failed to fetch categories:', response.statusText);
         }
       } catch (error) {
-        console.error('Error fetching categories:', error);
       } finally {
         setLoadingCategories(false);
       }

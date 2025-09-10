@@ -18,13 +18,11 @@ async function fetchFeaturedItems() {
     }
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Error fetching featured items:', response.statusText);
     }
     return [];
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Error fetching featured items:', error);
     }
     return [];
   }
@@ -44,13 +42,11 @@ async function toggleFeaturedItemStatus(id: string, isActive: boolean) {
     }
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Error toggling featured item status:', response.statusText);
     }
     return null;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Error toggling featured item status:', error);
     }
     return null;
   }
@@ -70,13 +66,11 @@ async function createFeaturedItem(item: any) {
     }
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Error creating featured item:', response.statusText);
     }
     return null;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Error creating featured item:', error);
     }
     return null;
   }
@@ -96,13 +90,11 @@ async function updateFeaturedItem(id: string, item: any) {
     }
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Error updating featured item:', response.statusText);
     }
     return null;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Error updating featured item:', error);
     }
     return null;
   }
@@ -118,13 +110,11 @@ async function deleteFeaturedItem(id: string) {
     }
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Error deleting featured item:', response.statusText);
     }
     return null;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Error deleting featured item:', error);
     }
     return null;
   }
@@ -144,13 +134,11 @@ async function reorderFeaturedItems(items: any[]) {
     }
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Error reordering featured items:', response.statusText);
     }
     return null;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       // eslint-disable-next-line no-console
-      console.error('Error reordering featured items:', error);
     }
     return null;
   }

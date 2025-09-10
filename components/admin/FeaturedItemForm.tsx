@@ -89,7 +89,6 @@ async function fetchReferences(type: 'review' | 'venue' | 'category' | 'collecti
     if (error instanceof Error && error.name === 'AbortError') {
       return { data: [], error: null }; // Don't treat aborted requests as errors
     }
-    console.error('Error fetching references:', error);
     
     // More specific error messages
     let errorMessage = 'Error desconocido al cargar referencias';
@@ -228,7 +227,6 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
         currentRequestTypeRef.current === type && 
         !abortControllerRef.current.signal.aborted
       ) {
-        console.error('Unexpected error in loadReferences:', error);
         setApiError(error instanceof Error ? error.message : 'Error inesperado al cargar referencias');
         setLoadingReferences(false);
       }
@@ -361,7 +359,6 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
     } catch (error) {
       // Only update error state if component is still mounted
       if (isMountedRef.current) {
-        console.error('Error saving featured item:', error);
         let errorMessage = 'Error al guardar el elemento destacado';
         
         if (error instanceof Error) {

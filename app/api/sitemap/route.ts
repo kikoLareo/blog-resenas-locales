@@ -54,7 +54,6 @@ export async function GET() {
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Error generando sitemap principal:', error);
     
     return NextResponse.json(
       { error: 'Error generando sitemap' },

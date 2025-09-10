@@ -84,7 +84,6 @@ export async function getAllFeaturedItems(): Promise<FeaturedItem[]> {
     const items = await adminSanityClient.fetch(query);
     return items || [];
   } catch (error) {
-    console.error('Error fetching featured items:', error);
     return [];
   }
 }
@@ -114,7 +113,6 @@ export async function getFeaturedItemById(id: string): Promise<FeaturedItem | nu
     const item = await adminSanityClient.fetch(query, { id });
     return item || null;
   } catch (error) {
-    console.error('Error fetching featured item by ID:', error);
     return null;
   }
 }
@@ -145,7 +143,6 @@ export async function getActiveFeaturedItems(limit?: number): Promise<FeaturedIt
     const items = await adminSanityClient.fetch(query);
     return items || [];
   } catch (error) {
-    console.error('Error fetching active featured items:', error);
     return [];
   }
 }
@@ -194,7 +191,6 @@ export async function createFeaturedItem(data: CreateFeaturedItemData): Promise<
     
     return result as unknown as FeaturedItem;
   } catch (error) {
-    console.error('Error creating featured item:', error);
     return null;
   }
 }
@@ -249,7 +245,6 @@ export async function updateFeaturedItem(data: UpdateFeaturedItemData): Promise<
     
     return result as unknown as FeaturedItem;
   } catch (error) {
-    console.error('Error updating featured item:', error);
     return null;
   }
 }
@@ -263,7 +258,6 @@ export async function deleteFeaturedItem(id: string): Promise<boolean> {
     
     return true;
   } catch (error) {
-    console.error('Error deleting featured item:', error);
     return false;
   }
 }
@@ -285,7 +279,6 @@ export async function updateFeaturedItemOrder(items: { _id: string; order: numbe
     
     return true;
   } catch (error) {
-    console.error('Error updating featured items order:', error);
     return false;
   }
 }
@@ -302,7 +295,6 @@ export async function toggleFeaturedItemStatus(id: string, isActive: boolean): P
     
     return true;
   } catch (error) {
-    console.error('Error toggling featured item status:', error);
     return false;
   }
 }
@@ -351,7 +343,6 @@ export async function getReferencesForSelect(type: 'review' | 'venue' | 'categor
     const items = await adminSanityClient.fetch(query);
     return items || [];
   } catch (error) {
-    console.error(`Error fetching ${type} references:`, error);
     return [];
   }
 }
@@ -374,7 +365,6 @@ export async function getFeaturedItemsStats() {
     const stats = await adminSanityClient.fetch(query);
     return stats;
   } catch (error) {
-    console.error('Error fetching featured items stats:', error);
     return {
       total: 0,
       active: 0,

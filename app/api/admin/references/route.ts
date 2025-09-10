@@ -17,7 +17,6 @@ export async function GET(request: NextRequest) {
     const references = await getReferencesForSelect(type);
     return NextResponse.json(references);
   } catch (error) {
-    console.error('Error in GET /api/admin/references:', error);
     return NextResponse.json(
       { error: 'Error fetching references' },
       { status: 500 }

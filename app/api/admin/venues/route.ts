@@ -35,7 +35,6 @@ export async function GET() {
 
     return NextResponse.json(venues);
   } catch (error) {
-    console.error('Error fetching venues:', error);
     return NextResponse.json(
       { error: 'Error al obtener locales' }, 
       { status: 500 }
@@ -103,7 +102,6 @@ export async function POST(request: NextRequest) {
       message: 'Local creado exitosamente' 
     });
   } catch (error) {
-    console.error('Error creating venue:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' }, 
       { status: 500 }
@@ -164,7 +162,6 @@ export async function PUT(request: NextRequest) {
       message: 'Local actualizado exitosamente' 
     });
   } catch (error) {
-    console.error('Error updating venue:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' }, 
       { status: 500 }
@@ -216,7 +213,6 @@ export async function DELETE(request: NextRequest) {
       message: 'Local eliminado exitosamente' 
     });
   } catch (error) {
-    console.error('Error deleting venue:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' }, 
       { status: 500 }

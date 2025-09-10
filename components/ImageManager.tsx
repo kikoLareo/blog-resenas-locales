@@ -91,7 +91,6 @@ export default function ImageManager({
       onImagesChange(updatedImages);
 
     } catch (error) {
-      console.error('Error uploading images:', error);
       alert('Error al subir las imágenes. Por favor, inténtalo de nuevo.');
     } finally {
       setUploading(false);

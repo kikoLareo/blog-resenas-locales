@@ -29,7 +29,6 @@ export default function CitiesPage() {
         setCities(data);
         setFilteredCities(data);
       } catch (error) {
-        console.error('Error fetching cities:', error);
       } finally {
         setLoading(false);
       }

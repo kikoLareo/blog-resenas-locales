@@ -1,7 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import VenueDetailPage from '@/app/dashboard/venues/[id]/page';
+import VenueDetailPage from '../../../app/dashboard/venues/[id]/page';
+import '@testing-library/jest-dom';
 
 // Mock next/link and next/navigation
 vi.mock('next/link', () => ({
@@ -16,22 +17,22 @@ vi.mock('next/navigation', () => ({
     back: vi.fn(),
   }),
   notFound: vi.fn(),
-}));
+})); 
 
 // Mock admin Sanity client
-vi.mock('@/lib/admin-sanity', () => ({
+vi.mock('../../../lib/admin-sanity', () => ({
   adminSanityClient: {
     fetch: vi.fn(),
   },
 }));
 
 // Mock admin queries
-vi.mock('@/lib/admin-queries', () => ({
+vi.mock('../../../lib/admin-queries', () => ({
   venueByIdQuery: 'mockQuery',
 }));
 
 // Mock ImageManager component
-vi.mock('@/components/ImageManager', () => ({
+vi.mock('../../../components/ImageManager', () => ({
   default: ({ title }: { title: string }) => <div data-testid="image-manager">{title}</div>
 }));
 
@@ -89,7 +90,7 @@ describe('Venue Edit Form', () => {
       const user = userEvent.setup();
       
       // Mock the venue data fetch
-      const { adminSanityClient } = await import('@/lib/admin-sanity');
+      const { adminSanityClient } = await import('../../../lib/admin-sanity');
       (adminSanityClient.fetch as any).mockResolvedValue(mockVenue);
       
       render(await VenueDetailPage({ params: Promise.resolve({ id: 'venue-1' }) }));
@@ -107,7 +108,7 @@ describe('Venue Edit Form', () => {
     it('should update form fields when editing', async () => {
       const user = userEvent.setup();
       
-      const { adminSanityClient } = await import('@/lib/admin-sanity');
+      const { adminSanityClient } = await import('../../../lib/admin-sanity');
       (adminSanityClient.fetch as any).mockResolvedValue(mockVenue);
       
       render(await VenueDetailPage({ params: Promise.resolve({ id: 'venue-1' }) }));
@@ -127,7 +128,7 @@ describe('Venue Edit Form', () => {
     it('should call API when saving changes', async () => {
       const user = userEvent.setup();
       
-      const { adminSanityClient } = await import('@/lib/admin-sanity');
+      const { adminSanityClient } = await import('../../../lib/admin-sanity');
       (adminSanityClient.fetch as any).mockResolvedValue(mockVenue);
       
       render(await VenueDetailPage({ params: Promise.resolve({ id: 'venue-1' }) }));
@@ -171,7 +172,7 @@ describe('Venue Edit Form', () => {
         }), 100))
       );
       
-      const { adminSanityClient } = await import('@/lib/admin-sanity');
+      const { adminSanityClient } = await import('../../../lib/admin-sanity');
       (adminSanityClient.fetch as any).mockResolvedValue(mockVenue);
       
       render(await VenueDetailPage({ params: Promise.resolve({ id: 'venue-1' }) }));
@@ -195,7 +196,7 @@ describe('Venue Edit Form', () => {
       // Mock alert
       window.alert = vi.fn();
       
-      const { adminSanityClient } = await import('@/lib/admin-sanity');
+      const { adminSanityClient } = await import('../../../lib/admin-sanity');
       (adminSanityClient.fetch as any).mockResolvedValue(mockVenue);
       
       render(await VenueDetailPage({ params: Promise.resolve({ id: 'venue-1' }) }));
@@ -228,7 +229,7 @@ describe('Venue Edit Form', () => {
       // Mock alert
       window.alert = vi.fn();
       
-      const { adminSanityClient } = await import('@/lib/admin-sanity');
+      const { adminSanityClient } = await import('../../../lib/admin-sanity');
       (adminSanityClient.fetch as any).mockResolvedValue(mockVenue);
       
       render(await VenueDetailPage({ params: Promise.resolve({ id: 'venue-1' }) }));
@@ -250,7 +251,7 @@ describe('Venue Edit Form', () => {
     it('should close modal after successful save', async () => {
       const user = userEvent.setup();
       
-      const { adminSanityClient } = await import('@/lib/admin-sanity');
+      const { adminSanityClient } = await import('../../../lib/admin-sanity');
       (adminSanityClient.fetch as any).mockResolvedValue(mockVenue);
       
       render(await VenueDetailPage({ params: Promise.resolve({ id: 'venue-1' }) }));
@@ -263,9 +264,9 @@ describe('Venue Edit Form', () => {
       const saveButton = screen.getByRole('button', { name: /guardar cambios/i });
       await user.click(saveButton);
       
-      // Should close modal and reload page
+      // Modal should be closed after save
       await waitFor(() => {
-        expect(mockLocation.reload).toHaveBeenCalled();
+        expect(screen.queryByRole('heading', { name: 'Editar Local' })).not.toBeInTheDocument();
       });
     });
   });

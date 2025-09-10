@@ -42,7 +42,6 @@ export default function VenuesPage() {
         setVenues(data || []);
         setFilteredVenues(data || []);
       } catch (error) {
-        console.error('Error fetching venues:', error);
         setError('Error al cargar los locales');
         setVenues([]);
         setFilteredVenues([]);

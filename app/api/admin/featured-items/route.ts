@@ -20,7 +20,6 @@ export async function GET(request: NextRequest) {
     const items = await getAllFeaturedItems();
     return NextResponse.json(items);
   } catch (error) {
-    console.error('Error in GET /api/admin/featured-items:', error);
     return NextResponse.json(
       { error: 'Error fetching featured items' },
       { status: 500 }
@@ -44,7 +43,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    console.error('Error in POST /api/admin/featured-items:', error);
     return NextResponse.json(
       { error: 'Error creating featured item' },
       { status: 500 }
@@ -75,7 +73,6 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in PATCH /api/admin/featured-items:', error);
     return NextResponse.json(
       { error: 'Error updating items order' },
       { status: 500 }

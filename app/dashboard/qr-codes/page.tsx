@@ -42,7 +42,6 @@ export default function QRCodesPage() {
         setQrCodes(data);
         setFilteredQrCodes(data);
       } catch (error) {
-        console.error('Error fetching QR codes:', error);
       } finally {
         setLoading(false);
       }
@@ -90,7 +89,6 @@ export default function QRCodesPage() {
         qr._id === qrCodeId ? { ...qr, isActive: !currentStatus } : qr
       ));
     } catch (error) {
-      console.error('Error updating QR code status:', error);
     }
   };
 

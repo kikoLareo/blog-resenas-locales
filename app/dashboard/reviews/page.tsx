@@ -42,13 +42,10 @@ export default function ReviewsPage() {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        console.log('Fetching reviews with query:', reviewsListQuery);
         const data = await adminSanityClient.fetch<Review[]>(reviewsListQuery);
-        console.log('Fetched reviews:', data);
         setReviews(data);
         setFilteredReviews(data);
       } catch (error) {
-        console.error('Error fetching reviews:', error);
       } finally {
         setLoading(false);
       }

@@ -25,14 +25,12 @@ export default function NewCityPage() {
 
     try {
       // Aquí iría la lógica para crear la ciudad en Sanity
-      console.log('Creando ciudad:', formData);
       
       // Simular creación exitosa
       setTimeout(() => {
         router.push('/dashboard/cities');
       }, 1000);
     } catch (error) {
-      console.error('Error creating city:', error);
     } finally {
       setLoading(false);
     }

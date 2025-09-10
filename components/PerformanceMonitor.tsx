@@ -115,13 +115,6 @@ export function PerformanceMonitor() {
 
     // Log métricas después de 3 segundos
     setTimeout(() => {
-      console.log('🚀 Core Web Vitals:', {
-        LCP: `${window.webVitals.lcp.toFixed(0)}ms`,
-        FCP: `${window.webVitals.fcp.toFixed(0)}ms`,
-        CLS: window.webVitals.cls.toFixed(3),
-        TTFB: `${window.webVitals.ttfb.toFixed(0)}ms`,
-        FID: `${window.webVitals.fid.toFixed(0)}ms`,
-      });
 
       // Enviar métricas a analytics si están disponibles
       if (typeof window.gtag !== 'undefined') {

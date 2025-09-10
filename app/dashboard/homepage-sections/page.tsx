@@ -287,7 +287,6 @@ export default function HomepageSectionsPage() {
           }
         }
       } catch (error) {
-        console.error('Error loading configuration:', error);
       } finally {
         setLoading(false);
       }
@@ -379,12 +378,9 @@ export default function HomepageSectionsPage() {
 
       if (response.ok) {
         setHasChanges(false);
-        console.log('Configuración guardada exitosamente');
       } else {
-        console.error('Error al guardar configuración');
       }
     } catch (error) {
-      console.error('Error guardando:', error);
     } finally {
       setSaving(false);
     }
