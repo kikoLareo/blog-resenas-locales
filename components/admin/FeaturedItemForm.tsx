@@ -14,6 +14,7 @@ import { X, Save, Eye, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 
 import { FeaturedItemPreview } from './FeaturedItemPreview';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { isValidUrl, getUrlErrorMessage } from '@/lib/validation';
 
 interface FeaturedItem {
   _id: string;
@@ -21,6 +22,7 @@ interface FeaturedItem {
   type: 'review' | 'venue' | 'category' | 'collection' | 'guide';
   customTitle?: string;
   customDescription?: string;
+  customUrl?: string;
   isActive: boolean;
   order: number;
   reviewRef?: { title: string; venue?: { title: string; slug: { current: string } } };
@@ -116,6 +118,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
   const [apiError, setApiError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [urlError, setUrlError] = useState<string>("");
   const abortControllerRef = useRef<AbortController | null>(null);
   const typeChangeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentRequestTypeRef = useRef<string>(''); // Track current request type to prevent race conditions
@@ -126,6 +129,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
     customTitle: string;
     customDescription: string;
     customCTA: string;
+    customUrl: string;
     isActive: boolean;
     order: number;
     selectedReference: string;
@@ -135,6 +139,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
     customTitle: '',
     customDescription: '',
     customCTA: '',
+    customUrl: '',
     isActive: true,
     order: 1,
     selectedReference: ''
@@ -177,6 +182,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
         customTitle: item.customTitle || '',
         customDescription: item.customDescription || '',
         customCTA: '',
+        customUrl: item.customUrl || '',
         isActive: item.isActive,
         order: item.order,
         selectedReference: getSelectedReference(item)
@@ -184,6 +190,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
       // Clear any previous errors when loading a new item
       setApiError(null);
       setValidationErrors({});
+      setUrlError('');
     }
   }, [item, getSelectedReference]);
 
@@ -293,6 +300,11 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
       errors.order = 'El orden debe ser mayor a 0';
     }
     
+    // Validate custom URL if provided
+    if (formData.customUrl && !isValidUrl(formData.customUrl)) {
+      errors.customUrl = getUrlErrorMessage(formData.customUrl);
+    }
+    
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -308,6 +320,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
     // Clear previous validation errors
     setValidationErrors({});
     setApiError(null);
+    setUrlError('');
     
     // Validate form
     if (!validateForm()) {
@@ -345,6 +358,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
         type: formData.type,
         customTitle: formData.customTitle,
         customDescription: formData.customDescription,
+        customUrl: formData.customUrl,
         isActive: formData.isActive,
         order: formData.order,
         _createdAt: item?._createdAt || new Date().toISOString(),
@@ -415,6 +429,11 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
     if (apiError && fieldName === 'title') {
       setApiError(null);
     }
+    
+    // Clear URL error when user starts typing in URL field
+    if (urlError && fieldName === 'customUrl') {
+      setUrlError('');
+    }
   };
 
   const handlePreview = () => {
@@ -442,6 +461,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
       type: formData.type,
       customTitle: formData.customTitle,
       customDescription: formData.customDescription,
+      customUrl: formData.customUrl,
       isActive: formData.isActive,
       order: formData.order,
       _createdAt: new Date().toISOString(),
@@ -462,6 +482,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
         type: formData.type,
         customTitle: formData.customTitle,
         customDescription: formData.customDescription,
+        customUrl: formData.customUrl,
         isActive: formData.isActive,
         order: formData.order,
         _createdAt: new Date().toISOString(),
@@ -648,6 +669,30 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
                     rows={3}
                   />
                   <p className="text-sm text-gray-500">Máximo 200 caracteres. Si se deja vacía, se usará la descripción original</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="customUrl">URL Personalizada (Opcional)</Label>
+                  <Input
+                    id="customUrl"
+                    type="url"
+                    value={formData.customUrl}
+                    onChange={(e) => {
+                      setFormData(prev => ({ ...prev, customUrl: e.target.value }));
+                      clearFieldError('customUrl');
+                    }}
+                    placeholder="https://www.ejemplo.com"
+                    aria-describedby="customUrl-help customUrl-error"
+                    className={validationErrors.customUrl ? 'border-destructive' : ''}
+                  />
+                  <p id="customUrl-help" className="text-sm text-gray-500">
+                    URL externa personalizada (ej: sitio web del local)
+                  </p>
+                  {validationErrors.customUrl && (
+                    <p id="customUrl-error" className="text-sm text-destructive" role="alert">
+                      {validationErrors.customUrl}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
