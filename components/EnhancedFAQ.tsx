@@ -79,6 +79,7 @@ export default function EnhancedFAQ({
     '¿Necesito reserva para este restaurante?'
   ];
 
+  return (
     <section 
       className={`enhanced-faq ${className}`}
       aria-labelledby="faq-heading"
@@ -279,7 +280,7 @@ function formatAnswerForVoiceSearch(answer: string): string {
     // Add proper paragraph breaks
     .replace(/\. ([A-Z])/g, '.</p><p>$1')
     // Wrap in paragraph tags if not already wrapped
-    .replace(/^(?!<p>)(.+)(?!<\/p>)$/s, '<p>$1</p>')
+    .replace(/^(?!<p>)([\s\S]+)(?!<\/p>)$/, '<p>$1</p>')
     // Add emphasis to key phrases
     .replace(/\b(recomendamos|importante|esencial|obligatorio|siempre)\b/gi, '<strong>$1</strong>')
     // Add semantic emphasis to numbers and ranges
