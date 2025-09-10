@@ -8,7 +8,7 @@ import {
   CurrencyEuroIcon,
   StarIcon,
   GlobeAltIcon,
-  ExternalLinkIcon
+  ArrowTopRightOnSquareIcon
 } from '@heroicons/react/24/outline';
 import { Venue, Review } from '@/lib/types';
 
@@ -264,7 +264,7 @@ export default function InfoSummaryBox({
                 className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
               >
                 <GlobeAltIcon className="w-4 h-4" />
-                <ExternalLinkIcon className="w-3 h-3" />
+                <ArrowTopRightOnSquareIcon className="w-3 h-3" />
                 Web
               </Link>
             )}
