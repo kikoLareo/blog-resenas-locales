@@ -103,6 +103,11 @@ export interface Ratings {
 export interface FAQ {
   question: string;
   answer: string;
+  // AEO enhancements
+  questionVariations?: string[];
+  answerFormat?: 'paragraph' | 'list' | 'direct';
+  voiceOptimized?: boolean;
+  featuredSnippetReady?: boolean;
 }
 
 export interface Review {
@@ -619,4 +624,151 @@ export interface HomepageData {
     description?: string;
     venueCount?: number;
   }>;
+}
+
+// ========================================
+// AEO (Answer Engine Optimization) Types
+// ========================================
+
+// Voice Search Optimization
+export interface VoiceSearchConfig {
+  enabled: boolean;
+  maxAnswerLength: number;
+  questionPatterns: string[];
+  conversationalTone: boolean;
+}
+
+export interface VoiceSearchFAQ extends FAQ {
+  voiceQuery: string;
+  spokenAnswer: string;
+  confidence: number; // 0-1 score for voice match
+}
+
+// Featured Snippets Optimization
+export interface FeaturedSnippetConfig {
+  type: 'paragraph' | 'list' | 'table';
+  maxLength: number;
+  includeDate?: boolean;
+  includeAuthor?: boolean;
+}
+
+export interface SnippetOptimizedContent {
+  question: string;
+  answer: string;
+  format: 'paragraph' | 'list' | 'table';
+  confidence: number;
+  selectors: string[];
+}
+
+// AEO Content Types
+export interface AEOContent {
+  tldr: {
+    content: string;
+    wordCount: number;
+    voiceOptimized: boolean;
+    answerFormat: boolean;
+  };
+  faqs: VoiceSearchFAQ[];
+  speakableElements: string[];
+  answerFormats: {
+    what: string;
+    where: string;
+    when: string;
+    how: string;
+    why: string;
+    who: string;
+  };
+}
+
+// Enhanced Schema Types with AEO
+export interface AEOJsonLd extends Record<string, any> {
+  '@context': 'https://schema.org';
+  '@type': string;
+  speakable?: {
+    '@type': 'SpeakableSpecification';
+    cssSelector: string[];
+  };
+  about?: {
+    '@type': 'Thing';
+    name: string;
+    sameAs?: string;
+  };
+  mentions?: Array<{
+    '@type': 'Thing';
+    name: string;
+  }>;
+}
+
+export interface QAPageJsonLd extends AEOJsonLd {
+  '@type': 'QAPage';
+  mainEntity: {
+    '@type': 'Question';
+    name: string;
+    text: string;
+    answerCount: number;
+    acceptedAnswer: {
+      '@type': 'Answer';
+      text: string;
+      speakable?: {
+        '@type': 'SpeakableSpecification';
+        cssSelector: string[];
+      };
+    };
+  };
+  relatedQuestions?: Array<{
+    '@type': 'Question';
+    name: string;
+    acceptedAnswer: {
+      '@type': 'Answer';
+      text: string;
+    };
+  }>;
+}
+
+// AEO Performance Metrics
+export interface AEOMetrics {
+  pageUrl: string;
+  timestamp: string;
+  
+  // Schema.org compliance
+  hasJsonLd: boolean;
+  schemaTypes: string[];
+  hasSpeakableMarkup: boolean;
+  
+  // Content optimization
+  hasFAQ: boolean;
+  faqCount: number;
+  hasOptimizedTldr: boolean;
+  tldrWordCount: number;
+  
+  // Voice search readiness
+  hasNaturalQuestions: boolean;
+  hasConversationalContent: boolean;
+  hasAnswerFormat: boolean;
+  voiceReadinessScore: number;
+  
+  // Featured snippet optimization
+  hasListContent: boolean;
+  hasTableContent: boolean;
+  hasParagraphAnswers: boolean;
+  snippetOptimizationScore: number;
+}
+
+export interface AEOValidationResult {
+  score: number; // 0-100
+  grade: 'A+' | 'A' | 'B+' | 'B' | 'C' | 'D' | 'F';
+  issues: Array<{
+    severity: 'critical' | 'warning' | 'info';
+    category: 'schema' | 'content' | 'voice' | 'performance';
+    message: string;
+    element?: string;
+    fix?: string;
+  }>;
+  suggestions: Array<{
+    category: 'schema' | 'content' | 'voice' | 'performance';
+    message: string;
+    impact: 'high' | 'medium' | 'low';
+    implementation: 'easy' | 'medium' | 'hard';
+  }>;
+  metrics: AEOMetrics;
 }

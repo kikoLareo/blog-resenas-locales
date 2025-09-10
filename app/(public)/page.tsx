@@ -8,6 +8,10 @@ import { homepageQuery, homepageConfigQuery } from '@/sanity/lib/queries';
 import { getAllFeaturedItems } from '@/lib/featured-admin';
 import { defaultHomepageConfig } from '@/lib/homepage-admin';
 
+// Force dynamic rendering in build environments to avoid timeout issues
+export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalidate every hour
+
 // Tipos para las secciones configurables
 interface SectionConfig {
   id: string;
@@ -111,15 +115,31 @@ export default async function HomePage() {
       query: homepageQuery,
       revalidate: 3600, // Cache por 1 hora
       tags: ['homepage', 'reviews'],
+    }).catch((error) => {
+      console.warn('Failed to fetch Sanity homepage data:', error.message);
+      return {
+        featuredReviews: [],
+        trendingReviews: [],
+        topReviews: [],
+        featuredPosts: [],
+        featuredCities: [],
+        featuredCategories: []
+      };
     }),
     
     sanityFetch<HomepageConfig>({
       query: homepageConfigQuery,
       revalidate: 3600, // Cache por 1 hora
       tags: ['homepage-config'],
+    }).catch((error) => {
+      console.warn('Failed to fetch homepage config:', error.message);
+      return null;
     }),
     
-    getAllFeaturedItems().catch(() => []) // Fallback en caso de error
+    getAllFeaturedItems().catch((error) => {
+      console.warn('Failed to fetch featured items:', error.message);
+      return []; // Fallback en caso de error
+    })
   ]);
 
   // Configuración por defecto si no existe en Sanity

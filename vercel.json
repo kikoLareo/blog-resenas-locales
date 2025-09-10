@@ -5,6 +5,10 @@
   "installCommand": "npm install",
   "devCommand": "npm run dev",
   "regions": ["iad1"],
+  "env": {
+    "PRISMA_GENERATE_DATAPROXY": "false",
+    "PRISMA_CLI_BINARY_TARGETS": "native,debian-openssl-3.0.x"
+  },
   "functions": {
     "app/api/sitemap/route.ts": {
       "maxDuration": 30

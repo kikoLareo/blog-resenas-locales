@@ -5,7 +5,7 @@ import { SITE_CONFIG } from '@/lib/constants';
 import { Post } from '@/lib/types';
 import { postPageJsonLd } from '@/lib/schema';
 import { sanityFetch } from '@/lib/sanity.client';
-import FAQ from '@/components/Faq';
+import FAQ from '@/components/FAQ';
 
 type BlogPostPageProps = {
   params: Promise<{ slug: string }>;

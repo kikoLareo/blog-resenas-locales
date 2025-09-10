@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import Gallery from '@/components/Gallery';
 import { MultiScore, CompactScore } from '@/components/ScoreBar';
-import FAQ from '@/components/Faq';
+import FAQ from '../../../../../../components/FAQ';
 import LocalInfo from '@/components/LocalInfo';
 import { SidebarAd, InArticleAd } from '@/components/AdSlot';
 import { Venue, Review } from '@/lib/types';

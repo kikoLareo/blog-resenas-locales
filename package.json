@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npx prisma generate && tsx scripts/indexnow-verify.ts",
+    "postinstall": "node scripts/prisma-setup.js",
+    "prebuild": "tsx scripts/indexnow-verify.ts",
     "generate-admin": "node scripts/generate-admin-password.js",
     "build": "next build",
     "start": "next start",
@@ -75,7 +76,7 @@
     "@testing-library/jest-dom": "^6.7.0",
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.6.1",
-    "@types/node": "^20.19.11",
+    "@types/node": "^20.19.13",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
