@@ -10,6 +10,15 @@ import {
   BreadcrumbJsonLd,
   City,
   Category,
+  SpeakableSpecificationJsonLd,
+  MenuJsonLd,
+  EventJsonLd,
+  HowToJsonLd,
+  ContactPointJsonLd,
+  OpeningHoursSpecificationJsonLd,
+  VideoObjectJsonLd,
+  ImageObjectJsonLd,
+  ServiceAreaJsonLd,
 } from './types';
 import { SITE_CONFIG } from './constants';
 
@@ -267,8 +276,9 @@ export function qaPageJsonLd(
 
 /**
  * Generate HowTo JSON-LD for step-by-step guides (restaurant visits, etc.)
+ * Renamed to avoid duplicate export.
  */
-export function howToJsonLd(
+export function basicHowToJsonLd(
   name: string,
   description: string,
   steps: Array<{ name: string; text: string; image?: string }>,
@@ -361,7 +371,7 @@ export function menuSectionJsonLd(
 /**
  * Generate Event JSON-LD for restaurant events and promotions
  */
-export function eventJsonLd(
+export function basicEventJsonLd(
   name: string,
   description: string,
   startDate: string,
@@ -874,4 +884,402 @@ export function renderJsonLd(schema: object | null) {
   if (!schema) return null;
   
   return JSON.stringify(schema, null, 0);
+}
+
+/**
+ * ADVANCED SCHEMA FUNCTIONS FOR VOICE SEARCH & ANSWER ENGINE OPTIMIZATION
+ */
+
+/**
+ * Generate SpeakableSpecification for voice search optimization
+ */
+export function speakableSpecificationJsonLd(
+  xpaths: string[] = [
+    '/html/head/title',
+    '/html/body//h1',
+    '/html/body//h2[1]',
+    '/html/body//p[1]'
+  ],
+  cssSelectors: string[] = [
+    'h1',
+    '.review-summary',
+    '.venue-description',
+    '.tldr'
+  ]
+): SpeakableSpecificationJsonLd {
+  return {
+    '@type': 'SpeakableSpecification',
+    xpath: xpaths,
+    cssSelector: cssSelectors,
+  };
+}
+
+/**
+ * Generate enhanced LocalBusiness with voice search optimization
+ */
+export function enhancedLocalBusinessJsonLd(venue: Venue): LocalBusinessJsonLd & {
+  speakable?: SpeakableSpecificationJsonLd;
+  contactPoint?: ContactPointJsonLd[];
+  openingHoursSpecification?: OpeningHoursSpecificationJsonLd[];
+  serviceArea?: ServiceAreaJsonLd;
+} {
+  const baseSchema = localBusinessJsonLd(venue);
+  
+  // Add voice search optimization
+  const enhanced: LocalBusinessJsonLd & {
+    speakable?: SpeakableSpecificationJsonLd;
+    contactPoint?: ContactPointJsonLd[];
+    openingHoursSpecification?: OpeningHoursSpecificationJsonLd[];
+    serviceArea?: ServiceAreaJsonLd;
+  } = {
+    ...baseSchema,
+    speakable: speakableSpecificationJsonLd(),
+  };
+
+  // Add contact points for voice search queries
+  if (venue.phone) {
+    enhanced.contactPoint = [
+      {
+        '@type': 'ContactPoint' as const,
+        telephone: venue.phone,
+        contactType: 'reservations' as const,
+        availableLanguage: ['es', 'Spanish'],
+        areaServed: venue.city.title,
+      },
+    ];
+  }
+
+  // Add detailed opening hours specification
+  if (venue.openingHours && venue.openingHours.length > 0) {
+    enhanced.openingHoursSpecification = venue.openingHours.map(hours => {
+      // Parse opening hours string (e.g., "Mon-Fri 09:00-22:00")
+      const [dayRange, timeRange] = hours.split(' ');
+      const [opens, closes] = timeRange?.split('-') || ['09:00', '22:00'];
+      
+      let dayOfWeek: string[];
+      if (dayRange?.includes('-')) {
+        const [start, end] = dayRange.split('-');
+        dayOfWeek = getDayRange(start, end);
+      } else {
+        dayOfWeek = [dayRange || 'Monday'];
+      }
+
+      return {
+        '@type': 'OpeningHoursSpecification' as const,
+        dayOfWeek,
+        opens: opens || '09:00',
+        closes: closes || '22:00',
+      };
+    });
+  }
+
+  // Add service area for local search optimization
+  if (venue.geo) {
+    enhanced.serviceArea = {
+      '@type': 'GeoCircle',
+      geoMidpoint: {
+        '@type': 'GeoCoordinates',
+        latitude: venue.geo.lat,
+        longitude: venue.geo.lng,
+      },
+      geoRadius: '5 km', // 5km service radius
+      addressRegion: venue.city.region,
+      addressCountry: 'ES',
+    };
+  }
+
+  return enhanced;
+}
+
+/**
+ * Generate Menu schema for restaurants
+ */
+export function menuJsonLd(
+  venue: Venue,
+  menuData?: {
+    sections: Array<{
+      name: string;
+      description?: string;
+      items: Array<{
+        name: string;
+        description?: string;
+        price: string;
+        dietary?: string[];
+        calories?: string;
+      }>;
+    }>;
+  }
+): MenuJsonLd | null {
+  if (!menuData || !menuData.sections.length) return null;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Menu',
+    '@id': `${SITE_CONFIG.url}/${venue.city.slug.current}/${venue.slug.current}#menu`,
+    name: `Menú de ${venue.title}`,
+    description: `Carta completa del restaurante ${venue.title} en ${venue.city.title}`,
+    provider: {
+      '@type': venue.schemaType === 'Restaurant' || venue.schemaType === 'LocalBusiness'
+        ? venue.schemaType
+        : 'LocalBusiness',
+      name: venue.title,
+    },
+    hasMenuSection: menuData.sections.map(section => ({
+      '@type': 'MenuSection',
+      name: section.name,
+      description: section.description,
+      hasMenuItem: section.items.map(item => ({
+        '@type': 'MenuItem',
+        name: item.name,
+        description: item.description,
+        offers: {
+          '@type': 'Offer',
+          price: item.price,
+          priceCurrency: 'EUR',
+        },
+        ...(item.calories && {
+          nutrition: {
+            '@type': 'NutritionInformation',
+            calories: item.calories,
+          },
+        }),
+        ...(item.dietary && {
+          suitableForDiet: item.dietary,
+        }),
+      })),
+    })),
+  };
+}
+
+/**
+ * Generate Event schema for restaurant events
+ */
+export function eventJsonLd(
+  venue: Venue,
+  eventData: {
+    name: string;
+    description?: string;
+    startDate: string;
+    endDate?: string;
+    price?: string;
+    organizer?: string;
+  }
+): EventJsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    '@id': `${SITE_CONFIG.url}/${venue.city.slug.current}/${venue.slug.current}/evento/${eventData.name.toLowerCase().replace(/\s+/g, '-')}`,
+    name: eventData.name,
+    description: eventData.description,
+    startDate: eventData.startDate,
+    endDate: eventData.endDate,
+    eventStatus: 'EventScheduled',
+    eventAttendanceMode: 'OfflineEventAttendanceMode',
+    location: {
+      '@type': 'Place',
+      name: venue.title,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: venue.address,
+        addressLocality: venue.city.title,
+        addressRegion: venue.city.region,
+        addressCountry: 'ES',
+      },
+    },
+    ...(eventData.organizer && {
+      organizer: {
+        '@type': 'Organization',
+        name: eventData.organizer,
+      },
+    }),
+    ...(eventData.price && {
+      offers: {
+        '@type': 'Offer',
+        price: eventData.price,
+        priceCurrency: 'EUR',
+        availability: 'InStock',
+      },
+    }),
+  };
+}
+
+/**
+ * Generate HowTo schema for restaurant guides
+ */
+export function howToJsonLd(
+  title: string,
+  steps: Array<{
+    name: string;
+    text: string;
+    image?: string;
+  }>,
+  options?: {
+    description?: string;
+    estimatedCost?: string;
+    totalTime?: string;
+    supplies?: string[];
+    tools?: string[];
+  }
+): HowToJsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: title,
+    description: options?.description,
+    ...(options?.estimatedCost && {
+      estimatedCost: {
+        '@type': 'MonetaryAmount',
+        currency: 'EUR',
+        value: options.estimatedCost,
+      },
+    }),
+    ...(options?.totalTime && {
+      totalTime: options.totalTime,
+    }),
+    ...(options?.supplies && {
+      supply: options.supplies.map(supply => ({
+        '@type': 'HowToSupply',
+        name: supply,
+      })),
+    }),
+    ...(options?.tools && {
+      tool: options.tools.map(tool => ({
+        '@type': 'HowToTool',
+        name: tool,
+      })),
+    }),
+    step: steps.map(step => ({
+      '@type': 'HowToStep',
+      name: step.name,
+      text: step.text,
+      ...(step.image && { image: step.image }),
+    })),
+  };
+}
+
+/**
+ * Generate VideoObject schema for video reviews
+ */
+export function videoObjectJsonLd(
+  videoData: {
+    name: string;
+    description?: string;
+    thumbnailUrl: string;
+    uploadDate: string;
+    duration?: string;
+    contentUrl?: string;
+    embedUrl?: string;
+    viewCount?: number;
+  }
+): VideoObjectJsonLd {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: videoData.name,
+    description: videoData.description,
+    thumbnailUrl: [videoData.thumbnailUrl],
+    uploadDate: videoData.uploadDate,
+    ...(videoData.duration && { duration: videoData.duration }),
+    ...(videoData.contentUrl && { contentUrl: videoData.contentUrl }),
+    ...(videoData.embedUrl && { embedUrl: videoData.embedUrl }),
+    ...(videoData.viewCount && {
+      interactionStatistic: {
+        '@type': 'InteractionCounter',
+        interactionType: 'WatchAction',
+        userInteractionCount: videoData.viewCount,
+      },
+    }),
+  };
+}
+
+/**
+ * Enhanced Article schema with speakable content for voice search
+ */
+export function enhancedArticleJsonLd(post: Post): ArticleJsonLd & {
+  speakable?: SpeakableSpecificationJsonLd;
+} {
+  const baseSchema = articleJsonLd(post);
+  
+  return {
+    ...baseSchema,
+    speakable: speakableSpecificationJsonLd([
+      '/html/head/title',
+      '/html/body//h1',
+      '/html/body//h2[1]',
+      '/html/body//p[1]',
+      '/html/body//*[@class="tldr"]',
+    ], [
+      'h1',
+      'h2:first-of-type', 
+      'p:first-of-type',
+      '.tldr',
+      '.article-summary',
+    ]),
+  };
+}
+
+/**
+ * Enhanced Review schema with voice search optimization
+ */
+export function enhancedReviewJsonLd(review: Review, venue: Venue): ReviewJsonLd & {
+  speakable?: SpeakableSpecificationJsonLd;
+} {
+  const baseSchema = reviewJsonLd(review, venue);
+  
+  return {
+    ...baseSchema,
+    speakable: speakableSpecificationJsonLd([
+      '/html/head/title',
+      '/html/body//h1',
+      '/html/body//*[@class="tldr"]',
+      '/html/body//*[@class="review-summary"]',
+    ], [
+      'h1',
+      '.tldr',
+      '.review-summary',
+      '.pros',
+      '.rating-summary',
+    ]),
+  };
+}
+
+/**
+ * Utility function to convert day abbreviations to full day names
+ */
+function getDayRange(start: string, end: string): string[] {
+  const dayMap = {
+    'Mon': 'Monday',
+    'Tue': 'Tuesday', 
+    'Wed': 'Wednesday',
+    'Thu': 'Thursday',
+    'Fri': 'Friday',
+    'Sat': 'Saturday',
+    'Sun': 'Sunday',
+    'Lun': 'Monday',
+    'Mar': 'Tuesday',
+    'Mié': 'Wednesday', 
+    'Jue': 'Thursday',
+    'Vie': 'Friday',
+    'Sáb': 'Saturday',
+    'Dom': 'Sunday',
+  };
+  
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const startDay = dayMap[start as keyof typeof dayMap] || start;
+  const endDay = dayMap[end as keyof typeof dayMap] || end;
+  
+  const startIndex = days.indexOf(startDay);
+  const endIndex = days.indexOf(endDay);
+  
+  if (startIndex === -1 || endIndex === -1) return [startDay];
+  
+  const result = [];
+  let current = startIndex;
+  while (current !== endIndex) {
+    result.push(days[current]);
+    current = (current + 1) % 7;
+  }
+  result.push(days[endIndex]);
+  
+  return result;
 }
