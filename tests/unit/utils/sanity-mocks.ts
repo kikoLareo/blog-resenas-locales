@@ -197,6 +197,22 @@ export const mockReviews = [
   })
 ];
 
+// Mock search results used by search-page tests
+export const mockSearchResults = [
+  // Venue result
+  createMockVenue({
+    _id: 'venue-search-1',
+    title: 'Restaurante la Búsqueda',
+    slug: { current: 'restaurante-la-busqueda' }
+  }),
+  // Review result
+  createMockReview({
+    _id: 'review-search-1',
+    title: 'Reseña encontrada',
+    slug: { current: 'resena-encontrada' }
+  })
+];
+
 // Mock Sanity Client
 export const mockSanityFetch = vi.fn();
 
@@ -204,20 +220,24 @@ export const mockSanityFetch = vi.fn();
 export const setupMockSanityFetch = () => {
   mockSanityFetch.mockImplementation(({ query, params = {} }) => {
     // Mock different queries based on query content
-    if (query.includes('*[_type == "city"') && query.includes('slug.current == $citySlug')) {
+    if (typeof query === 'string' && query.includes('cityQuery')) {
       const citySlug = params.citySlug;
       return Promise.resolve(mockCities.find(city => city.slug.current === citySlug) || null);
     }
-    
-    if (query.includes('*[_type == "venue"') && query.includes('city->slug.current == $citySlug')) {
+
+    if (typeof query === 'string' && query.includes('venuesByCityQuery')) {
       return Promise.resolve(mockVenues);
     }
-    
-    if (query.includes('*[_type == "review"') && query.includes('venue->city->slug.current == $citySlug')) {
+
+    if (typeof query === 'string' && query.includes('reviewsByCityQuery')) {
       return Promise.resolve(mockReviews);
     }
-    
-    if (query.includes('homepageQuery')) {
+
+    if (typeof query === 'string' && query.includes('searchQuery')) {
+      return Promise.resolve(params.searchTerm === 'noresults' ? [] : mockSearchResults);
+    }
+
+    if (typeof query === 'string' && query.includes('homepageQuery')) {
       return Promise.resolve({
         featuredReviews: mockReviews,
         trendingReviews: mockReviews,

@@ -4,10 +4,9 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { setupMockSanityFetch, createMockReview, createMockPost, createMockCity, resetSanityMocks } from '../utils/sanity-mocks';
+import { setupMockSanityFetch, createMockReview, createMockPost, createMockCity, resetSanityMocks, mockSanityFetch } from '../utils/sanity-mocks';
 
-// Mock Sanity integration
-const mockSanityFetch = vi.fn();
+// Mock Sanity integration (use the exported mock from utils)
 vi.mock('@/lib/sanity.client', () => ({
   sanityFetch: mockSanityFetch
 }));
@@ -84,6 +83,7 @@ describe('Homepage Integration Tests', () => {
       
       expect(fallbackData).toBeDefined();
     });
+  });
 
   describe('Data Processing Logic', () => {
     it('should process review data correctly for featured sections', () => {
