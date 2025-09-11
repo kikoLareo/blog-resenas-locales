@@ -334,6 +334,178 @@ export interface BreadcrumbJsonLd {
   }>;
 }
 
+// Advanced Schema Types for Voice Search and Answer Engine Optimization
+
+export interface SpeakableSpecificationJsonLd {
+  '@type': 'SpeakableSpecification';
+  xpath: string[];
+  cssSelector?: string[];
+}
+
+export interface MenuJsonLd {
+  '@context': 'https://schema.org';
+  '@type': 'Menu';
+  '@id'?: string;
+  name: string;
+  description?: string;
+  provider: {
+    '@type': 'Restaurant' | 'LocalBusiness';
+    name: string;
+  };
+  hasMenuSection?: Array<{
+    '@type': 'MenuSection';
+    name: string;
+    description?: string;
+    hasMenuItem: Array<{
+      '@type': 'MenuItem';
+      name: string;
+      description?: string;
+      offers: {
+        '@type': 'Offer';
+        price: string;
+        priceCurrency: 'EUR';
+      };
+      nutrition?: {
+        '@type': 'NutritionInformation';
+        calories?: string;
+      };
+      suitableForDiet?: string[];
+    }>;
+  }>;
+}
+
+export interface EventJsonLd {
+  '@context': 'https://schema.org';
+  '@type': 'Event';
+  '@id'?: string;
+  name: string;
+  description?: string;
+  startDate: string;
+  endDate?: string;
+  eventStatus?: 'EventScheduled' | 'EventCancelled' | 'EventPostponed';
+  eventAttendanceMode?: 'OfflineEventAttendanceMode' | 'OnlineEventAttendanceMode' | 'MixedEventAttendanceMode';
+  location: {
+    '@type': 'Place';
+    name: string;
+    address: {
+      '@type': 'PostalAddress';
+      streetAddress: string;
+      addressLocality: string;
+      addressRegion?: string;
+      addressCountry: 'ES';
+    };
+  };
+  organizer?: {
+    '@type': 'Organization' | 'Person';
+    name: string;
+  };
+  offers?: {
+    '@type': 'Offer';
+    price?: string;
+    priceCurrency?: 'EUR';
+    availability?: 'InStock' | 'SoldOut' | 'PreOrder';
+  };
+}
+
+export interface HowToJsonLd {
+  '@context': 'https://schema.org';
+  '@type': 'HowTo';
+  '@id'?: string;
+  name: string;
+  description?: string;
+  image?: string[];
+  estimatedCost?: {
+    '@type': 'MonetaryAmount';
+    currency: 'EUR';
+    value: string;
+  };
+  totalTime?: string; // ISO 8601 duration format
+  supply?: Array<{
+    '@type': 'HowToSupply';
+    name: string;
+  }>;
+  tool?: Array<{
+    '@type': 'HowToTool';
+    name: string;
+  }>;
+  step: Array<{
+    '@type': 'HowToStep';
+    name: string;
+    text: string;
+    image?: string;
+    url?: string;
+  }>;
+}
+
+export interface ContactPointJsonLd {
+  '@type': 'ContactPoint';
+  telephone?: string;
+  contactType: 'customer service' | 'reservations' | 'sales' | 'support';
+  availableLanguage: string[];
+  areaServed?: string;
+  hoursAvailable?: {
+    '@type': 'OpeningHoursSpecification';
+    dayOfWeek: string[];
+    opens: string;
+    closes: string;
+  };
+}
+
+export interface OpeningHoursSpecificationJsonLd {
+  '@type': 'OpeningHoursSpecification';
+  dayOfWeek: string | string[];
+  opens: string;
+  closes: string;
+  validFrom?: string;
+  validThrough?: string;
+}
+
+export interface VideoObjectJsonLd {
+  '@context': 'https://schema.org';
+  '@type': 'VideoObject';
+  '@id'?: string;
+  name: string;
+  description?: string;
+  thumbnailUrl: string[];
+  uploadDate: string;
+  duration?: string; // ISO 8601 duration format
+  contentUrl?: string;
+  embedUrl?: string;
+  interactionStatistic?: {
+    '@type': 'InteractionCounter';
+    interactionType: 'WatchAction';
+    userInteractionCount: number;
+  };
+}
+
+export interface ImageObjectJsonLd {
+  '@type': 'ImageObject';
+  '@id'?: string;
+  url: string;
+  width?: number;
+  height?: number;
+  caption?: string;
+  description?: string;
+  copyrightHolder?: {
+    '@type': 'Person' | 'Organization';
+    name: string;
+  };
+  license?: string;
+  acquireLicensePage?: string;
+}
+
+export interface ServiceAreaJsonLd {
+  '@type': 'GeoCircle' | 'GeoShape';
+  geoMidpoint?: {
+    '@type': 'GeoCoordinates';
+    latitude: number;
+    longitude: number;
+  };
+  geoRadius?: string; // e.g., "10 km"
+  addressRegion?: string;
+  addressCountry?: 'ES';
+}
+
 // Tipo base para breadcrumbs usado por componentes UI
 export interface BreadcrumbItem {
   name: string;
