@@ -162,3 +162,69 @@ export const CONTENT_LIMITS = {
   metaDescription: { min: 150, max: 160 }, // characters
   title: { min: 50, max: 60 }, // characters
 } as const;
+
+// AEO (Answer Engine Optimization) configuration
+export const AEO_CONFIG = {
+  // Voice search optimization
+  voiceSearch: {
+    enabled: true,
+    maxAnswerLength: 300, // characters for voice responses
+    questionPatterns: [
+      'cómo', 'qué', 'cuál', 'dónde', 'cuándo', 'por qué', 'quién'
+    ],
+  },
+  
+  // Featured snippets optimization
+  featuredSnippets: {
+    paragraphLength: 50, // words
+    listItemCount: 8, // max items in lists
+    tableColumns: 4, // max columns
+  },
+  
+  // FAQ optimization
+  faq: {
+    minQuestions: 3,
+    maxQuestions: 8,
+    answerLength: { min: 40, max: 300 },
+    requireQuestionMark: true,
+  },
+  
+  // Schema.org requirements
+  schema: {
+    requiredTypes: ['LocalBusiness', 'Review', 'FAQPage'],
+    speakableRequired: true,
+    breadcrumbsRequired: true,
+  },
+  
+  // Performance thresholds
+  performance: {
+    aeoScoreThreshold: 80, // minimum AEO score
+    validationRequired: process.env.NODE_ENV === 'development',
+  },
+} as const;
+
+// Voice search question templates
+export const VOICE_SEARCH_TEMPLATES = {
+  venue: {
+    location: '¿Dónde está {name}?',
+    hours: '¿A qué hora abre {name}?',
+    price: '¿Cuánto cuesta comer en {name}?',
+    quality: '¿Es bueno {name}?',
+    food: '¿Qué sirven en {name}?',
+    contact: '¿Cómo contactar con {name}?',
+  },
+  
+  review: {
+    rating: '¿Qué puntuación tiene {name}?',
+    experience: '¿Cómo fue la experiencia en {name}?',
+    recommendation: '¿Recomiendas {name}?',
+    highlights: '¿Qué destacas de {name}?',
+  },
+  
+  general: {
+    best: '¿Cuáles son los mejores {category}?',
+    nearby: '¿Qué {category} hay cerca?',
+    popular: '¿Cuál es el {category} más popular?',
+    recommended: '¿Qué {category} recomiendas?',
+  },
+} as const;
