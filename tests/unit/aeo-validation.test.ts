@@ -20,20 +20,22 @@ import { validatePageAEO } from '../../lib/aeo-monitor';
 
 // Mock data
 const mockVenue = {
+  _id: 'venue-1',
   title: 'Restaurante Ejemplo',
   address: 'Calle Ficticia 123',
   city: {
+    _id: 'city-1',
     title: 'Santiago',
     slug: { current: 'santiago' },
     region: 'Galicia'
   },
   slug: { current: 'restaurante-ejemplo' },
   categories: [
-    { title: 'Cocina Gallega' }
+    { _id: 'cat-1', title: 'Cocina Gallega', slug: { current: 'cocina-gallega' } }
   ],
-  priceRange: '€€',
+  priceRange: "€€" as const,
   phone: '+34 981 123 456',
-  openingHours: 'Lunes a Domingo 12:00-23:00',
+  openingHours: ['Lunes a Domingo 12:00-23:00'],
   avgRating: 8.5,
   reviewCount: 42,
   schemaType: 'Restaurant' as const,
