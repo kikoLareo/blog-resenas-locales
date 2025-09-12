@@ -8,6 +8,13 @@ export { TagChips } from './TagChips';
 export { PostHeader } from './PostHeader';
 export { SuggestionsRail } from './SuggestionsRail';
 
+// Modern page components
+export { ReviewDetailModern } from './ReviewDetailModern';
+export { VenueDetailModern } from './VenueDetailModern';
+export { TopicPageModern } from './TopicPageModern';
+export { HeroModern } from './HeroModern';
+export { FeaturedSectionsModern } from './FeaturedSectionsModern';
+
 // Loading states
 export { 
   Skeleton,
