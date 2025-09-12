@@ -202,12 +202,12 @@ export async function generateMetadata({ params }: ReviewPageProps): Promise<Met
     };
   }
 
-  const avgRating = (
+  const avgRating = review.ratings ? (
     review.ratings.food + 
     review.ratings.service + 
     review.ratings.ambience + 
     review.ratings.value
-  ) / 4;
+  ) / 4 : 0;
   
   const ratingText = avgRating >= 8 ? 'Excelente' : avgRating >= 6 ? 'Muy bueno' : avgRating >= 4 ? 'Bueno' : 'Regular';
   
@@ -253,12 +253,12 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
     notFound();
   }
 
-  const avgRating = (
+  const avgRating = review.ratings ? (
     review.ratings.food + 
     review.ratings.service + 
     review.ratings.ambience + 
     review.ratings.value
-  ) / 4;
+  ) / 4 : 0;
 
   // Generar JSON-LD para SEO
   const jsonLd = {
