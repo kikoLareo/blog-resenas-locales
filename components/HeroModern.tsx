@@ -2,10 +2,12 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, TrendingUp, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel } from '@/components/Carousel';
+import CarouselFullScreen from '@/components/CarouselFullScreen';
 import { ReviewCard } from '@/components/CardReview';
 import { VenueCard } from '@/components/CardVenue';
 import { RatingStars } from '@/components/RatingStars';
@@ -61,42 +63,49 @@ export const HeroModern: React.FC<HeroModernProps> = ({
   ];
 
   return (
-    <section className={cn("relative overflow-hidden bg-gradient-to-br from-primary-50 to-white", className)}>
-      <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
-        {/* Hero Content */}
-        <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4 bg-primary-100 text-primary-800">
-            <TrendingUp className="h-3 w-3 mr-1" />
-            Blog de reseñas gastronómicas
-          </Badge>
-          
-          <h1 className="font-serif text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Descubre sabores
-            <br />
-            <span className="text-primary-600">auténticos</span>
-          </h1>
-          
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8 leading-relaxed">
-            Reseñas honestas y detalladas de los mejores restaurantes, bares y locales gastronómicos de España.
-            Tu guía confiable para experiencias culinarias inolvidables.
-          </p>
+    <section className={cn("relative overflow-hidden", className)}>
+      {/* Fullscreen image carousel hero */}
+      <CarouselFullScreen
+        images={heroItems.map((h) => ({ src: h.image, alt: h.title }))}
+        autoPlay
+        intervalMs={6000}
+        showArrows
+        showDots
+      >
+        {/* Overlay content: same hero copy, centered */}
+        <Badge variant="secondary" className="mb-4 bg-primary-100 text-primary-800 inline-flex items-center gap-2">
+          <TrendingUp className="h-3 w-3" />
+          Blog de reseñas gastronómicas
+        </Badge>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" asChild className="gap-2">
-              <Link href="/reviews">
-                Explorar reseñas
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            
-            <Button variant="outline" size="lg" asChild>
-              <Link href="/venues">
-                Buscar locales
-              </Link>
-            </Button>
-          </div>
+        <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+          Descubre sabores
+          <br />
+          <span className="text-primary-300">auténticos</span>
+        </h1>
+
+        <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-6">
+          Reseñas honestas y detalladas de los mejores restaurantes, bares y locales gastronómicos de España.
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button size="lg" asChild className="gap-2">
+            <Link href="/reviews">
+              Explorar reseñas
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+
+          <Button variant="outline" size="lg" asChild>
+            <Link href="/venues">
+              Buscar locales
+            </Link>
+          </Button>
         </div>
+      </CarouselFullScreen>
 
+      {/* After the fullscreen hero, keep the featured carousel section (unchanged) */}
+      <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
         {/* Featured Carousel */}
         {heroItems.length > 0 && (
           <div className="mb-16">
@@ -126,7 +135,63 @@ export const HeroModern: React.FC<HeroModernProps> = ({
             >
               {heroItems.map((item) => (
                 <div key={item.id} className="h-full">
-                  <HeroCard item={item} />
+                  <Link href={item.href} className="block group h-full">
+                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg border border-gray-100 h-full transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+                      <div className="relative aspect-video overflow-hidden">
+                        <div className="w-full h-full relative">
+                          <Image
+                            src={item.image}
+                            alt={item.title}
+                            fill
+                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                            sizes="(min-width:1280px) 33vw, (min-width:768px) 50vw, 100vw"
+                          />
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                        {item.rating && (
+                          <div className="absolute top-4 left-4">
+                            <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
+                              <RatingStars rating={item.rating} size="sm" showValue />
+                            </div>
+                          </div>
+                        )}
+                        {item.location && (
+                          <div className="absolute top-4 right-4">
+                            <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium">
+                              {item.location}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="p-6">
+                        <h3 className="font-serif text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
+                          {item.title}
+                        </h3>
+                        <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
+                          {item.description}
+                        </p>
+                      </div>
+
+                      <div className="absolute bottom-4 right-4">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-xs font-medium",
+                            item.type === 'review' && "bg-blue-50 text-blue-700 border-blue-200",
+                            item.type === 'venue' && "bg-green-50 text-green-700 border-green-200",
+                            item.type === 'guide' && "bg-purple-50 text-purple-700 border-purple-200",
+                            item.type === 'collection' && "bg-orange-50 text-orange-700 border-orange-200",
+                          )}
+                        >
+                          {item.type === 'review' && 'Reseña'}
+                          {item.type === 'venue' && 'Local'}
+                          {item.type === 'guide' && 'Guía'}
+                          {item.type === 'collection' && 'Colección'}
+                        </Badge>
+                      </div>
+                    </div>
+                  </Link>
                 </div>
               ))}
             </Carousel>
@@ -155,7 +220,7 @@ export const HeroModern: React.FC<HeroModernProps> = ({
         </div>
       </div>
 
-      {/* Background decoration */}
+      {/* Background decoration (kept for visual cadence below hero) */}
       <div className="absolute top-0 right-0 -z-10 opacity-5">
         <svg width="404" height="404" fill="none" viewBox="0 0 404 404" className="text-primary-600">
           <defs>
@@ -177,11 +242,15 @@ const HeroCard: React.FC<{ item: any }> = ({ item }) => {
       <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg border border-gray-100 h-full transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
         {/* Image */}
         <div className="relative aspect-video overflow-hidden">
-          <img
-            src={item.image}
-            alt={item.title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
+          <div className="w-full h-full relative">
+            <Image
+              src={item.image}
+              alt={item.title}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              sizes="(min-width:1280px) 33vw, (min-width:768px) 50vw, 100vw"
+            />
+          </div>
           
           {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
