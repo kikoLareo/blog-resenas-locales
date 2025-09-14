@@ -2,6 +2,7 @@
 
 import { Search, Menu, MapPin, Star, Coffee } from "lucide-react";
 import { Button } from "./ui/button";
+import Link from "next/link";
 import { Input } from "./ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { DarkModeToggle } from "./DarkModeToggle";
@@ -88,17 +89,17 @@ export function Header() {
           
           {/* Navigation - Desktop */}
           <nav className="hidden md:flex items-center space-x-1">
-            <a href="/categorias" className="nav-link">
+            <Link href="/categorias" className="nav-link">
               Categorías
-            </a>
-            <a href="#" className="nav-link group">
+            </Link>
+            <Link href="/ciudades" className="nav-link group">
               <MapPin className="h-4 w-4 transition-transform group-hover:scale-110" />
               <span>Ciudades</span>
-            </a>
-            <a href="#" className="nav-link group">
+            </Link>
+            <Link href="/top-resenas" className="nav-link group">
               <Star className="h-4 w-4 transition-transform group-hover:scale-110" />
               <span>Top Reseñas</span>
-            </a>
+            </Link>
             
             {/* Dark Mode Toggle */}
             <DarkModeToggle className="ml-2" />
@@ -133,17 +134,17 @@ export function Header() {
                   
                   {/* Mobile Navigation */}
                   <nav className="flex flex-col space-y-2">
-                    <a href="/categorias" className="mobile-nav-link">
+                    <Link href="/categorias" className="mobile-nav-link">
                       Categorías
-                    </a>
-                    <a href="#" className="mobile-nav-link">
+                    </Link>
+                    <Link href="/ciudades" className="mobile-nav-link">
                       <MapPin className="h-4 w-4" />
                       <span>Ciudades</span>
-                    </a>
-                    <a href="#" className="mobile-nav-link">
+                    </Link>
+                    <Link href="/top-resenas" className="mobile-nav-link">
                       <Star className="h-4 w-4" />
                       <span>Top Reseñas</span>
-                    </a>
+                    </Link>
                   </nav>
                 </div>
               </SheetContent>
