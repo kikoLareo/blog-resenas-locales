@@ -2,6 +2,7 @@
 
   import { Search, Menu, MapPin, Star, Coffee } from "lucide-react";
 import { Button } from "./ui/button";
+import Link from "next/link";
 import { Input } from "./ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { useState, useEffect } from "react";
@@ -82,15 +83,15 @@ export function Header() {
             </div>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
-            <a href="#" className="text-gray-800 dark:text-white hover:text-orange-500 transition-colors font-medium">Categorías</a>
-            <a href="#" className="text-gray-800 dark:text-white hover:text-orange-500 transition-colors flex items-center space-x-1 font-medium">
+            <Link href="/categorias/" className="text-gray-800 dark:text-white hover:text-orange-500 transition-colors font-medium">Categorías</Link>
+            <Link href="/ciudades/" className="text-gray-800 dark:text-white hover:text-orange-500 transition-colors flex items-center space-x-1 font-medium">
               <MapPin className="h-4 w-4" />
               <span>Ciudades</span>
-            </a>
-            <a href="#" className="text-gray-800 dark:text-white hover:text-orange-500 transition-colors flex items-center space-x-1 font-medium">
+            </Link>
+            <Link href="/top-resenas/" className="text-gray-800 dark:text-white hover:text-orange-500 transition-colors flex items-center space-x-1 font-medium">
               <Star className="h-4 w-4" />
               <span>Top Reseñas</span>
-            </a>
+            </Link>
           </nav>
           <div className="md:hidden">
             <Sheet>
@@ -114,15 +115,15 @@ export function Header() {
                     />
                   </div>
                   <nav className="flex flex-col space-y-4">
-                    <a href="#" className="text-gray-800 dark:text-white hover:text-orange-500 transition-colors font-medium py-2">Categorías</a>
-                    <a href="#" className="text-gray-800 dark:text-white hover:text-orange-500 transition-colors flex items-center space-x-1 font-medium py-2">
+                    <Link href="/categorias/" className="text-gray-800 dark:text-white hover:text-orange-500 transition-colors font-medium py-2">Categorías</Link>
+                    <Link href="/ciudades/" className="text-gray-800 dark:text-white hover:text-orange-500 transition-colors flex items-center space-x-1 font-medium py-2">
                       <MapPin className="h-4 w-4" />
                       <span>Ciudades</span>
-                    </a>
-                    <a href="#" className="text-gray-800 dark:text-white hover:text-orange-500 transition-colors flex items-center space-x-1 font-medium py-2">
+                    </Link>
+                    <Link href="/top-resenas/" className="text-gray-800 dark:text-white hover:text-orange-500 transition-colors flex items-center space-x-1 font-medium py-2">
                       <Star className="h-4 w-4" />
                       <span>Top Reseñas</span>
-                    </a>
+                    </Link>
                   </nav>
                 </div>
               </SheetContent>
