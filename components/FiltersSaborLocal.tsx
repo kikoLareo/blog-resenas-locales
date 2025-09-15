@@ -448,7 +448,7 @@ export function FiltersSaborLocal({
               
               {filters.search && (
                 <span className="inline-flex items-center gap-1 bg-saffron-100 dark:bg-saffron-900 text-saffron-700 dark:text-saffron-300 px-2 py-1 rounded-full text-xs">
-                  "{filters.search}"
+                  &quot;{filters.search}&quot;
                   <button onClick={() => clearFilter('search')}>
                     <X className="h-3 w-3" />
                   </button>

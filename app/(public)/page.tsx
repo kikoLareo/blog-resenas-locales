@@ -5,7 +5,7 @@ import { sanityFetch } from '@/lib/sanity.client';
 import { homepageQuery, homepageConfigQuery } from '@/sanity/lib/queries';
 import { getAllFeaturedItems } from '@/lib/featured-admin';
 import { defaultHomepageConfig } from '@/lib/homepage-admin';
-
+import { FeaturedSectionsModern, HeroModern } from '@/components';
 // Mock data import for development
 import reviewsData from '@/mocks/reviews.json';
 import venuesData from '@/mocks/venues.json';
@@ -204,9 +204,11 @@ export default async function HomePage() {
       id: topic._id,
       name: topic.name,
       slug: topic.slug.current,
-      reviewCount: topic.reviewCount,
+      count: topic.reviewCount,
       color: topic.color,
       emoji: topic.emoji,
+      image: '',
+      description: topic.description,
     })),
   };
 
