@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { SITE_CONFIG } from '@/lib/constants';
-import { HeroModern } from '@/components/HeroModern';
-import { FeaturedSectionsModern } from '@/components/FeaturedSectionsModern';
+import { HomeSaborLocal } from '@/components/HomeSaborLocal';
 import { sanityFetch } from '@/lib/sanity.client';
 import { homepageQuery, homepageConfigQuery } from '@/sanity/lib/queries';
 import { getAllFeaturedItems } from '@/lib/featured-admin';
@@ -69,18 +68,55 @@ const transformMockVenues = (venues: any[]) => {
 };
 
 export const metadata: Metadata = {
-  title: 'Inicio',
+  title: 'SaborLocal - Descubre los Mejores Restaurantes y Locales Gastronómicos',
   description:
-    'Descubre los mejores restaurantes y locales con reseñas auténticas y guías gastronómicas.',
+    'Encuentra los mejores restaurantes, bares y locales gastronómicos cerca de ti. Reseñas auténticas, guías especializadas y las últimas tendencias culinarias en SaborLocal.',
+  keywords: [
+    'restaurantes Madrid',
+    'mejores restaurantes',
+    'reseñas gastronómicas',
+    'guías restaurantes',
+    'comida local',
+    'tendencias culinarias',
+    'bares tapas',
+    'cocina española',
+    'restaurantes cerca',
+    'SaborLocal'
+  ],
   alternates: {
     canonical: SITE_CONFIG.url,
   },
   openGraph: {
-    title: 'Reseñas Gastronómicas Locales',
-    description: 'Los mejores restaurantes cerca de ti con reseñas auténticas',
+    title: 'SaborLocal - Reseñas Gastronómicas y Guías de Restaurantes',
+    description: 'Descubre los mejores restaurantes y locales gastronómicos con reseñas auténticas y guías especializadas',
     type: 'website',
     url: SITE_CONFIG.url,
-  }
+    images: [
+      {
+        url: `${SITE_CONFIG.url}/og-home.jpg`,
+        width: 1200,
+        height: 630,
+        alt: 'SaborLocal - Reseñas Gastronómicas',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SaborLocal - Descubre los Mejores Restaurantes',
+    description: 'Reseñas auténticas y guías gastronómicas de los mejores locales',
+    images: [`${SITE_CONFIG.url}/og-home.jpg`],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 // Componente para renderizar sección dinámicamente pero de forma estática
@@ -178,13 +214,12 @@ export default async function HomePage() {
   const sections = homepageConfig?.sections || defaultHomepageConfig;
 
   return (
-    <div className="min-h-screen bg-white">
-      {sections
-        .filter(section => section.enabled) // Solo secciones habilitadas
-        .sort((a, b) => (a.order || 0) - (b.order || 0)) // Ordenar por prioridad
-        .map(section => renderSection(section, data, featuredItems, mockData))
-        .filter(Boolean) // Remover elementos null
-      }
-    </div>
+    <HomeSaborLocal
+      featuredItems={featuredItems}
+      trendingReviews={mockData.trendingReviews}
+      topRatedReviews={mockData.topReviews}
+      categories={mockData.categories}
+      venues={mockData.venues}
+    />
   );
 }

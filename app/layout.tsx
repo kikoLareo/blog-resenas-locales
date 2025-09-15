@@ -3,6 +3,7 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import '@/styles/globals.css';
 
 import { AuthProvider } from '@/components/providers/AuthProvider';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { PerformanceMonitor } from '@/components/PerformanceMonitor';
 import { SITE_CONFIG, SEO_DEFAULTS } from '@/lib/constants';
 import { websiteJsonLd, organizationJsonLd } from '@/lib/schema';
@@ -105,24 +106,26 @@ export default function RootLayout({
         {/* Performance optimizations */}
         <meta httpEquiv="X-DNS-Prefetch-Control" content="on" />
       </head>
-      <body className="antialiased bg-black font-sans">
-        <AuthProvider>
-          <GoogleAnalytics gaId={process.env.GA_MEASUREMENT_ID || 'G-XSLBYXBEZJ'} />
-          <PerformanceMonitor />
-          {/* Skip link for accessibility */}
-          <a href="#main-content" className="skip-link">
-            Saltar al contenido principal
-          </a>
-          
-          {/* Main content */}
-          <main id="main-content" className="min-h-screen">
-            {children}
-          </main>
+      <body className="antialiased bg-background font-sans text-foreground transition-colors duration-300">
+        <ThemeProvider>
+          <AuthProvider>
+            <GoogleAnalytics gaId={process.env.GA_MEASUREMENT_ID || 'G-XSLBYXBEZJ'} />
+            <PerformanceMonitor />
+            
+            {/* Skip link for accessibility */}
+            <a href="#main-content" className="skip-link">
+              Saltar al contenido principal
+            </a>
+            
+            {/* Main content */}
+            <main id="main-content" className="min-h-screen">
+              {children}
+            </main>
 
-
-          {/* Consent Banner */}
-          <ConsentBanner />
-        </AuthProvider>
+            {/* Consent Banner */}
+            <ConsentBanner />
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
