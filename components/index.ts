@@ -15,6 +15,14 @@ export { TopicPageModern } from './TopicPageModern';
 export { HeroModern } from './HeroModern';
 export { FeaturedSectionsModern } from './FeaturedSectionsModern';
 
+// New SEO content components
+export { GuideDetail } from './GuideDetail';
+export { ListDetail } from './ListDetail';
+export { RecipeDetail } from './RecipeDetail';
+export { DishGuideDetail } from './DishGuideDetail';
+export { NewsCard } from './NewsCard';
+export { OfferCard } from './OfferCard';
+
 // Loading states
 export { 
   Skeleton,

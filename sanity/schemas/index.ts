@@ -12,6 +12,14 @@ import post from './post';
 import qrCode from './qr-code';
 import qrFeedback from './qr-feedback';
 
+// New SEO-focused content types
+import { guide } from './guide';
+import { list } from './list';
+import { recipe } from './recipe';
+import { dishGuide } from './dish-guide';
+import { news } from './news';
+import { offer } from './offer';
+
 // Featured content
 import featuredItem from './featured-item';
 import { homepageSection } from './homepageSection';
@@ -32,6 +40,15 @@ export const schemaTypes = [
   qrCode,      // Códigos QR para acceso a locales
   qrFeedback,  // Feedback de códigos QR
   
+  // ===== CONTENIDO SEO ESPECIALIZADO =====
+  // Nuevos tipos de contenido para arquitectura SEO
+  guide,       // Guías y rutas gastronómicas
+  list,        // Listas y rankings
+  recipe,      // Recetas tradicionales y modernas
+  dishGuide,   // Guías específicas de platos
+  news,        // Novedades y tendencias
+  offer,       // Ofertas y menús especiales
+  
   // ===== CONTENIDO DESTACADO =====
   // Gestión de elementos destacados en homepage
   featuredItem, // Items del carrusel principal
@@ -42,34 +59,40 @@ export const schemaTypes = [
 // Configuración adicional para validaciones y referencias
 export const schemaConfig = {
   // Tipos que pueden ser referenciados
-  referenceTypes: ['city', 'category', 'venue'],
+  referenceTypes: ['city', 'category', 'venue', 'guide', 'list', 'recipe', 'dish-guide'],
   
   // Tipos de contenido principal
-  contentTypes: ['venue', 'review', 'post'],
+  contentTypes: ['venue', 'review', 'post', 'guide', 'list', 'recipe', 'dish-guide', 'news', 'offer'],
   
   // Tipos con slug (para URLs)
-  slugTypes: ['city', 'category', 'venue', 'review', 'post'],
+  slugTypes: ['city', 'category', 'venue', 'review', 'post', 'guide', 'list', 'recipe', 'dish-guide', 'news', 'offer'],
   
   // Tipos con imágenes
-  imageTypes: ['city', 'category', 'venue', 'review', 'post'],
+  imageTypes: ['city', 'category', 'venue', 'review', 'post', 'guide', 'list', 'recipe', 'dish-guide', 'news', 'offer'],
   
   // Tipos con SEO
-  seoTypes: ['city', 'category', 'venue', 'review', 'post'],
+  seoTypes: ['city', 'category', 'venue', 'review', 'post', 'guide', 'list', 'recipe', 'dish-guide', 'news', 'offer'],
   
   // Tipos que pueden ser destacados
-  featuredTypes: ['category', 'city', 'post'],
+  featuredTypes: ['category', 'city', 'post', 'guide', 'list', 'recipe', 'news'],
   
   // Tipos con FAQ
-  faqTypes: ['review', 'post'],
+  faqTypes: ['review', 'post', 'guide', 'list', 'dish-guide'],
   
   // Tipos con ratings/valoraciones
-  ratedTypes: ['review'],
+  ratedTypes: ['review', 'list'],
   
   // Tipos con ubicación geográfica
-  geoTypes: ['city', 'venue'],
+  geoTypes: ['city', 'venue', 'guide'],
   
   // Tipos con fechas de publicación
-  publishedTypes: ['review', 'post'],
+  publishedTypes: ['review', 'post', 'guide', 'list', 'recipe', 'dish-guide', 'news', 'offer'],
+  
+  // Tipos con fechas de expiración
+  expiringTypes: ['news', 'offer'],
+  
+  // Tipos que enlazan a locales
+  venueLinkedTypes: ['review', 'guide', 'list', 'dish-guide', 'news', 'offer'],
 };
 
 // Metadatos de los esquemas para uso en la aplicación

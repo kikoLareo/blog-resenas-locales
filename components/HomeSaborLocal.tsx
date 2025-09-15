@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { HeroSaborLocal } from "./HeroSaborLocal";
-import { FiltersSaborLocal } from "./FiltersSaborLocal";
 import { ReviewCardSaborLocal } from "./ReviewCardSaborLocal";
 import { ThemeToggle } from "./ThemeToggle";
-import { TrendingUp, Star, MapPin, Clock, Heart, Users, Award, Sparkles, ChevronRight } from "lucide-react";
+import { TrendingUp, Heart, Award, Sparkles, ChevronRight } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 
@@ -240,63 +238,6 @@ export function HomeSaborLocal({
   venues,
   className = ""
 }: HomeSaborLocalProps) {
-  const [filteredReviews, setFilteredReviews] = useState<ReviewData[]>(trendingReviews);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleFiltersChange = async (filters: any) => {
-    setIsLoading(true);
-    // Simular filtrado (en producción sería una llamada a API)
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    let filtered = [...trendingReviews, ...topRatedReviews];
-    
-    if (filters.search) {
-      filtered = filtered.filter(review => 
-        review.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-        review.description.toLowerCase().includes(filters.search.toLowerCase()) ||
-        review.tags.some(tag => tag.toLowerCase().includes(filters.search.toLowerCase()))
-      );
-    }
-    
-    if (filters.cuisine.length > 0) {
-      filtered = filtered.filter(review => 
-        filters.cuisine.includes(review.cuisine?.toLowerCase())
-      );
-    }
-    
-    if (filters.priceRange.length > 0) {
-      filtered = filtered.filter(review => 
-        filters.priceRange.includes(review.priceRange)
-      );
-    }
-    
-    if (filters.openNow) {
-      filtered = filtered.filter(review => review.openNow);
-    }
-    
-    if (filters.rating[0] > 0) {
-      filtered = filtered.filter(review => review.rating >= filters.rating[0]);
-    }
-    
-    // Ordenar según filtro
-    switch (filters.sortBy) {
-      case 'rating':
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'newest':
-        filtered.sort((a, b) => new Date(b.publishedDate || '').getTime() - new Date(a.publishedDate || '').getTime());
-        break;
-      case 'popular':
-        filtered.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
-        break;
-      default:
-        // Mantener orden por relevancia
-        break;
-    }
-    
-    setFilteredReviews(filtered);
-    setIsLoading(false);
-  };
 
   return (
     <div className={`min-h-screen bg-background ${className}`}>
@@ -309,13 +250,6 @@ export function HomeSaborLocal({
       {/* Theme Toggle Floating */}
       <ThemeToggle variant="floating" />
 
-      {/* Filters Section */}
-      <FiltersSaborLocal
-        onFiltersChange={handleFiltersChange}
-        sticky={true}
-        resultCount={filteredReviews.length}
-        className="shadow-sm"
-      />
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 space-y-12">
@@ -342,35 +276,21 @@ export function HomeSaborLocal({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {isLoading ? (
-              // Skeletons
-              Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="bg-card rounded-2xl overflow-hidden shadow-food-card">
-                  <div className="h-56 bg-muted animate-skeleton" />
-                  <div className="p-5 space-y-3">
-                    <div className="h-4 bg-muted animate-skeleton rounded" />
-                    <div className="h-6 bg-muted animate-skeleton rounded" />
-                    <div className="h-16 bg-muted animate-skeleton rounded" />
-                  </div>
-                </div>
-              ))
-            ) : (
-              filteredReviews.slice(0, 6).map((review) => (
-                <ReviewCardSaborLocal
-                  key={review.id}
-                  {...review}
-                  onFavoriteToggle={(id, isFavorite) => {
-                    console.log(`Toggle favorite for ${id}: ${isFavorite}`);
-                  }}
-                  onShare={(id) => {
-                    console.log(`Share ${id}`);
-                  }}
-                  onBookmark={(id) => {
-                    console.log(`Bookmark ${id}`);
-                  }}
-                />
-              ))
-            )}
+            {trendingReviews.slice(0, 6).map((review) => (
+              <ReviewCardSaborLocal
+                key={review.id}
+                {...review}
+                onFavoriteToggle={(id, isFavorite) => {
+                  console.log(`Toggle favorite for ${id}: ${isFavorite}`);
+                }}
+                onShare={(id) => {
+                  console.log(`Share ${id}`);
+                }}
+                onBookmark={(id) => {
+                  console.log(`Bookmark ${id}`);
+                }}
+              />
+            ))}
           </div>
         </section>
 
