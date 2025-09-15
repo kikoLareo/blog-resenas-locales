@@ -290,28 +290,28 @@ export default function ContentManagementPage() {
             <div className="flex items-center gap-4">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <div className="flex-1">
-                <p className="text-sm font-medium">Nueva guía "Dónde comer en Chueca" publicada</p>
+                <p className="text-sm font-medium">Nueva guía &quot;Dónde comer en Chueca&quot; publicada</p>
                 <p className="text-xs text-muted-foreground">Hace 2 horas</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
               <div className="flex-1">
-                <p className="text-sm font-medium">Ranking "Mejores tortillas de Madrid" actualizado</p>
+                <p className="text-sm font-medium">Ranking &quot;Mejores tortillas de Madrid&quot; actualizado</p>
                 <p className="text-xs text-muted-foreground">Hace 4 horas</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
               <div className="flex-1">
-                <p className="text-sm font-medium">Oferta "Menús de San Valentín" próxima a expirar</p>
+                <p className="text-sm font-medium">Oferta &quot;Menús de San Valentín&quot; próxima a expirar</p>
                 <p className="text-xs text-muted-foreground">Hace 1 día</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
               <div className="flex-1">
-                <p className="text-sm font-medium">Nueva receta "Empanada gallega" en borrador</p>
+                <p className="text-sm font-medium">Nueva receta &quot;Empanada gallega&quot; en borrador</p>
                 <p className="text-xs text-muted-foreground">Hace 2 días</p>
               </div>
             </div>
@@ -331,21 +331,21 @@ export default function ContentManagementPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
               <div>
-                <p className="text-sm font-medium">Guía de brunch en Malasaña</p>
+                <p className="text-sm font-medium">Guía de brunch en &quot;Malasaña&quot;</p>
                 <p className="text-xs text-muted-foreground">Programado para publicar</p>
               </div>
               <div className="text-xs text-blue-600 font-medium">Mañana</div>
             </div>
             <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950 rounded-lg">
               <div>
-                <p className="text-sm font-medium">Ranking mejores hamburguesas</p>
+                <p className="text-sm font-medium">Ranking &quot;mejores hamburguesas&quot;</p>
                 <p className="text-xs text-muted-foreground">Revisión programada</p>
               </div>
               <div className="text-xs text-green-600 font-medium">Viernes</div>
             </div>
             <div className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-950 rounded-lg">
               <div>
-                <p className="text-sm font-medium">Ofertas de temporada</p>
+                <p className="text-sm font-medium">Ofertas de &quot;temporada&quot;</p>
                 <p className="text-xs text-muted-foreground">Actualización mensual</p>
               </div>
               <div className="text-xs text-orange-600 font-medium">Próx. semana</div>

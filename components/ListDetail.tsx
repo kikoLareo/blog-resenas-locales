@@ -5,8 +5,7 @@ import { Trophy, MapPin, Star, TrendingUp, ChevronRight, Filter, ArrowUpDown } f
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { OptimizedImage } from './OptimizedImage';
-import { VenueCard } from './VenueCard';
-import { EnhancedFAQ } from './EnhancedFAQ';
+import EnhancedFAQ from './EnhancedFAQ';
 
 interface RankedVenue {
   position: number;
@@ -254,7 +253,7 @@ export function ListDetail({ list, className = "" }: ListDetailProps) {
                         </div>
                       </div>
                     </td>
-                    {list.comparisonTable.columns.map((col) => (
+                    {list.comparisonTable?.columns.map((col) => (
                       <td key={col.key} className="text-center p-4">
                         {col.key === 'price' && venueItem.priceNote ? venueItem.priceNote :
                          col.key === 'rating' && venueItem.score ? `${venueItem.score}/10` :
@@ -350,7 +349,7 @@ export function ListDetail({ list, className = "" }: ListDetailProps) {
 
                     {venueItem.specialNote && (
                       <p className="text-sm text-muted-foreground italic">
-                        "{venueItem.specialNote}"
+                        &quot;{venueItem.specialNote}&quot;
                       </p>
                     )}
 
