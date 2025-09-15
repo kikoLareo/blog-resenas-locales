@@ -28,8 +28,8 @@ export function ThemeToggle({
   if (!mounted) {
     return (
       <Button
-        variant="ghost" 
-        size={size}
+        variant="ghost"
+        size={size === "md" ? "default" : size}
         className={className}
         disabled
       >
@@ -80,7 +80,7 @@ export function ThemeToggle({
   return (
     <Button
       variant="ghost"
-      size={size}
+      size={size === "md" ? "default" : size}
       onClick={toggleTheme}
       className={`transition-all duration-300 ${className}`}
       aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}

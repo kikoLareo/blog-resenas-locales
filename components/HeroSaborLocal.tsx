@@ -222,9 +222,9 @@ export function HeroSaborLocal({
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchStartY, setTouchStartY] = useState<number | null>(null);
   const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
-  const autoplayRef = useRef<NodeJS.Timeout>();
+  const autoplayRef = useRef<any>(null);
   const heroRef = useRef<HTMLElement>(null);
-  
+
   // Procesar los featured items o usar fallback
   const processedItems = featuredItems && featuredItems.length > 0 
     ? featuredItems.map(adaptFeaturedItemToHeroReview)
