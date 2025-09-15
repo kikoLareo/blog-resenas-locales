@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import hero carousel styles */
-@import './hero-carousel.css';
 
 @layer base {
   :root {
