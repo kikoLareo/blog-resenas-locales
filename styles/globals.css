@@ -71,7 +71,9 @@
   }
 
   body {
-    @apply font-sans antialiased bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+    @apply font-sans antialiased;
+    background-color: rgb(var(--background));
+    color: rgb(var(--foreground));
     /* Enhanced text rendering */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

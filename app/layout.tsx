@@ -68,8 +68,29 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="es" className="scroll-smooth">
+    <html lang="es" suppressHydrationWarning>
       <head>
+        {/* Theme script to prevent flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('saborlocal-theme') || 'system';
+                  if (theme === 'system') {
+                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  }
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {}
+              })();
+            `
+          }}
+        />
+        
         {/* JSON-LD for website and organization */}
         <script
           type="application/ld+json"
@@ -106,7 +127,7 @@ export default function RootLayout({
         {/* Performance optimizations */}
         <meta httpEquiv="X-DNS-Prefetch-Control" content="on" />
       </head>
-      <body className="antialiased bg-background font-sans text-foreground transition-colors duration-300">
+      <body className="antialiased font-sans transition-colors duration-300">
         <ThemeProvider>
           <AuthProvider>
             <GoogleAnalytics gaId={process.env.GA_MEASUREMENT_ID || 'G-XSLBYXBEZJ'} />

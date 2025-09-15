@@ -6,11 +6,11 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
     <NextThemesProvider
       attribute="class"
-      defaultTheme="light"
+      defaultTheme="system"
       enableSystem
       disableTransitionOnChange={false}
       storageKey="saborlocal-theme"
-      themes={['light', 'dark']}
+      themes={['light', 'dark', 'system']}
       {...props}
     >
       {children}
