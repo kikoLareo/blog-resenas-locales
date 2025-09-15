@@ -5,8 +5,8 @@ import { MapPin, Clock, Star, Users, ChevronRight, Filter, Navigation } from 'lu
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { OptimizedImage } from './OptimizedImage';
-import { VenueCard } from './VenueCard';
-import { EnhancedFAQ } from './EnhancedFAQ';
+import VenueCard from './VenueCard';
+import EnhancedFAQ from './EnhancedFAQ';
 
 interface GuideVenue {
   venue: {
@@ -241,13 +241,32 @@ export function GuideDetail({ guide, className = "" }: GuideDetailProps) {
                       title: venueItem.venue.title,
                       slug: venueItem.venue.slug,
                       address: venueItem.venue.address,
-                      priceRange: venueItem.venue.priceRange,
-                      images: venueItem.venue.images,
-                      categories: venueItem.venue.categories,
+                      city: {
+                        ...guide.city,
+                        _id: guide.city.slug.current
+                      },
+                      priceRange: venueItem.venue.priceRange as '€' | '€€' | '€€€' | '€€€€',
+                      images: venueItem.venue.images.map(img => ({
+                        ...img,
+                        _type: 'image' as const,
+                        asset: {
+                          _id: img.asset?.url || '',
+                          url: img.asset?.url || '',
+                          metadata: {
+                            dimensions: {
+                              width: 800,
+                              height: 600,
+                              aspectRatio: 800/600
+                            }
+                          }
+                        }
+                      })),
+                      categories: venueItem.venue.categories.map(cat => ({
+                        ...cat,
+                        _id: cat.slug.current
+                      })),
+                      schemaType: 'Restaurant' as const
                     }}
-                    highlight={venueItem.highlight}
-                    note={venueItem.note}
-                    citySlug={guide.city.slug.current}
                   />
                 </div>
               ))}

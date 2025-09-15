@@ -75,15 +75,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const difficultyLabels = {
+  const difficultyLabels: Record<string, string> = {
     facil: 'Fácil',
     intermedio: 'Intermedio',
     avanzado: 'Avanzado'
   };
 
-  const seoTitle = recipe.seoTitle || `${recipe.title} - Receta ${difficultyLabels[recipe.difficulty]} | ${SITE_CONFIG.name}`;
+  const difficultyLabel = difficultyLabels[recipe.difficulty] || 'Intermedio';
+  const seoTitle = recipe.seoTitle || `${recipe.title} - Receta ${difficultyLabel} | ${SITE_CONFIG.name}`;
   const seoDescription = recipe.seoDescription || 
-    `${recipe.description} Receta ${difficultyLabels[recipe.difficulty]} con ${recipe.ingredients?.length || 0} ingredientes. ⏱️ ${recipe.totalTime} min total.`;
+    `${recipe.description} Receta ${difficultyLabel} con ${recipe.ingredients?.length || 0} ingredientes. ⏱️ ${recipe.totalTime} min total.`;
 
   return {
     title: seoTitle,

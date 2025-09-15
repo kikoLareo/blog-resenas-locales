@@ -5,7 +5,7 @@ import { Clock, Users, ChefHat, Star, ChevronRight, Printer, Share2, Bookmark, P
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { OptimizedImage } from './OptimizedImage';
-import { VenueCard } from './VenueCard';
+import VenueCard from './VenueCard';
 
 interface Ingredient {
   amount: string;
@@ -454,8 +454,35 @@ export function RecipeDetail({ recipe, className = "" }: RecipeDetailProps) {
             {recipe.relatedVenues.map((venue) => (
               <VenueCard
                 key={venue._id}
-                venue={venue}
-                citySlug={venue.city.slug.current}
+                venue={{
+                  ...venue,
+                  city: {
+                    ...venue.city,
+                    _id: venue.city.slug.current,
+                    title: venue.city.slug.current
+                  },
+                  priceRange: venue.priceRange as '€' | '€€' | '€€€' | '€€€€',
+                  images: venue.images.map(img => ({
+                    ...img,
+                    _type: 'image' as const,
+                    asset: {
+                      _id: img.asset?.url || '',
+                      url: img.asset?.url || '',
+                      metadata: {
+                        dimensions: {
+                          width: 800,
+                          height: 600,
+                          aspectRatio: 800/600
+                        }
+                      }
+                    }
+                  })),
+                  categories: venue.categories.map(cat => ({
+                    ...cat,
+                    _id: cat.slug.current
+                  })),
+                  schemaType: 'Restaurant' as const
+                }}
               />
             ))}
           </div>

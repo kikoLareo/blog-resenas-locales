@@ -8,6 +8,7 @@ import { SITE_CONFIG } from './constants';
 interface BaseSchema {
   '@context': 'https://schema.org';
   '@type': string;
+  [key: string]: any; // Allow additional properties
 }
 
 interface ImageObject {

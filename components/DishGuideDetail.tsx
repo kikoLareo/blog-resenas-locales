@@ -5,8 +5,8 @@ import { MapPin, ChevronRight, Star, Clock, Utensils } from 'lucide-react';
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { OptimizedImage } from './OptimizedImage';
-import { VenueCard } from './VenueCard';
-import { EnhancedFAQ } from './EnhancedFAQ';
+import VenueCard from './VenueCard';
+import EnhancedFAQ from './EnhancedFAQ';
 
 interface DishVariation {
   region: string;
