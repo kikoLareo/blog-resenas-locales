@@ -4,9 +4,7 @@ import { reviewDetailQuery } from '@/lib/public-queries';
 import ReviewDetailModern from '@/components/ReviewDetailModern';
 import type { Metadata } from 'next';
 
-// Mock data import for development
-import reviewsData from '@/mocks/reviews.json';
-import venuesData from '@/mocks/venues.json';
+// Removed mock data imports - now using real Sanity data only
 
 interface ReviewPageProps {
   params: Promise<{
@@ -100,95 +98,18 @@ async function getReview(
   reviewSlug: string
 ): Promise<ReviewWithVenue | null> {
   try {
-    // First try to get from Sanity
+    // Get review from Sanity
     const review = await client.fetch(reviewDetailQuery, {
       citySlug,
       venueSlug,
       reviewSlug,
     });
     
-    if (review) {
-      return review;
-    }
+    return review || null;
   } catch (error) {
-    console.warn('Failed to fetch from Sanity, using mock data:', error);
-  }
-  
-  // Fallback to mock data
-  const mockReview = reviewsData.reviews.find(r => 
-    r.slug.current === reviewSlug && 
-    r.venue.slug.current === venueSlug &&
-    r.venue.citySlug === citySlug
-  );
-  
-  if (!mockReview) {
+    console.error('Failed to fetch review from Sanity:', error);
     return null;
   }
-  
-  const mockVenue = venuesData.venues.find(v => v.slug.current === venueSlug);
-  
-  // Transform mock data to match expected format
-  return {
-    _id: mockReview._id,
-    title: mockReview.title,
-    slug: mockReview.slug.current,
-    author: mockReview.author.name,
-    authorAvatar: mockReview.author.avatar ? {
-      asset: {
-        _id: 'mock-avatar',
-        url: mockReview.author.avatar
-      }
-    } : undefined,
-    publishedAt: mockReview.publishedAt,
-    ratings: {
-      food: mockReview.ratings.food * 2, // Convert 0-5 to 0-10 scale
-      service: mockReview.ratings.service * 2,
-      ambience: mockReview.ratings.atmosphere * 2,
-      value: mockReview.ratings.value * 2,
-      overall: (mockReview.ratings.food + mockReview.ratings.service + mockReview.ratings.atmosphere + mockReview.ratings.value) * 0.5
-    },
-    highlights: mockReview.recommendedDishes,
-    tldr: mockReview.tldr,
-    content: mockReview.content,
-    gallery: mockReview.gallery ? [{
-      asset: {
-        _id: 'mock-gallery',
-        url: mockReview.gallery.asset.url
-      },
-      alt: `${mockReview.venue.name} - ${mockReview.title}`
-    }] : [],
-    tags: mockReview.tags,
-    venue: {
-      _id: mockReview.venue.name.replace(/\s+/g, '-').toLowerCase(),
-      title: mockReview.venue.name,
-      slug: mockReview.venue.slug.current,
-      address: mockReview.venue.address,
-      phone: mockVenue?.phone,
-      website: mockVenue?.website,
-      geo: mockVenue?.location ? {
-        lat: mockVenue.location.lat,
-        lng: mockVenue.location.lng
-      } : undefined,
-      priceRange: mockVenue ? '$'.repeat(mockVenue.priceLevel) : undefined,
-      images: mockVenue?.gallery ? mockVenue.gallery.map(img => ({
-        asset: {
-          _id: 'mock-venue-image',
-          url: img.asset.url
-        }
-      })) : [],
-      city: {
-        _id: mockReview.venue.citySlug,
-        title: mockReview.venue.city,
-        slug: mockReview.venue.citySlug,
-        region: 'España'
-      },
-      categories: mockReview.tags.map(tag => ({
-        _id: tag.toLowerCase().replace(/\s+/g, '-'),
-        title: tag,
-        slug: tag.toLowerCase().replace(/\s+/g, '-')
-      }))
-    }
-  };
 }
 
 export async function generateMetadata({ params }: ReviewPageProps): Promise<Metadata> {

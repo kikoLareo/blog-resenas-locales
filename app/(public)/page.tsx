@@ -6,10 +6,7 @@ import { homepageQuery, homepageConfigQuery } from '@/sanity/lib/queries';
 import { getAllFeaturedItems } from '@/lib/featured-admin';
 import { defaultHomepageConfig } from '@/lib/homepage-admin';
 import { FeaturedSectionsModern, HeroModern } from '@/components';
-// Mock data import for development
-import reviewsData from '@/mocks/reviews.json';
-import venuesData from '@/mocks/venues.json';
-import topicsData from '@/mocks/topics.json';
+// Removed mock data imports - now using real Sanity data only
 
 // Force dynamic rendering in build environments to avoid timeout issues
 export const dynamic = 'force-dynamic';
@@ -35,12 +32,12 @@ interface HomepageConfig {
   sections: SectionConfig[];
 }
 
-// Transform mock data to match expected format
-const transformMockReviews = (reviews: any[]) => {
-  return reviews.map((review, index) => ({
+// Transform Sanity data to match expected format for components
+const transformSanityReviews = (reviews: any[]) => {
+  return reviews.map((review) => ({
     id: review._id,
     title: review.title,
-    image: review.gallery?.asset?.url ?? '',
+    image: review.gallery?.[0]?.asset?.url ?? '',
     rating: review.ratings?.food ?? 4.5,
     location: review.venue?.city ?? '',
     readTime: '5 min',
@@ -50,20 +47,33 @@ const transformMockReviews = (reviews: any[]) => {
   }));
 };
 
-const transformMockVenues = (venues: any[]) => {
+const transformSanityVenues = (venues: any[]) => {
   return venues.map((venue) => ({
     id: venue._id,
-    name: venue.name,
-    image: venue.gallery?.[0]?.asset?.url ?? '',
-    averageRating: venue.averageRating || 4.0,
-    reviewCount: venue.reviewCount || 0,
+    name: venue.title,
+    image: venue.images?.[0]?.asset?.url ?? '',
+    averageRating: 4.0, // Will be calculated from reviews in the future
+    reviewCount: venue.reviews?.length || 0,
     address: venue.address,
-    neighborhood: venue.neighborhood,
-    priceLevel: venue.priceLevel || 2,
-    cuisine: venue.cuisine,
-    href: `/${venue.citySlug}/${venue.slug.current}`,
-    isOpen: venue.isOpen,
-    openingHours: venue.openingHours,
+    neighborhood: venue.address?.split(',')[0] || '',
+    priceLevel: venue.priceRange?.length || 2,
+    cuisine: venue.categories?.[0]?.title || '',
+    href: `/${venue.city?.slug?.current}/${venue.slug?.current}`,
+    isOpen: true, // Default to open
+    openingHours: venue.openingHours?.[0] || 'Consultar horarios',
+  }));
+};
+
+const transformSanityCategories = (categories: any[]) => {
+  return categories.map(category => ({
+    id: category._id,
+    name: category.title,
+    slug: category.slug?.current,
+    count: category.venueCount || 0,
+    color: category.color || '#3b82f6',
+    emoji: category.icon || '🍴',
+    image: category.heroImage?.asset?.url || '',
+    description: category.description || '',
   }));
 };
 
@@ -124,7 +134,7 @@ function renderSection(
   section: SectionConfig, 
   data: any, 
   featuredItems: any[],
-  mockData: {
+  sanityData: {
     trendingReviews: any[];
     topReviews: any[];
     venues: any[];
@@ -142,10 +152,10 @@ function renderSection(
       return (
         <FeaturedSectionsModern 
           key={section.id}
-          trending={mockData.trendingReviews}
-          topRated={mockData.topReviews}
-          categories={mockData.categories}
-          venues={mockData.venues}
+          trending={sanityData.trendingReviews}
+          topRated={sanityData.topReviews}
+          categories={sanityData.categories}
+          venues={sanityData.venues}
         />
       );
     
@@ -195,21 +205,12 @@ export default async function HomePage() {
     })
   ]);
 
-  // Preparar datos mock como fallback
-  const mockData = {
-    trendingReviews: transformMockReviews(reviewsData.reviews.slice(0, 6)),
-    topReviews: transformMockReviews(reviewsData.reviews.slice(0, 6).reverse()),
-    venues: transformMockVenues(venuesData.venues.slice(0, 6)),
-    categories: topicsData.topics.map(topic => ({
-      id: topic._id,
-      name: topic.name,
-      slug: topic.slug.current,
-      count: topic.reviewCount,
-      color: topic.color,
-      emoji: topic.emoji,
-      image: '',
-      description: topic.description,
-    })),
+  // Preparar datos de Sanity transformados
+  const sanityData = {
+    trendingReviews: transformSanityReviews(data.trendingReviews || []),
+    topReviews: transformSanityReviews(data.topReviews || []),
+    venues: transformSanityVenues([]), // Will be populated when we add venues to the homepage query
+    categories: transformSanityCategories(data.featuredCategories || []),
   };
 
   // Configuración por defecto si no existe en Sanity
@@ -218,10 +219,10 @@ export default async function HomePage() {
   return (
     <HomeSaborLocal
       featuredItems={featuredItems}
-      trendingReviews={mockData.trendingReviews}
-      topRatedReviews={mockData.topReviews}
-      categories={mockData.categories}
-      venues={mockData.venues}
+      trendingReviews={sanityData.trendingReviews}
+      topRatedReviews={sanityData.topReviews}
+      categories={sanityData.categories}
+      venues={sanityData.venues}
     />
   );
 }
