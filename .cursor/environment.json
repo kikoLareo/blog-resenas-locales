@@ -1,0 +1,15 @@
+{
+  "install": "npm install && npx sanity install",
+  "terminals": [
+    {
+      "name": "dev-server",
+      "command": "NEXT_TELEMETRY_DISABLED=1 npm run dev",
+      "description": "Next.js development server"
+    },
+    {
+      "name": "sanity-studio",
+      "command": "NEXT_TELEMETRY_DISABLED=1 npm run studio",
+      "description": "Sanity Studio development"
+    }
+  ]
+}

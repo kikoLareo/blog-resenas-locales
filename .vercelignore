@@ -1,0 +1,8 @@
+# ...existing ignores...
+tests/
+docs/
+.vscode/
+
+# Excluir cache de Next/webpack que puede inflar funciones
+.next/cache/
+.next/cache/**

@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://example.com/sitemap.xml
+
+# Block admin areas
+Disallow: /studio/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /acceso
+
+# Allow crawling of images
+Allow: /images/
+Allow: /_next/image
+Allow: /_next/static/
+
+# Crawl delay (optional)
+Crawl-delay: 1
