@@ -4,13 +4,14 @@ import { ReviewEditForm } from '@/components/dashboard/ReviewEditForm';
 import { adminSanityClient } from '@/lib/admin-sanity';
 
 interface ReviewEditPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: ReviewEditPageProps): Promise<Metadata> {
-  const review = await getReview(params.id);
+  const { id } = await params;
+  const review = await getReview(id);
   
   if (!review) {
     return {
@@ -102,8 +103,9 @@ async function getVenues() {
 }
 
 export default async function ReviewEditPage({ params }: ReviewEditPageProps) {
+  const { id } = await params;
   const [review, venues] = await Promise.all([
-    getReview(params.id),
+    getReview(id),
     getVenues()
   ]);
 
