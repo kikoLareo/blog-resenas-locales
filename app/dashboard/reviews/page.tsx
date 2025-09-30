@@ -179,7 +179,7 @@ export default function ReviewsPage() {
             ) : (
               filteredReviews.map((review) => {
                 // Construir las URLs de manera segura
-                const editUrl = `/dashboard/reviews/${review._id}`;
+                const editUrl = `/dashboard/reviews/${review._id}/edit`;
                 const viewUrl = review.venue?.city?.slug?.current && review.slug?.current
                   ? `/${review.venue.city.slug.current}/review/${review.slug.current}`
                   : '#';

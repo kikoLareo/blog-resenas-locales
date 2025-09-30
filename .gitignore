@@ -64,3 +64,7 @@ coverage/
 *.db
 *.db-*
 /prisma/*.db
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md
