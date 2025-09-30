@@ -3,11 +3,11 @@ import { adminSanityWriteClient } from '@/lib/admin-sanity';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await request.json();
-    const { id } = params;
+    const { id } = await params;
 
     // Validar datos requeridos
     if (!body.title || !body.content || !body.venueId) {
@@ -65,10 +65,10 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Eliminar de Sanity
     const result = await adminSanityWriteClient.delete(id);
