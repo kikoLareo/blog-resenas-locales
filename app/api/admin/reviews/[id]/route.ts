@@ -57,7 +57,10 @@ export async function PATCH(
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      {
+        error: 'Error interno del servidor',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }
@@ -76,7 +79,10 @@ export async function DELETE(
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { 
+        error: 'Error interno del servidor',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }
