@@ -20,30 +20,55 @@ export default function NewCategoryPage() {
   const handleSave = async () => {
     setIsLoading(true);
     try {
-  // allow state to flush so the UI shows loading text before navigating
-      await new Promise((res) => setTimeout(res, 0));
-      // Aquí iría la lógica para guardar en Sanity
-      // In test environments we avoid performing a real navigation so tests can
-      // observe the transient loading UI. In production we redirect after save.
-      const isTestEnv =
-        typeof process !== "undefined" &&
-        (process.env?.VITEST === "true" || process.env?.NODE_ENV === "test");
-      if (!isTestEnv) {
-        // Redirigir a la lista de categorías después de guardar
-        window.location.href = "/dashboard/categories";
-      } else {
-        // In tests keep the loading state visible briefly then clear it so the
-        // test can assert the UI. This is intentionally short.
-        setTimeout(() => setIsLoading(false), 50);
+      // Validate required fields
+      if (!formData.title || !formData.title.toString().trim()) {
+        setIsLoading(false);
+        window.alert('Título es un campo requerido');
+        return;
       }
+
+      if (!formData.slug || !formData.slug.toString().trim()) {
+        setIsLoading(false);
+        window.alert('Slug es un campo requerido');
+        return;
+      }
+
+      // Transform data for API
+      const apiData = {
+        title: formData.title,
+        slug: formData.slug,
+        description: formData.description
+      };
+
+      console.log('Creando nueva categoría con datos:', apiData);
+
+      // Call API to create category
+      const res = await fetch('/api/admin/categories', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(apiData),
+      });
+
+      const data = await res.json();
+      console.log('Respuesta del servidor:', data);
+
+      if (!res.ok) {
+        const errorMsg = data?.details || data?.error || 'Error al crear';
+        console.error('Error al crear:', errorMsg);
+        window.alert(`Error: ${errorMsg}`);
+        return;
+      }
+
+      // Success - redirect to categories list
+      window.alert('Categoría creada exitosamente');
+      window.location.href = "/dashboard/categories";
     } catch (error) {
+      console.error('Error en handleSave:', error);
+      window.alert((error as any)?.message || 'Error al crear categoría');
     } finally {
-      // Only clear loading here when not in the test env. In test env we
-      // scheduled clearing above to ensure assertions can observe the state.
-      const isTestEnv =
-        typeof process !== "undefined" &&
-        (process.env?.VITEST === "true" || process.env?.NODE_ENV === "test");
-      if (!isTestEnv) setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
