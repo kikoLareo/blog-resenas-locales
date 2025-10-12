@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       _type: 'venue',
       title: data.title,
       slug: {
-        current: data.slug,
+        current: data.slug.current || data.slug,
         _type: 'slug'
       },
       description: data.description || '',
@@ -133,7 +133,7 @@ export async function PUT(request: NextRequest) {
       .set({
         title: data.title,
         slug: data.slug ? {
-          current: data.slug,
+          current: data.slug.current || data.slug,
           _type: 'slug'
         } : undefined,
         description: data.description,

@@ -97,7 +97,7 @@ export async function PUT(
       .set({
         title: data.title,
         slug: data.slug ? {
-          current: data.slug,
+          current: data.slug.current || data.slug,
           _type: 'slug'
         } : undefined,
         description: data.description || '',

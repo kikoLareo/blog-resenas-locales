@@ -106,8 +106,22 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
       }
       setPhoneError('');
 
+      // Transform data for API
+      const apiData = {
+        title: formData.title,
+        slug: formData.slug,
+        description: formData.description,
+        address: formData.address,
+        phone: formData.phone,
+        website: formData.website,
+        priceRange: formData.priceRange,
+        city: formData.city?._id,
+        categories: formData.categories?.map(cat => cat._id) || [],
+        images: images
+      };
+
       console.log('Guardando venue con ID:', venue._id);
-      console.log('Datos a enviar:', { ...formData, images });
+      console.log('Datos a enviar:', apiData);
 
       // Call API to update venue
       const res = await fetch(`/api/admin/venues/${venue._id}`, {
@@ -115,7 +129,7 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...formData, images }),
+        body: JSON.stringify(apiData),
       });
 
       const data = await res.json();
@@ -293,7 +307,7 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
                     <div key={review._id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex-1">
                         <Link 
-                          href={`/dashboard/reviews/${review._id}/edit`}
+                          href={`/${venue.city.slug}/${venue.slug}/review/${review.slug}`}
                           className="font-medium text-blue-600 hover:underline"
                         >
                           {review.title}

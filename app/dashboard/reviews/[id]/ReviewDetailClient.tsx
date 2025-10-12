@@ -47,14 +47,74 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [formData, setFormData] = useState(review);
   const [images, setImages] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const publicReviewUrl = review.venue?.city?.slug?.current && review.slug?.current
     ? `/${review.venue.city.slug.current}/review/${review.slug.current}`
     : '#';
 
-  const handleSave = () => {
-    // Aquí iría la lógica para guardar en Sanity
-    setIsEditModalOpen(false);
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+      // Validate required fields
+      if (!formData.title || !formData.title.toString().trim()) {
+        setIsLoading(false);
+        window.alert('El título es un campo requerido');
+        return;
+      }
+
+      // Transform data for API
+      const apiData = {
+        title: formData.title,
+        slug: formData.slug?.current || formData.slug,
+        content: formData.content || '',
+        tldr: formData.tldr || '',
+        venueId: formData.venue?._id,
+        ratings: {
+          food: formData.ratings.food,
+          service: formData.ratings.service,
+          ambience: formData.ratings.ambience,
+          value: formData.ratings.value
+        },
+        published: !!formData.publishedAt,
+        author: formData.author || '',
+        visitDate: formData.visitDate || '',
+        tags: formData.tags || [],
+        images: images
+      };
+
+      console.log('Guardando reseña con ID:', review._id);
+      console.log('Datos a enviar:', apiData);
+
+      // Call API to update review
+      const res = await fetch(`/api/admin/reviews/${review._id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(apiData),
+      });
+
+      const data = await res.json();
+      console.log('Respuesta del servidor:', data);
+
+      if (!res.ok) {
+        const errorMsg = data?.details || data?.error || 'Error al actualizar';
+        console.error('Error al guardar:', errorMsg);
+        window.alert(`Error: ${errorMsg}`);
+        return;
+      }
+
+      // Close modal on success and reload page to show updated data
+      window.alert('Reseña actualizada exitosamente');
+      setIsEditModalOpen(false);
+      window.location.reload();
+    } catch (error) {
+      console.error('Error en handleSave:', error);
+      window.alert((error as any)?.message || 'Error al actualizar');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderStars = (rating: number) => {
@@ -441,12 +501,16 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
 
               {/* Botones */}
               <div className="flex justify-end space-x-2 pt-4 border-t">
-                <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsEditModalOpen(false)}
+                  disabled={isLoading}
+                >
                   Cancelar
                 </Button>
-                <Button onClick={handleSave}>
+                <Button onClick={handleSave} disabled={isLoading}>
                   <Save className="mr-2 h-4 w-4" />
-                  Guardar Cambios
+                  {isLoading ? 'Guardando...' : 'Guardar Cambios'}
                 </Button>
               </div>
             </div>
