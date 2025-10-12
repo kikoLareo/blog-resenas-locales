@@ -75,9 +75,17 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
 
   // Calculate average rating
   const avgRating = venue.reviews && venue.reviews.length > 0
-    ? venue.reviews.reduce((acc, review) => 
-        acc + (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4, 0
-      ) / venue.reviews.length
+    ? venue.reviews.reduce((acc, review) => {
+        // Verificar que ratings exista y tenga todos los campos necesarios
+        if (!review.ratings || 
+            typeof review.ratings.food !== 'number' ||
+            typeof review.ratings.service !== 'number' ||
+            typeof review.ratings.ambience !== 'number' ||
+            typeof review.ratings.value !== 'number') {
+          return acc;
+        }
+        return acc + (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4;
+      }, 0) / venue.reviews.length
     : 0;
 
   const handleSave = async () => {
@@ -260,33 +268,58 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
           <CardContent>
             {venue.reviews && venue.reviews.length > 0 ? (
               <div className="space-y-4">
-                {venue.reviews.map((review) => (
-                  <div key={review._id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex-1">
-                      <Link 
-                        href={`/dashboard/reviews/${review._id}`}
-                        className="font-medium text-blue-600 hover:underline"
-                      >
-                        {review.title}
-                      </Link>
-                      <p className="text-sm text-muted-foreground">/{review.slug?.current}</p>
-                      <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
-                        <span>Comida: {review.ratings.food}/5</span>
-                        <span>Servicio: {review.ratings.service}/5</span>
-                        <span>Ambiente: {review.ratings.ambience}/5</span>
-                        <span>Valor: {review.ratings.value}/5</span>
+                {venue.reviews.map((review) => {
+                  // Verificar que ratings exista y tenga todos los campos necesarios
+                  const hasValidRatings = review.ratings && 
+                    typeof review.ratings.food === 'number' &&
+                    typeof review.ratings.service === 'number' &&
+                    typeof review.ratings.ambience === 'number' &&
+                    typeof review.ratings.value === 'number';
+                  
+                  const averageRating = hasValidRatings
+                    ? (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4
+                    : 0;
+
+                  return (
+                    <div key={review._id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex-1">
+                        <Link 
+                          href={`/dashboard/reviews/${review._id}`}
+                          className="font-medium text-blue-600 hover:underline"
+                        >
+                          {review.title}
+                        </Link>
+                        <p className="text-sm text-muted-foreground">/{review.slug?.current}</p>
+                        {hasValidRatings ? (
+                          <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
+                            <span>Comida: {review.ratings.food}/5</span>
+                            <span>Servicio: {review.ratings.service}/5</span>
+                            <span>Ambiente: {review.ratings.ambience}/5</span>
+                            <span>Valor: {review.ratings.value}/5</span>
+                          </div>
+                        ) : (
+                          <div className="mt-2 text-xs text-muted-foreground">
+                            Calificaciones no disponibles
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        {hasValidRatings ? (
+                          <div className="text-lg font-bold text-yellow-600">
+                            ⭐ {averageRating.toFixed(1)}
+                          </div>
+                        ) : (
+                          <div className="text-sm text-muted-foreground">
+                            Sin calificación
+                          </div>
+                        )}
+                        <div className="text-xs text-muted-foreground">
+                          {new Date(review._createdAt).toLocaleDateString()}
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-yellow-600">
-                        ⭐ {((review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4).toFixed(1)}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(review._createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <p className="text-muted-foreground text-center py-8">
