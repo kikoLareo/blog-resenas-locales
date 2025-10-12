@@ -129,7 +129,10 @@ export async function sanityFetch<T = unknown>({
 
     return await Promise.race([fetchPromise, timeoutPromise]) as T;
   } catch (error) {
-    console.warn(`Sanity fetch failed for query: ${query.substring(0, 100)}...`, error);
+    // Log error in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`Sanity fetch failed for query: ${query.substring(0, 100)}...`, error);
+    }
     throw error;
   }
 }

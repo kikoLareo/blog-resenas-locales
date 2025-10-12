@@ -6,6 +6,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { TrendingUp, Heart, Award, Sparkles, ChevronRight } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { adminSanityClient } from "@/lib/admin-sanity";
 
 // Tipos para los datos
 interface ReviewData {
