@@ -13,30 +13,32 @@ interface BlogPost {
   excerpt: string;
 }
 
+async function getBlogPosts(): Promise<BlogPost[]> {
+  try {
+    const posts = await adminSanityClient.fetch<BlogPost[]>(`
+      *[_type == "post"] | order(_createdAt desc) {
+        _id,
+        title,
+        slug,
+        _createdAt,
+        _updatedAt,
+        publishedAt,
+        excerpt,
+        "status": select(
+          publishedAt != null => "published",
+          "draft"
+        )
+      }
+    `);
+    return posts || [];
+  } catch (error) {
+    console.error('Error fetching blog posts:', error);
+    return [];
+  }
+}
+
 export default async function BlogPage() {
-  // TODO: Conectar con Sanity para obtener posts reales del dashboard admin
-  const posts: BlogPost[] = [
-    {
-      _id: "1",
-      title: "Las mejores pizzerías de Madrid",
-      slug: { current: "mejores-pizzerias-madrid" },
-      _createdAt: "2024-01-15T10:00:00Z",
-      _updatedAt: "2024-01-15T10:00:00Z",
-      publishedAt: "2024-01-15T10:00:00Z",
-      status: "published",
-      excerpt: "Descubre las pizzerías más auténticas de la capital..."
-    },
-    {
-      _id: "2",
-      title: "Guía de restaurantes veganos en Barcelona",
-      slug: { current: "restaurantes-veganos-barcelona" },
-      _createdAt: "2024-01-10T10:00:00Z",
-      _updatedAt: "2024-01-10T10:00:00Z",
-      publishedAt: null,
-      status: "draft",
-      excerpt: "Una completa guía de opciones veganas en la ciudad condal..."
-    }
-  ];
+  const posts = await getBlogPosts();
 
   return (
     <div className="space-y-6">
