@@ -129,18 +129,14 @@ export const getNewsQuery = groq`
 
 // Query para obtener todas las ofertas
 export const getOffersQuery = groq`
-  *[_type == "offer" && published == true && validUntil >= now()] | order(publishedAt desc) {
+  *[_type == "offer" && published == true] | order(publishedAt desc) {
     _id,
     title,
     slug,
     excerpt,
     venue->{
       title,
-      slug,
-      city->{
-        title,
-        slug
-      }
+      slug
     },
     offerType,
     discount,
@@ -158,6 +154,108 @@ export const getOffersQuery = groq`
     seoKeywords
   }
 `;
+
+// Query para obtener estadísticas de contenidos SEO
+export const getSEOContentStatsQuery = groq`
+{
+  "guides": {
+    "total": count(*[_type == "guide"]),
+    "published": count(*[_type == "guide" && published == true]),
+    "drafts": count(*[_type == "guide" && published != true]),
+    "featured": count(*[_type == "guide" && featured == true]),
+    "thisMonth": count(*[_type == "guide" && publishedAt > dateTime(now()) - 60*60*24*30]),
+    "avgViews": math::avg(*[_type == "guide" && defined(stats.views)].stats.views)
+  },
+  "lists": {
+    "total": count(*[_type == "list"]),
+    "published": count(*[_type == "list" && published == true]),
+    "drafts": count(*[_type == "list" && published != true]),
+    "featured": count(*[_type == "list" && featured == true]),
+    "thisMonth": count(*[_type == "list" && publishedAt > dateTime(now()) - 60*60*24*30]),
+    "avgViews": math::avg(*[_type == "list" && defined(stats.views)].stats.views)
+  },
+  "recipes": {
+    "total": count(*[_type == "recipe"]),
+    "published": count(*[_type == "recipe" && published == true]),
+    "drafts": count(*[_type == "recipe" && published != true]),
+    "featured": count(*[_type == "recipe" && featured == true]),
+    "thisMonth": count(*[_type == "recipe" && publishedAt > dateTime(now()) - 60*60*24*30]),
+    "avgCookTime": math::avg(*[_type == "recipe" && defined(cookTime)].cookTime)
+  },
+  "dishGuides": {
+    "total": count(*[_type == "dish-guide"]),
+    "published": count(*[_type == "dish-guide" && published == true]),
+    "drafts": count(*[_type == "dish-guide" && published != true]),
+    "featured": count(*[_type == "dish-guide" && featured == true]),
+    "thisMonth": count(*[_type == "dish-guide" && publishedAt > dateTime(now()) - 60*60*24*30])
+  },
+  "news": {
+    "total": count(*[_type == "news"]),
+    "published": count(*[_type == "news" && published == true]),
+    "drafts": count(*[_type == "news" && published != true]),
+    "featured": count(*[_type == "news" && featured == true]),
+    "expiringSoon": count(*[_type == "news" && expiryDate > now() && expiryDate < dateTime(now()) + 60*60*24*7]),
+    "thisMonth": count(*[_type == "news" && publishedAt > dateTime(now()) - 60*60*24*30])
+  },
+  "offers": {
+    "total": count(*[_type == "offer"]),
+    "published": count(*[_type == "offer" && published == true]),
+    "drafts": count(*[_type == "offer" && published != true]),
+    "featured": count(*[_type == "offer" && featured == true]),
+    "expiringSoon": count(*[_type == "offer" && validUntil > now() && validUntil < dateTime(now()) + 60*60*24*7]),
+    "active": count(*[_type == "offer" && validUntil > now()]),
+    "thisMonth": count(*[_type == "offer" && publishedAt > dateTime(now()) - 60*60*24*30])
+  }
+}`;
+
+// Query para obtener actividad reciente de contenidos SEO
+export const getRecentSEOActivityQuery = groq`
+{
+  "recent": [
+    ...*[_type in ["guide", "list", "recipe", "dish-guide", "news", "offer"] && published == true] | order(publishedAt desc)[0...10] {
+      _id,
+      _type,
+      title,
+      publishedAt,
+      "action": "published"
+    },
+    ...*[_type in ["guide", "list", "recipe", "dish-guide", "news", "offer"] && lastUpdated > publishedAt] | order(lastUpdated desc)[0...10] {
+      _id,
+      _type,
+      title,
+      lastUpdated,
+      "action": "updated"
+    }
+  ] | order(coalesce(publishedAt, lastUpdated) desc)[0...8]
+}`;
+
+// Query para obtener contenido programado y calendario editorial
+export const getEditorialCalendarQuery = groq`
+{
+  "scheduled": *[_type in ["guide", "list", "recipe", "dish-guide", "news", "offer"] && published != true] | order(_createdAt desc)[0...5] {
+    _id,
+    _type,
+    title,
+    _createdAt,
+    published
+  },
+  "expiring": [
+    ...*[_type == "news" && defined(expiryDate) && expiryDate > now()] | order(expiryDate asc)[0...3] {
+      _id,
+      _type,
+      title,
+      expiryDate,
+      "eventType": "expires"
+    },
+    ...*[_type == "offer" && defined(validUntil) && validUntil > now()] | order(validUntil asc)[0...3] {
+      _id,
+      _type,
+      title,
+      validUntil,
+      "eventType": "expires"
+    }
+  ] | order(coalesce(expiryDate, validUntil) asc)[0...5]
+}`;
 
 // Query para obtener contenido SEO destacado
 export const getFeaturedSEOContentQuery = groq`
