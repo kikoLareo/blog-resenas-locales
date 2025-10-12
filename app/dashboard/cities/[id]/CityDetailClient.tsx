@@ -47,6 +47,7 @@ export default function CityDetailClient({ city }: { city: CityWithDetails }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [formData, setFormData] = useState(city);
   const [images, setImages] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const publicCityUrl = city.slug?.current ? `/${city.slug.current}` : '#';
 
@@ -54,9 +55,57 @@ export default function CityDetailClient({ city }: { city: CityWithDetails }) {
     ? city.reviews.reduce((acc, review) => acc + review.ratings.overall, 0) / city.reviews.length
     : 0;
 
-  const handleSave = () => {
-    // Aquí iría la lógica para guardar en Sanity
-    setIsEditModalOpen(false);
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+      // Validate required fields
+      if (!formData.title || !formData.title.toString().trim()) {
+        setIsLoading(false);
+        window.alert('Título es un campo requerido');
+        return;
+      }
+
+      // Transform data for API
+      const apiData = {
+        title: formData.title,
+        slug: formData.slug?.current || formData.slug,
+        region: formData.region,
+        description: formData.description,
+        images: images
+      };
+
+      console.log('Guardando ciudad con ID:', city._id);
+      console.log('Datos a enviar:', apiData);
+
+      // Call API to update city
+      const res = await fetch(`/api/admin/cities/${city._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(apiData),
+      });
+
+      const data = await res.json();
+      console.log('Respuesta del servidor:', data);
+
+      if (!res.ok) {
+        const errorMsg = data?.details || data?.error || 'Error al actualizar';
+        console.error('Error al guardar:', errorMsg);
+        window.alert(`Error: ${errorMsg}`);
+        return;
+      }
+
+      // Close modal on success and reload page to show updated data
+      window.alert('Ciudad actualizada exitosamente');
+      setIsEditModalOpen(false);
+      window.location.reload();
+    } catch (error) {
+      console.error('Error en handleSave:', error);
+      window.alert((error as any)?.message || 'Error al actualizar');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -322,12 +371,13 @@ export default function CityDetailClient({ city }: { city: CityWithDetails }) {
                 <Button 
                   variant="outline" 
                   onClick={() => setIsEditModalOpen(false)}
+                  disabled={isLoading}
                 >
                   Cancelar
                 </Button>
-                <Button onClick={handleSave}>
+                <Button onClick={handleSave} disabled={isLoading}>
                   <Save className="mr-2 h-4 w-4" />
-                  Guardar Cambios
+                  {isLoading ? 'Guardando...' : 'Guardar Cambios'}
                 </Button>
               </div>
             </CardContent>

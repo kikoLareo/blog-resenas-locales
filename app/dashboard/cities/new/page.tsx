@@ -24,13 +24,54 @@ export default function NewCityPage() {
     setLoading(true);
 
     try {
-      // Aquí iría la lógica para crear la ciudad en Sanity
-      
-      // Simular creación exitosa
-      setTimeout(() => {
-        router.push('/dashboard/cities');
-      }, 1000);
+      // Validate required fields
+      if (!formData.title || !formData.title.toString().trim()) {
+        setLoading(false);
+        window.alert('Título es un campo requerido');
+        return;
+      }
+
+      if (!formData.slug || !formData.slug.toString().trim()) {
+        setLoading(false);
+        window.alert('Slug es un campo requerido');
+        return;
+      }
+
+      // Transform data for API
+      const apiData = {
+        title: formData.title,
+        slug: formData.slug,
+        region: formData.region,
+        description: formData.description
+      };
+
+      console.log('Creando nueva ciudad con datos:', apiData);
+
+      // Call API to create city
+      const res = await fetch('/api/admin/cities', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(apiData),
+      });
+
+      const data = await res.json();
+      console.log('Respuesta del servidor:', data);
+
+      if (!res.ok) {
+        const errorMsg = data?.details || data?.error || 'Error al crear';
+        console.error('Error al crear:', errorMsg);
+        window.alert(`Error: ${errorMsg}`);
+        return;
+      }
+
+      // Success - redirect to cities list
+      window.alert('Ciudad creada exitosamente');
+      router.push('/dashboard/cities');
     } catch (error) {
+      console.error('Error en handleSubmit:', error);
+      window.alert((error as any)?.message || 'Error al crear ciudad');
     } finally {
       setLoading(false);
     }
