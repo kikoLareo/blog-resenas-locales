@@ -10,7 +10,7 @@ const adminClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.SANITY_STUDIO_PROJECT_ID || 'xaenlpyp',
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || process.env.SANITY_STUDIO_DATASET || 'production',
   apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
-  token: "sk5pdI1X71JKsFKbiWMFyXEiG8mOeBpze9ZsQBfxHfVMmkZmzfE5ixogDmbesz7dg4bIAqHNkDst2tJq9bv7BhE1VwIG1sJ6PK3uZhYuW0MLsqtpxzQYNQl14bOwiV17ZEhhCx6XTNy3Yjje0ViA31DU31ibKfguaZQYzcBU0vE7Kp7ZMZ3D",
+  token: "skjQCsaScEi4684Avj6dClTHXvMGjrcxoP3ZlFWQysoXkB4xfPuxBrk5UdzU1KBXNxXAsUkv7EARMRQjEb0QqjhTANQY9oRL4Pjm1hXh0Ds7zTbzWlKVzoojeE6wvWxy7xBJI8wZAyYjkFm1upOOkNE8K8j5CW9kGhpyjGLSo2PYjCN8X1ez",
   useCdn: false,
 });
 

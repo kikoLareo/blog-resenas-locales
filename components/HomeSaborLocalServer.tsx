@@ -55,6 +55,37 @@ async function getFeaturedReviews() {
   }
 }
 
+// Función para obtener categorías reales
+async function getCategories() {
+  try {
+    const categories = await adminSanityClient.fetch(`
+      *[_type == "category" && published == true] | order(title asc) {
+        _id,
+        title,
+        slug,
+        description,
+        color,
+        emoji,
+        "count": count(*[_type == "venue" && references(^._id)])
+      }
+    `);
+    
+    return categories.map((cat: any) => ({
+      id: cat._id,
+      name: cat.title,
+      slug: cat.slug?.current || cat.slug,
+      count: cat.count || 0,
+      image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop&q=85", // Imagen por defecto
+      description: cat.description || "Descubre los mejores locales de esta categoría",
+      color: cat.color || "#f59e0b",
+      emoji: cat.emoji || "🍽️"
+    }));
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+}
+
 // Función para obtener contenido SEO destacado
 async function getFeaturedSEOContent() {
   try {
@@ -117,9 +148,10 @@ interface HomeSaborLocalServerProps {
 }
 
 export default async function HomeSaborLocalServer({ className }: HomeSaborLocalServerProps) {
-  const [featuredReviews, seoContent] = await Promise.all([
+  const [featuredReviews, seoContent, categories] = await Promise.all([
     getFeaturedReviews(),
-    getFeaturedSEOContent()
+    getFeaturedSEOContent(),
+    getCategories()
   ]);
 
   return (
@@ -127,6 +159,8 @@ export default async function HomeSaborLocalServer({ className }: HomeSaborLocal
       className={className}
       featuredItems={featuredReviews}
       trendingReviews={featuredReviews}
+      topRatedReviews={featuredReviews}
+      categories={categories}
     />
   );
 }

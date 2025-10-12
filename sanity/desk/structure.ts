@@ -60,6 +60,194 @@ export const structure = (S: StructureBuilder) =>
                         ),
                     ])
                 ),
+
+              // Guías Gastronómicas
+              S.listItem()
+                .title('Guías Gastronómicas')
+                .icon(() => '🗺️')
+                .child(
+                  S.list()
+                    .title('Guías Gastronómicas')
+                    .items([
+                      S.listItem()
+                        .title('🌟 Guías Destacadas')
+                        .child(
+                          S.documentTypeList('guide')
+                            .title('Guías Destacadas')
+                            .filter('_type == "guide" && featured == true')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                      S.listItem()
+                        .title('🗺️ Todas las Guías')
+                        .child(
+                          S.documentTypeList('guide')
+                            .title('Todas las Guías')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                      S.listItem()
+                        .title('🏙️ Guías por Barrio')
+                        .child(
+                          S.documentTypeList('guide')
+                            .title('Guías por Barrio')
+                            .filter('_type == "guide" && type == "neighborhood"')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                      S.listItem()
+                        .title('💰 Guías Económicas')
+                        .child(
+                          S.documentTypeList('guide')
+                            .title('Guías Económicas')
+                            .filter('_type == "guide" && type == "budget"')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                    ])
+                ),
+
+              // Listas y Rankings
+              S.listItem()
+                .title('Listas y Rankings')
+                .icon(() => '📋')
+                .child(
+                  S.list()
+                    .title('Listas y Rankings')
+                    .items([
+                      S.listItem()
+                        .title('⭐ Listas Destacadas')
+                        .child(
+                          S.documentTypeList('list')
+                            .title('Listas Destacadas')
+                            .filter('_type == "list" && featured == true')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                      S.listItem()
+                        .title('📋 Todas las Listas')
+                        .child(
+                          S.documentTypeList('list')
+                            .title('Todas las Listas')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                      S.listItem()
+                        .title('🍽️ Rankings por Plato')
+                        .child(
+                          S.documentTypeList('list')
+                            .title('Rankings por Plato')
+                            .filter('_type == "list" && listType == "top-dish"')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                    ])
+                ),
+
+              // Recetas
+              S.listItem()
+                .title('Recetas')
+                .icon(() => '👨‍🍳')
+                .child(
+                  S.list()
+                    .title('Recetas')
+                    .items([
+                      S.listItem()
+                        .title('🌟 Recetas Destacadas')
+                        .child(
+                          S.documentTypeList('recipe')
+                            .title('Recetas Destacadas')
+                            .filter('_type == "recipe" && featured == true')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                      S.listItem()
+                        .title('👨‍🍳 Todas las Recetas')
+                        .child(
+                          S.documentTypeList('recipe')
+                            .title('Todas las Recetas')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                      S.listItem()
+                        .title('🇪🇸 Recetas Tradicionales')
+                        .child(
+                          S.documentTypeList('recipe')
+                            .title('Recetas Tradicionales')
+                            .filter('_type == "recipe" && recipeType == "tradicional"')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                    ])
+                ),
+
+              // Guías de Platos
+              S.listItem()
+                .title('Guías de Platos')
+                .icon(() => '🍽️')
+                .child(
+                  S.documentTypeList('dish-guide')
+                    .title('Guías de Platos')
+                    .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                ),
+
+              // Noticias y Tendencias
+              S.listItem()
+                .title('Noticias')
+                .icon(() => '📰')
+                .child(
+                  S.list()
+                    .title('Noticias')
+                    .items([
+                      S.listItem()
+                        .title('🌟 Noticias Destacadas')
+                        .child(
+                          S.documentTypeList('news')
+                            .title('Noticias Destacadas')
+                            .filter('_type == "news" && featured == true')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                      S.listItem()
+                        .title('📰 Todas las Noticias')
+                        .child(
+                          S.documentTypeList('news')
+                            .title('Todas las Noticias')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                      S.listItem()
+                        .title('📈 Tendencias')
+                        .child(
+                          S.documentTypeList('news')
+                            .title('Tendencias Gastronómicas')
+                            .filter('_type == "news" && category == "tendencias"')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                    ])
+                ),
+
+              // Ofertas
+              S.listItem()
+                .title('Ofertas')
+                .icon(() => '🎁')
+                .child(
+                  S.list()
+                    .title('Ofertas')
+                    .items([
+                      S.listItem()
+                        .title('🔥 Ofertas Activas')
+                        .child(
+                          S.documentTypeList('offer')
+                            .title('Ofertas Activas')
+                            .filter('_type == "offer" && validUntil > now()')
+                            .defaultOrdering([{ field: 'validUntil', direction: 'asc' }])
+                        ),
+                      S.listItem()
+                        .title('⭐ Ofertas Destacadas')
+                        .child(
+                          S.documentTypeList('offer')
+                            .title('Ofertas Destacadas')
+                            .filter('_type == "offer" && featured == true')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                      S.listItem()
+                        .title('🎁 Todas las Ofertas')
+                        .child(
+                          S.documentTypeList('offer')
+                            .title('Todas las Ofertas')
+                            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }])
+                        ),
+                    ])
+                ),
             ])
         ),
 
@@ -267,6 +455,49 @@ export const structure = (S: StructureBuilder) =>
                     .title('Nuevo Post')
                     .canHandleIntent((_name: string, params: { type?: string }) => params.type === 'post')
                 ),
+              S.listItem()
+                .title('🗺️ Nueva Guía')
+                .child(
+                  S.documentTypeList('guide')
+                    .title('Nueva Guía')
+                    .canHandleIntent((_name: string, params: { type?: string }) => params.type === 'guide')
+                ),
+              S.listItem()
+                .title('📋 Nueva Lista')
+                .child(
+                  S.documentTypeList('list')
+                    .title('Nueva Lista')
+                    .canHandleIntent((_name: string, params: { type?: string }) => params.type === 'list')
+                ),
+              S.listItem()
+                .title('👨‍🍳 Nueva Receta')
+                .child(
+                  S.documentTypeList('recipe')
+                    .title('Nueva Receta')
+                    .canHandleIntent((_name: string, params: { type?: string }) => params.type === 'recipe')
+                ),
+              S.listItem()
+                .title('🍽️ Nueva Guía de Plato')
+                .child(
+                  S.documentTypeList('dish-guide')
+                    .title('Nueva Guía de Plato')
+                    .canHandleIntent((_name: string, params: { type?: string }) => params.type === 'dish-guide')
+                ),
+              S.listItem()
+                .title('📰 Nueva Noticia')
+                .child(
+                  S.documentTypeList('news')
+                    .title('Nueva Noticia')
+                    .canHandleIntent((_name: string, params: { type?: string }) => params.type === 'news')
+                ),
+              S.listItem()
+                .title('🎁 Nueva Oferta')
+                .child(
+                  S.documentTypeList('offer')
+                    .title('Nueva Oferta')
+                    .canHandleIntent((_name: string, params: { type?: string }) => params.type === 'offer')
+                ),
+              S.divider(),
               S.listItem()
                 .title('🏪 Nuevo Local')
                 .child(
