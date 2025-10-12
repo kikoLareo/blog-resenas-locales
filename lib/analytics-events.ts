@@ -347,12 +347,11 @@ export const contentSpecificEvents = {
 };
 
 // Export default para fácil importación
-export default {
+const analyticsEvents = {
   trackContentView,
   trackContentInteraction,
   trackMapInteraction,
   trackSearch,
-  trackInternalNavigation,
   trackContentEngagement,
   trackConversion,
   trackContentPerformance,
@@ -360,3 +359,5 @@ export default {
   setupAutomaticTracking,
   contentSpecificEvents,
 };
+
+export default analyticsEvents;

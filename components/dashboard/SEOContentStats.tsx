@@ -23,6 +23,7 @@ async function getSEOStats() {
     const stats = await adminSanityClient.fetch(getSEOContentStatsQuery);
     return stats;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error fetching SEO stats:', error);
     // Fallback con datos vacíos
     return {
@@ -42,6 +43,7 @@ async function getRecentActivity() {
     const activity = await adminSanityClient.fetch(getRecentSEOActivityQuery);
     return activity.recent || [];
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error fetching recent activity:', error);
     return [];
   }
@@ -53,6 +55,7 @@ async function getEditorialCalendar() {
     const calendar = await adminSanityClient.fetch(getEditorialCalendarQuery);
     return calendar;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error fetching editorial calendar:', error);
     return { scheduled: [], expiring: [] };
   }
@@ -367,7 +370,7 @@ export default async function SEOContentStats() {
                   <div className={`w-2 h-2 ${actionColors[item.action]} rounded-full`}></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">
-                      {typeNames[item._type]} "{item.title}" {item.action === 'published' ? 'publicada' : 'actualizada'}
+                      {typeNames[item._type]} &quot;{item.title}&quot; {item.action === 'published' ? 'publicada' : 'actualizada'}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(item.publishedAt || item.lastUpdated).toLocaleDateString('es-ES', {
@@ -401,7 +404,7 @@ export default async function SEOContentStats() {
             {calendar.scheduled.map((item: any) => (
               <div key={item._id} className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
                 <div>
-                  <p className="text-sm font-medium">{typeNames[item._type]}: "{item.title}"</p>
+                  <p className="text-sm font-medium">{typeNames[item._type]}: &quot;{item.title}&quot;</p>
                   <p className="text-xs text-muted-foreground">En borrador</p>
                 </div>
                 <div className="text-xs text-blue-600 font-medium">
@@ -414,7 +417,7 @@ export default async function SEOContentStats() {
             {calendar.expiring.map((item: any) => (
               <div key={item._id} className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-950 rounded-lg">
                 <div>
-                  <p className="text-sm font-medium">{typeNames[item._type]}: "{item.title}"</p>
+                  <p className="text-sm font-medium">{typeNames[item._type]}: &quot;{item.title}&quot;</p>
                   <p className="text-xs text-muted-foreground">Próximo a expirar</p>
                 </div>
                 <div className="text-xs text-orange-600 font-medium">
