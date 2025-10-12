@@ -125,8 +125,8 @@ export default async function HomeSaborLocalServer({ className }: HomeSaborLocal
   return (
     <HomeSaborLocal 
       className={className}
-      featuredReviews={featuredReviews}
-      seoContent={seoContent}
+      featuredItems={featuredReviews}
+      trendingReviews={featuredReviews}
     />
   );
 }
