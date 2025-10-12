@@ -106,6 +106,9 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
       }
       setPhoneError('');
 
+      console.log('Guardando venue con ID:', venue._id);
+      console.log('Datos a enviar:', { ...formData, images });
+
       // Call API to update venue
       const res = await fetch(`/api/admin/venues/${venue._id}`, {
         method: 'PUT',
@@ -116,15 +119,21 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
       });
 
       const data = await res.json();
+      console.log('Respuesta del servidor:', data);
 
       if (!res.ok) {
-        window.alert(data?.error || 'Error al actualizar');
+        const errorMsg = data?.details || data?.error || 'Error al actualizar';
+        console.error('Error al guardar:', errorMsg);
+        window.alert(`Error: ${errorMsg}`);
         return;
       }
 
-      // Close modal on success
+      // Close modal on success and reload page to show updated data
+      window.alert('Local actualizado exitosamente');
       setIsEditModalOpen(false);
+      window.location.reload();
     } catch (error) {
+      console.error('Error en handleSave:', error);
       window.alert((error as any)?.message || 'Error al actualizar');
     } finally {
       setIsLoading(false);
@@ -284,7 +293,7 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
                     <div key={review._id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex-1">
                         <Link 
-                          href={`/dashboard/reviews/${review._id}`}
+                          href={`/dashboard/reviews/${review._id}/edit`}
                           className="font-medium text-blue-600 hover:underline"
                         >
                           {review.title}
