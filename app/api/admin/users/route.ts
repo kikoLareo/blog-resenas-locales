@@ -75,16 +75,34 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { email, password, role, name } = body;
 
+    // Validaciones
     if (!email || !password) {
-      return NextResponse.json({ error: 'email and password required' }, { status: 400 });
+      return NextResponse.json({ error: 'Email y contraseña son requeridos' }, { status: 400 });
     }
 
-    const emailNorm = (email as string).toLowerCase();
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Formato de email inválido' }, { status: 400 });
+    }
+
+    // Validar longitud de contraseña
+    if (password.length < 8) {
+      return NextResponse.json({ error: 'La contraseña debe tener al menos 8 caracteres' }, { status: 400 });
+    }
+
+    // Validar rol válido
+    const validRoles = ['GUEST', 'MEMBER', 'EDITOR', 'ADMIN'];
+    if (role && !validRoles.includes(role)) {
+      return NextResponse.json({ error: 'Rol inválido' }, { status: 400 });
+    }
+
+    const emailNorm = (email as string).toLowerCase().trim();
 
     // check existing
     const existing = await prisma.user.findUnique({ where: { email: emailNorm } });
     if (existing) {
-      return NextResponse.json({ error: 'User already exists' }, { status: 409 });
+      return NextResponse.json({ error: 'El usuario ya existe' }, { status: 409 });
     }
 
     const saltRounds = parseInt(process.env.PASSWORD_SALT_ROUNDS || '10', 10);
@@ -95,7 +113,7 @@ export async function POST(req: NextRequest) {
         email: emailNorm,
         passwordHash: hash,
         role: role || 'MEMBER',
-        name: name || null,
+        name: name ? name.trim() : null,
       },
       select: {
         id: true,
@@ -109,6 +127,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ user: created }, { status: 201 });
   } catch (err: any) {
     console.error('Error creating user:', err);
-    return NextResponse.json({ error: 'internal_error' }, { status: 500 });
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Users, UserPlus, Shield, Edit, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { Users, UserPlus, Shield, Edit, Trash2, CheckCircle, XCircle, Key, Search } from "lucide-react";
 
 interface User {
   id: string;
@@ -38,9 +38,14 @@ interface Stats {
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [adminSecret, setAdminSecret] = useState('');
+  
+  // Filtros y búsqueda
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
   
   // Formulario para crear usuario
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -54,12 +59,38 @@ export default function AdminUsersPage() {
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [editRole, setEditRole] = useState('');
   const [editName, setEditName] = useState('');
+  const [editUsername, setEditUsername] = useState('');
+
+  // Cambio de contraseña
+  const [changingPassword, setChangingPassword] = useState<string | null>(null);
+  const [newUserPassword, setNewUserPassword] = useState('');
 
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   useEffect(() => {
     loadUsers();
   }, []);
+
+  // Filtrar usuarios cuando cambian los filtros
+  useEffect(() => {
+    let filtered = users;
+
+    // Filtrar por término de búsqueda
+    if (searchTerm) {
+      filtered = filtered.filter(user =>
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.username?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filtrar por rol
+    if (roleFilter !== 'all') {
+      filtered = filtered.filter(user => user.role === roleFilter);
+    }
+
+    setFilteredUsers(filtered);
+  }, [users, searchTerm, roleFilter]);
 
   const loadUsers = async () => {
     const secret = localStorage.getItem('admin-secret') || '';
@@ -80,6 +111,7 @@ export default function AdminUsersPage() {
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users);
+        setFilteredUsers(data.users);
         setStats(data.stats);
       } else {
         setMessage({ type: 'error', text: 'Error al cargar usuarios. Verifica el secret.' });
@@ -148,7 +180,8 @@ export default function AdminUsersPage() {
         },
         body: JSON.stringify({
           role: editRole,
-          name: editName || null
+          name: editName || null,
+          username: editUsername || null
         })
       });
 
@@ -163,6 +196,40 @@ export default function AdminUsersPage() {
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Error de red al actualizar usuario' });
+    }
+  };
+
+  const handleChangePassword = async (userId: string) => {
+    if (!newUserPassword || newUserPassword.length < 8) {
+      setMessage({ type: 'error', text: 'La contraseña debe tener al menos 8 caracteres' });
+      return;
+    }
+
+    setMessage(null);
+
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': adminSecret
+        },
+        body: JSON.stringify({
+          password: newUserPassword
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage({ type: 'success', text: 'Contraseña actualizada exitosamente' });
+        setChangingPassword(null);
+        setNewUserPassword('');
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Error al cambiar contraseña' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Error de red al cambiar contraseña' });
     }
   };
 
@@ -198,6 +265,12 @@ export default function AdminUsersPage() {
     setEditingUser(user.id);
     setEditRole(user.role);
     setEditName(user.name || '');
+    setEditUsername(user.username || '');
+  };
+
+  const startChangePassword = (userId: string) => {
+    setChangingPassword(userId);
+    setNewUserPassword('');
   };
 
   const getRoleColor = (role: string) => {
@@ -386,6 +459,7 @@ export default function AdminUsersPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="GUEST">GUEST - Invitado</SelectItem>
                     <SelectItem value="MEMBER">MEMBER - Usuario básico</SelectItem>
                     <SelectItem value="EDITOR">EDITOR - Editor de contenido</SelectItem>
                     <SelectItem value="ADMIN">ADMIN - Administrador completo</SelectItem>
@@ -406,28 +480,82 @@ export default function AdminUsersPage() {
         </Card>
       )}
 
+      {/* Filtros y búsqueda */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filtrar Usuarios</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="search">Buscar</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  id="search"
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Buscar por email, nombre o username..."
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="roleFilter">Filtrar por Rol</Label>
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los roles</SelectItem>
+                  <SelectItem value="ADMIN">ADMIN</SelectItem>
+                  <SelectItem value="EDITOR">EDITOR</SelectItem>
+                  <SelectItem value="MEMBER">MEMBER</SelectItem>
+                  <SelectItem value="GUEST">GUEST</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          {(searchTerm || roleFilter !== 'all') && (
+            <div className="mt-4 text-sm text-gray-600">
+              Mostrando {filteredUsers.length} de {users.length} usuarios
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Lista de usuarios */}
       <Card>
         <CardHeader>
           <CardTitle>Usuarios Registrados</CardTitle>
           <CardDescription>
-            {users.length} usuarios en total
+            {filteredUsers.length} {filteredUsers.length === 1 ? 'usuario' : 'usuarios'} 
+            {(searchTerm || roleFilter !== 'all') && ` encontrado(s)`}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {users.map((user) => (
+            {filteredUsers.map((user) => (
               <div key={user.id} className="border rounded-lg p-4">
                 {editingUser === user.id ? (
                   // Modo edición
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <Label>Nombre</Label>
                         <Input
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
                           placeholder="Nombre del usuario"
+                        />
+                      </div>
+                      <div>
+                        <Label>Username</Label>
+                        <Input
+                          value={editUsername}
+                          onChange={(e) => setEditUsername(e.target.value)}
+                          placeholder="Username único"
                         />
                       </div>
                       <div>
@@ -447,9 +575,34 @@ export default function AdminUsersPage() {
                     </div>
                     <div className="flex gap-2">
                       <Button onClick={() => handleUpdateUser(user.id)} size="sm">
-                        Guardar
+                        Guardar Cambios
                       </Button>
                       <Button onClick={() => setEditingUser(null)} variant="outline" size="sm">
+                        Cancelar
+                      </Button>
+                    </div>
+                  </div>
+                ) : changingPassword === user.id ? (
+                  // Modo cambio de contraseña
+                  <div className="space-y-4">
+                    <div className="max-w-md">
+                      <Label>Nueva Contraseña para {user.email}</Label>
+                      <Input
+                        type="password"
+                        value={newUserPassword}
+                        onChange={(e) => setNewUserPassword(e.target.value)}
+                        placeholder="Mínimo 8 caracteres"
+                        minLength={8}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button onClick={() => handleChangePassword(user.id)} size="sm">
+                        Cambiar Contraseña
+                      </Button>
+                      <Button onClick={() => {
+                        setChangingPassword(null);
+                        setNewUserPassword('');
+                      }} variant="outline" size="sm">
                         Cancelar
                       </Button>
                     </div>
@@ -475,21 +628,29 @@ export default function AdminUsersPage() {
                             </span>
                           </div>
                           <div className="text-sm text-gray-500">{user.email}</div>
+                          {user.username && (
+                            <div className="text-xs text-gray-400">@{user.username}</div>
+                          )}
                           <div className="text-xs text-gray-400 mt-1">
                             Creado: {new Date(user.createdAt).toLocaleDateString('es-ES')} • 
-                            {user._count.sessions} sesiones activas
+                            {user._count.sessions} sesiones • 
+                            {user._count.paywallSubscriptions} suscripciones
                           </div>
                         </div>
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button onClick={() => startEdit(user)} variant="outline" size="sm">
+                      <Button onClick={() => startEdit(user)} variant="outline" size="sm" title="Editar usuario">
                         <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button onClick={() => startChangePassword(user.id)} variant="outline" size="sm" title="Cambiar contraseña">
+                        <Key className="h-4 w-4" />
                       </Button>
                       <Button 
                         onClick={() => handleDeleteUser(user.id, user.email || '')} 
                         variant="destructive" 
                         size="sm"
+                        title="Eliminar usuario"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -499,9 +660,12 @@ export default function AdminUsersPage() {
               </div>
             ))}
 
-            {users.length === 0 && (
+            {filteredUsers.length === 0 && (
               <div className="text-center py-12 text-gray-500">
-                No hay usuarios registrados aún
+                {searchTerm || roleFilter !== 'all' 
+                  ? 'No se encontraron usuarios con los filtros aplicados'
+                  : 'No hay usuarios registrados aún'
+                }
               </div>
             )}
           </div>
