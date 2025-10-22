@@ -1,88 +1,126 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { NextResponse } from 'next/server';
 import { 
-  saveHomepageConfiguration, 
   getHomepageConfiguration, 
-  revalidateHomepage,
-  HomepageSectionConfig 
+  saveHomepageConfiguration, 
+  defaultHomepageConfig,
+  type HomepageSectionConfig 
 } from '@/lib/homepage-admin';
 
-// GET - Obtener configuración actual
+/**
+ * GET /api/admin/homepage-config
+ * Obtiene la configuración actual de la homepage desde Sanity
+ * Si no existe, devuelve la configuración por defecto
+ */
 export async function GET() {
   try {
-    // If NEXTAUTH_SECRET is not configured, don't call getServerSession during
-    // build-time or in environments where auth isn't set up. Return 503 so the
-    // caller knows the admin API isn't available.
-    if (!process.env.NEXTAUTH_SECRET) {
-      return NextResponse.json(
-        { error: 'Authentication not configured' },
-        { status: 503 }
-      );
-    }
-
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    }
-
     const config = await getHomepageConfiguration();
-    return NextResponse.json(config);
-  } catch (error) {
+    
+    if (config && config.sections) {
+      return NextResponse.json(config, { status: 200 });
+    }
+    
+    // Si no hay configuración en Sanity, devolver la por defecto
     return NextResponse.json(
-      { error: 'Error al obtener configuración' }, 
-      { status: 500 }
+      { 
+        sections: defaultHomepageConfig,
+        title: 'Homepage Principal',
+        lastModified: new Date().toISOString()
+      }, 
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error fetching homepage configuration:', error);
+    
+    // En caso de error, devolver configuración por defecto
+    return NextResponse.json(
+      { 
+        sections: defaultHomepageConfig,
+        title: 'Homepage Principal',
+        lastModified: new Date().toISOString()
+      }, 
+      { status: 200 }
     );
   }
 }
 
-// POST - Guardar nueva configuración
-export async function POST(request: NextRequest) {
+/**
+ * POST /api/admin/homepage-config
+ * Guarda la configuración de la homepage en Sanity
+ * Body: { sections: HomepageSectionConfig[] }
+ */
+export async function POST(request: Request) {
   try {
-    if (!process.env.NEXTAUTH_SECRET) {
+    const body = await request.json();
+    
+    // Validar que se envió el campo sections
+    if (!body.sections || !Array.isArray(body.sections)) {
       return NextResponse.json(
-        { error: 'Authentication not configured' },
-        { status: 503 }
-      );
-    }
-
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    }
-
-    const { sections }: { sections: HomepageSectionConfig[] } = await request.json();
-
-    if (!sections || !Array.isArray(sections)) {
-      return NextResponse.json(
-        { error: 'Datos de secciones inválidos' }, 
+        { 
+          success: false, 
+          error: 'El campo "sections" es requerido y debe ser un array' 
+        },
         { status: 400 }
       );
+    }
+
+    // Validar estructura básica de cada sección
+    const sections = body.sections as HomepageSectionConfig[];
+    
+    for (const section of sections) {
+      if (!section.id || !section.type || !section.title) {
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: 'Cada sección debe tener id, type y title' 
+          },
+          { status: 400 }
+        );
+      }
+
+      // Validar tipo de sección
+      const validTypes = ['hero', 'featured', 'trending', 'categories', 'newsletter'];
+      if (!validTypes.includes(section.type)) {
+        return NextResponse.json(
+          { 
+            success: false, 
+            error: `Tipo de sección inválido: ${section.type}` 
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // Guardar en Sanity
     const success = await saveHomepageConfiguration(sections);
     
-    if (!success) {
+    if (success) {
       return NextResponse.json(
-        { error: 'Error al guardar configuración' }, 
-        { status: 500 }
+        { 
+          success: true,
+          message: 'Configuración guardada exitosamente'
+        },
+        { status: 200 }
       );
     }
-
-    // Revalidar páginas que dependen de esta configuración
-    await revalidateHomepage();
-
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Configuración guardada exitosamente' 
-    });
-  } catch (error) {
+    
     return NextResponse.json(
-      { error: 'Error interno del servidor' }, 
+      { 
+        success: false, 
+        error: 'Error al guardar la configuración en Sanity' 
+      },
+      { status: 500 }
+    );
+    
+  } catch (error) {
+    console.error('Error saving homepage configuration:', error);
+    
+    return NextResponse.json(
+      { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Error desconocido' 
+      },
       { status: 500 }
     );
   }
 }
+
