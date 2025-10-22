@@ -41,11 +41,32 @@ interface CategoryStats {
   reviewCount: number;
 }
 
+interface PerformanceData {
+  totalSessions: number;
+  totalMetrics: number;
+  aggregatedStats: {
+    sampleSize: number;
+    coreWebVitals: {
+      lcp: { p50: number; p75: number; p90: number; p95: number };
+      cls: { p50: number; p75: number; p90: number; p95: number };
+      fcp: { p50: number; p75: number; p90: number; p95: number };
+      ttfb: { p50: number; p75: number; p90: number; p95: number };
+    };
+    loadTimes: { p50: number; p75: number; p90: number; p95: number };
+    deviceInfo: {
+      connectionTypes: string[];
+      avgMemory: number;
+      avgConcurrency: number;
+    };
+  } | null;
+}
+
 export default function AdminAnalyticsPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [ratings, setRatings] = useState<RatingsStats | null>(null);
   const [cities, setCities] = useState<CityStats[]>([]);
   const [categories, setCategories] = useState<CategoryStats[]>([]);
+  const [performance, setPerformance] = useState<PerformanceData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -77,6 +98,13 @@ export default function AdminAnalyticsPage() {
         if (categoriesResponse.ok) {
           const categoriesData = await categoriesResponse.json();
           setCategories(categoriesData);
+        }
+
+        // Cargar métricas de rendimiento
+        const performanceResponse = await fetch('/api/performance/metrics?hours=24');
+        if (performanceResponse.ok) {
+          const performanceData = await performanceResponse.json();
+          setPerformance(performanceData);
         }
       } catch (error) {
         console.error('Error cargando analytics:', error);
@@ -192,6 +220,164 @@ export default function AdminAnalyticsPage() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Core Web Vitals y Performance */}
+      {performance && performance.aggregatedStats && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Core Web Vitals */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Core Web Vitals (Últimas 24h)</CardTitle>
+              <CardDescription>
+                {performance.totalSessions} sesiones • {performance.aggregatedStats.sampleSize} métricas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* LCP - Largest Contentful Paint */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">LCP (Largest Contentful Paint)</span>
+                    <span className={`text-sm font-bold ${
+                      performance.aggregatedStats.coreWebVitals.lcp.p75 <= 2500 
+                        ? 'text-green-600' 
+                        : performance.aggregatedStats.coreWebVitals.lcp.p75 <= 4000 
+                        ? 'text-yellow-600' 
+                        : 'text-red-600'
+                    }`}>
+                      {(performance.aggregatedStats.coreWebVitals.lcp.p75 / 1000).toFixed(2)}s
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    P50: {(performance.aggregatedStats.coreWebVitals.lcp.p50 / 1000).toFixed(2)}s • 
+                    P90: {(performance.aggregatedStats.coreWebVitals.lcp.p90 / 1000).toFixed(2)}s
+                  </div>
+                </div>
+
+                {/* CLS - Cumulative Layout Shift */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">CLS (Cumulative Layout Shift)</span>
+                    <span className={`text-sm font-bold ${
+                      performance.aggregatedStats.coreWebVitals.cls.p75 <= 0.1 
+                        ? 'text-green-600' 
+                        : performance.aggregatedStats.coreWebVitals.cls.p75 <= 0.25 
+                        ? 'text-yellow-600' 
+                        : 'text-red-600'
+                    }`}>
+                      {performance.aggregatedStats.coreWebVitals.cls.p75.toFixed(3)}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    P50: {performance.aggregatedStats.coreWebVitals.cls.p50.toFixed(3)} • 
+                    P90: {performance.aggregatedStats.coreWebVitals.cls.p90.toFixed(3)}
+                  </div>
+                </div>
+
+                {/* FCP - First Contentful Paint */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">FCP (First Contentful Paint)</span>
+                    <span className={`text-sm font-bold ${
+                      performance.aggregatedStats.coreWebVitals.fcp.p75 <= 1800 
+                        ? 'text-green-600' 
+                        : performance.aggregatedStats.coreWebVitals.fcp.p75 <= 3000 
+                        ? 'text-yellow-600' 
+                        : 'text-red-600'
+                    }`}>
+                      {(performance.aggregatedStats.coreWebVitals.fcp.p75 / 1000).toFixed(2)}s
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    P50: {(performance.aggregatedStats.coreWebVitals.fcp.p50 / 1000).toFixed(2)}s • 
+                    P90: {(performance.aggregatedStats.coreWebVitals.fcp.p90 / 1000).toFixed(2)}s
+                  </div>
+                </div>
+
+                {/* TTFB - Time to First Byte */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">TTFB (Time to First Byte)</span>
+                    <span className={`text-sm font-bold ${
+                      performance.aggregatedStats.coreWebVitals.ttfb.p75 <= 800 
+                        ? 'text-green-600' 
+                        : performance.aggregatedStats.coreWebVitals.ttfb.p75 <= 1800 
+                        ? 'text-yellow-600' 
+                        : 'text-red-600'
+                    }`}>
+                      {(performance.aggregatedStats.coreWebVitals.ttfb.p75 / 1000).toFixed(2)}s
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    P50: {(performance.aggregatedStats.coreWebVitals.ttfb.p50 / 1000).toFixed(2)}s • 
+                    P90: {(performance.aggregatedStats.coreWebVitals.ttfb.p90 / 1000).toFixed(2)}s
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Device Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Información de Dispositivos</CardTitle>
+              <CardDescription>
+                Datos de los usuarios en las últimas 24 horas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="text-sm font-medium mb-2">Tipos de Conexión</div>
+                  <div className="flex flex-wrap gap-2">
+                    {performance.aggregatedStats.deviceInfo.connectionTypes.length > 0 ? (
+                      performance.aggregatedStats.deviceInfo.connectionTypes.map((type, idx) => (
+                        <span key={idx} className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                          {type}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-xs text-gray-500">No hay datos disponibles</span>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-sm font-medium mb-2">Memoria del Dispositivo</div>
+                  <div className="text-2xl font-bold">
+                    {performance.aggregatedStats.deviceInfo.avgMemory > 0 
+                      ? `${performance.aggregatedStats.deviceInfo.avgMemory.toFixed(1)} GB`
+                      : 'N/A'
+                    }
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Promedio</p>
+                </div>
+
+                <div>
+                  <div className="text-sm font-medium mb-2">Núcleos de CPU</div>
+                  <div className="text-2xl font-bold">
+                    {performance.aggregatedStats.deviceInfo.avgConcurrency > 0 
+                      ? performance.aggregatedStats.deviceInfo.avgConcurrency.toFixed(1)
+                      : 'N/A'
+                    }
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Promedio de núcleos</p>
+                </div>
+
+                <div>
+                  <div className="text-sm font-medium mb-2">Tiempo de Carga</div>
+                  <div className="text-2xl font-bold">
+                    {(performance.aggregatedStats.loadTimes.p75 / 1000).toFixed(2)}s
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    P75 • P90: {(performance.aggregatedStats.loadTimes.p90 / 1000).toFixed(2)}s
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Gráficos y métricas detalladas */}
@@ -313,20 +499,127 @@ export default function AdminAnalyticsPage() {
         </CardContent>
       </Card>
 
+      {/* Configuración de Analytics */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Configuración de Analytics</CardTitle>
+          <CardDescription>
+            Herramientas de análisis configuradas en el sitio
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Google Analytics 4 */}
+            <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+              <div>
+                <h4 className="font-medium flex items-center gap-2">
+                  Google Analytics 4
+                  <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">Activo</span>
+                </h4>
+                <p className="text-sm text-gray-600 mt-1">
+                  ID: {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-XSLBYXBEZJ'}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Tracking de eventos, páginas y conversiones activo
+                </p>
+              </div>
+              <Link href="https://analytics.google.com" target="_blank">
+                <Button variant="outline" size="sm">
+                  Ver en GA4 →
+                </Button>
+              </Link>
+            </div>
+            
+            {/* Performance Monitor */}
+            <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+              <div>
+                <h4 className="font-medium flex items-center gap-2">
+                  Performance Monitor
+                  <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">Activo</span>
+                </h4>
+                <p className="text-sm text-gray-600 mt-1">
+                  Core Web Vitals y Real User Monitoring
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {performance ? `${performance.totalSessions} sesiones en las últimas 24h` : 'Recopilando datos...'}
+                </p>
+              </div>
+              <Button variant="outline" size="sm" disabled>
+                En Vivo
+              </Button>
+            </div>
+
+            {/* Sanity Analytics */}
+            <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+              <div>
+                <h4 className="font-medium flex items-center gap-2">
+                  Sanity CMS Analytics
+                  <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">Activo</span>
+                </h4>
+                <p className="text-sm text-gray-600 mt-1">
+                  Estadísticas de contenido en tiempo real
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {stats ? `${stats.totalReviews} reseñas • ${stats.totalVenues} locales` : 'Cargando...'}
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+                Actualizar
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Información adicional */}
       <Card>
         <CardHeader>
           <CardTitle>Sobre las Estadísticas</CardTitle>
           <CardDescription>
-            Información en tiempo real desde Sanity CMS
+            Información sobre los datos mostrados
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2 text-sm text-gray-600">
-            <p>• Los datos se obtienen directamente desde Sanity CMS</p>
-            <p>• Las estadísticas se actualizan en tiempo real al recargar la página</p>
-            <p>• Los ratings son promedios de todas las reseñas publicadas</p>
-            <p>• Para analíticas de tráfico, configura Google Analytics 4</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="font-medium mb-2">📊 Datos de Contenido</h4>
+              <div className="space-y-1 text-sm text-gray-600">
+                <p>• Obtienen desde Sanity CMS</p>
+                <p>• Actualizados en tiempo real</p>
+                <p>• Incluyen borradores y publicados</p>
+                <p>• Ratings promediados automáticamente</p>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-medium mb-2">⚡ Core Web Vitals</h4>
+              <div className="space-y-1 text-sm text-gray-600">
+                <p>• Datos reales de usuarios (RUM)</p>
+                <p>• Últimas 24 horas de actividad</p>
+                <p>• Percentiles: P50, P75, P90, P95</p>
+                <p>• Colores: 🟢 Bueno 🟡 Regular 🔴 Pobre</p>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-medium mb-2">🌐 Google Analytics 4</h4>
+              <div className="space-y-1 text-sm text-gray-600">
+                <p>• Tracking automático de páginas</p>
+                <p>• Eventos personalizados activos</p>
+                <p>• Ver reportes completos en GA4</p>
+                <p>• Exportar datos disponible</p>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-medium mb-2">💡 Recomendaciones</h4>
+              <div className="space-y-1 text-sm text-gray-600">
+                <p>• LCP objetivo: &lt; 2.5s</p>
+                <p>• CLS objetivo: &lt; 0.1</p>
+                <p>• FCP objetivo: &lt; 1.8s</p>
+                <p>• TTFB objetivo: &lt; 800ms</p>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

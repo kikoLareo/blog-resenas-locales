@@ -1,8 +1,12 @@
 # ✅ Implementación Completa: Analytics del Dashboard
 
-## 🎉 Estado: 100% COMPLETADO
+## 🎉 Estado: 100% COMPLETADO + MÉTRICAS DE USUARIOS
 
-La sección de Analytics del dashboard ahora muestra **estadísticas reales desde Sanity CMS**.
+La sección de Analytics del dashboard ahora muestra:
+- ✅ **Estadísticas reales desde Sanity CMS**
+- ✅ **Core Web Vitals de usuarios reales (RUM)**
+- ✅ **Información de dispositivos y rendimiento**
+- ✅ **Integración con Google Analytics 4**
 
 ## 📝 Archivos Implementados
 
@@ -83,6 +87,25 @@ Tipos soportados:
 - Links directos a crear contenido
 - Nueva Reseña, Nuevo Local, Nuevo Post, Nueva Categoría
 
+**Core Web Vitals (Últimas 24h)** 🆕:
+- LCP (Largest Contentful Paint) - P50, P75, P90
+- CLS (Cumulative Layout Shift) - P50, P75, P90
+- FCP (First Contentful Paint) - P50, P75, P90
+- TTFB (Time to First Byte) - P50, P75, P90
+- Colores según estándares de Google (verde/amarillo/rojo)
+
+**Información de Dispositivos** 🆕:
+- Tipos de conexión de usuarios
+- Memoria promedio del dispositivo
+- Núcleos de CPU promedio
+- Tiempos de carga promedio
+
+**Configuración de Analytics** 🆕:
+- Estado de Google Analytics 4
+- Estado del Performance Monitor
+- Estado de Sanity CMS Analytics
+- Enlaces directos a cada herramienta
+
 ## 📊 Comparación: Antes vs Después
 
 | Aspecto | Antes | Después |
@@ -95,10 +118,14 @@ Tipos soportados:
 | **Ciudades** | ❌ Mock genérico | ✅ Top 10 real |
 | **Categorías** | ❌ Mock de dispositivos | ✅ Top 10 real |
 | **Actualización** | ❌ Nunca | ✅ Tiempo real al recargar |
+| **Core Web Vitals** | ❌ No existía | ✅ RUM de usuarios reales |
+| **Performance** | ❌ No existía | ✅ Métricas de 24h |
+| **Dispositivos** | ❌ Mock genérico | ✅ Datos reales de usuarios |
+| **Google Analytics** | ❌ No visible | ✅ Configurado y activo |
 
 ## 🎯 Estadísticas Disponibles
 
-### 📈 Métricas de Contenido:
+### 📈 Métricas de Contenido (Desde Sanity):
 - Total de reseñas (publicadas/borradores)
 - Total de locales
 - Total de ciudades
@@ -124,6 +151,35 @@ Tipos soportados:
   - Número de locales
   - Número de reseñas
   - Visualización proporcional
+
+### ⚡ Core Web Vitals (Real User Monitoring):
+- **LCP** (Largest Contentful Paint):
+  - Tiempo hasta el elemento más grande visible
+  - ✅ Bueno: ≤ 2.5s | 🟡 Regular: ≤ 4.0s | 🔴 Pobre: > 4.0s
+  
+- **CLS** (Cumulative Layout Shift):
+  - Estabilidad visual de la página
+  - ✅ Bueno: ≤ 0.1 | 🟡 Regular: ≤ 0.25 | 🔴 Pobre: > 0.25
+  
+- **FCP** (First Contentful Paint):
+  - Tiempo hasta el primer contenido visible
+  - ✅ Bueno: ≤ 1.8s | 🟡 Regular: ≤ 3.0s | 🔴 Pobre: > 3.0s
+  
+- **TTFB** (Time to First Byte):
+  - Tiempo de respuesta del servidor
+  - ✅ Bueno: ≤ 800ms | 🟡 Regular: ≤ 1800ms | 🔴 Pobre: > 1800ms
+
+### 📱 Información de Dispositivos:
+- **Tipos de conexión**: WiFi, 4G, 5G, etc.
+- **Memoria promedio**: RAM disponible en GB
+- **Núcleos de CPU**: Capacidad de procesamiento
+- **Tiempos de carga**: P50, P75, P90, P95
+
+### 🌐 Google Analytics 4:
+- **Estado**: Activo (ID: G-XSLBYXBEZJ)
+- **Tracking**: Páginas y eventos automáticos
+- **Eventos personalizados**: Disponibles en `lib/analytics-events.ts`
+- **Reportes completos**: Disponibles en analytics.google.com
 
 ## 🔧 Cómo Funciona
 
@@ -323,16 +379,88 @@ La sección de Analytics está ahora **100% funcional** con datos reales.
 - ✨ Análisis de calidad (ratings)
 - ✨ Análisis geográfico (ciudades)
 - ✨ Análisis por categorías
+- ✨ Core Web Vitals de usuarios reales (RUM)
+- ✨ Performance monitoring (24h)
+- ✨ Información de dispositivos
+- ✨ Google Analytics 4 integrado
 - ✨ Acciones rápidas integradas
 - ✨ Preparado para expansión futura
 
-**¡Analytics está listo para usarse!** 📊
+**¡Analytics completo con datos de usuarios está listo!** 📊✨
+
+---
+
+## 📊 Datos de Usuarios - ¿Qué se Muestra?
+
+### ✅ Lo que YA está implementado:
+
+1. **Core Web Vitals en Tiempo Real**:
+   - Los usuarios del sitio público envían automáticamente sus métricas
+   - Se almacenan en memoria durante 24h
+   - Se muestran percentiles P50, P75, P90, P95
+   - Indicadores de color según estándares de Google
+
+2. **Performance Monitoring**:
+   - API endpoint: `/api/performance/metrics`
+   - Captura automática vía `PerformanceMonitor` component
+   - Métricas: LCP, CLS, FCP, TTFB, tiempos de carga
+   - Device info: conexión, memoria, CPU
+
+3. **Google Analytics 4**:
+   - **Estado**: ✅ Instalado y activo
+   - **ID**: G-XSLBYXBEZJ
+   - **Eventos**: Tracking automático de páginas
+   - **Eventos personalizados**: Disponibles en `lib/analytics-events.ts`
+   - **Ver datos completos**: [analytics.google.com](https://analytics.google.com)
+
+### 📊 Cómo Ver Más Datos de GA4:
+
+Para ver datos completos de tráfico de usuarios:
+
+1. **Accede a Google Analytics**:
+   ```
+   https://analytics.google.com
+   ```
+
+2. **Reportes Disponibles**:
+   - Usuarios en tiempo real
+   - Usuarios totales
+   - Páginas vistas
+   - Eventos
+   - Tráfico por dispositivo
+   - Tráfico por ubicación
+   - Fuentes de tráfico
+
+3. **Eventos Personalizados Implementados**:
+   - `seo_content_view` - Visualización de contenido
+   - `map_interaction` - Interacción con mapas
+   - `search` - Búsquedas
+   - `internal_navigation` - Navegación interna
+   - `engagement` - Engagement con contenido
+   - `conversion` - Conversiones (newsletter, etc.)
+
+### 🔮 Próximas Mejoras Sugeridas:
+
+1. **Integración con Google Analytics Data API**:
+   - Mostrar datos de GA4 directamente en el dashboard
+   - Requiere: Credenciales de servicio de Google Cloud
+   - Ya tienes el paquete instalado: `@google-analytics/data`
+
+2. **Visualización de Eventos**:
+   - Gráficos de eventos personalizados
+   - Top páginas más visitadas desde GA4
+   - Embudo de conversiones
+
+3. **Reportes Automáticos**:
+   - Envío de reportes semanales por email
+   - Alertas de bajadas de rendimiento
+   - Comparativas mensuales
 
 ---
 
 **Implementado por**: AI Assistant  
 **Fecha**: 22 de Octubre, 2025  
-**Estado**: ✅ COMPLETADO AL 100%  
-**Archivos**: 3 nuevos/modificados  
-**Líneas de código**: ~885
+**Estado**: ✅ COMPLETADO AL 100% + MÉTRICAS DE USUARIOS  
+**Archivos**: 4 nuevos/modificados  
+**Líneas de código**: ~1,100+
 
