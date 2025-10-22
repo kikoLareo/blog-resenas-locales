@@ -25,9 +25,11 @@ interface FeaturedItem {
   customUrl?: string;
   isActive: boolean;
   order: number;
-  reviewRef?: { title: string; venue?: { title: string; slug: { current: string } } };
-  venueRef?: { title: string; slug: { current: string } };
-  categoryRef?: { title: string; slug: { current: string } };
+  reviewRef?: { _id: string; title: string; venue?: { title: string; slug: { current: string } } };
+  venueRef?: { _id: string; title: string; slug: { current: string } };
+  categoryRef?: { _id: string; title: string; slug: { current: string } };
+  guideRef?: { _id: string; title: string; slug: { current: string } };
+  collectionRef?: { _id: string; title: string; slug: { current: string } };
   _createdAt: string;
   _updatedAt: string;
 }
@@ -48,7 +50,7 @@ function InlineAlert({ message }: { message: string }) {
 }
 
 // API functions para obtener referencias con mejor manejo de errores
-async function fetchReferences(type: 'review' | 'venue' | 'category' | 'collection' | 'guide', signal?: AbortSignal) {
+async function fetchReferences(type: 'review' | 'venue' | 'category' | 'guide', signal?: AbortSignal) {
   const TIMEOUT_MS = 10000; // 10 second timeout
   
   try {
@@ -168,11 +170,14 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
   }, []);
 
   const getSelectedReference = useCallback((item: FeaturedItem): string => {
-    if (item.reviewRef) return references.find((r: any) => r.title === item.reviewRef?.title)?._id || '';
-    if (item.venueRef) return references.find((v: any) => v.title === item.venueRef?.title)?._id || '';
-    if (item.categoryRef) return references.find((c: any) => c.title === item.categoryRef?.title)?._id || '';
+    // Usar el _id directamente de las referencias expandidas
+    if (item.reviewRef?._id) return item.reviewRef._id;
+    if (item.venueRef?._id) return item.venueRef._id;
+    if (item.categoryRef?._id) return item.categoryRef._id;
+    if (item.guideRef?._id) return item.guideRef._id;
+    if (item.collectionRef?._id) return item.collectionRef._id;
     return '';
-  }, [references]);
+  }, []);
 
   useEffect(() => {
     if (item) {
@@ -194,7 +199,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
     }
   }, [item, getSelectedReference]);
 
-  const loadReferences = useCallback(async (type: 'review' | 'venue' | 'category') => {
+  const loadReferences = useCallback(async (type: 'review' | 'venue' | 'category' | 'guide') => {
     // Don't proceed if component is unmounted
     if (!isMountedRef.current) {
       return;
@@ -246,7 +251,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
       return;
     }
     
-    if (['review', 'venue', 'category'].includes(formData.type)) {
+    if (['review', 'venue', 'category', 'guide'].includes(formData.type)) {
       // Clear previous timeout
       if (typeChangeTimeoutRef.current) {
         clearTimeout(typeChangeTimeoutRef.current);
@@ -263,11 +268,11 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
       // Debounce type changes to prevent rapid API calls
       typeChangeTimeoutRef.current = setTimeout(() => {
         if (isMountedRef.current) {
-          loadReferences(formData.type as 'review' | 'venue' | 'category');
+          loadReferences(formData.type as 'review' | 'venue' | 'category' | 'guide');
         }
       }, 300);
     } else {
-      // Clear references for types that don't need them
+      // Clear references for types that don't need them (solo collection no requiere referencias por ahora)
       setReferences([]);
       setApiError(null);
       setLoadingReferences(false);
@@ -289,9 +294,10 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
     }
     
     // Validate reference selection for types that require it
-    if (['review', 'venue', 'category'].includes(formData.type) && !formData.selectedReference) {
+    if (['review', 'venue', 'category', 'guide'].includes(formData.type) && !formData.selectedReference) {
       const typeName = formData.type === 'review' ? 'reseña' : 
-                      formData.type === 'venue' ? 'local' : 'categoría';
+                      formData.type === 'venue' ? 'local' : 
+                      formData.type === 'guide' ? 'guía' : 'categoría';
       errors.selectedReference = `Debe seleccionar una ${typeName}`;
     }
     
@@ -331,7 +337,7 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
     
     try {
       // Crear el objeto según el tipo
-      let reference = {};
+      let reference: any = {};
       if (formData.type === 'review') {
         const review = references.find((r: any) => r._id === formData.selectedReference);
         if (!review && ['review', 'venue', 'category'].includes(formData.type)) {
@@ -350,9 +356,15 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
           throw new Error('La referencia seleccionada no es válida. Por favor, selecciona otra opción.');
         }
         reference = { categoryRef: category };
+      } else if (formData.type === 'guide') {
+        const guide = references.find((g: any) => g._id === formData.selectedReference);
+        reference = { guideRef: guide };
+      } else if (formData.type === 'collection') {
+        const collection = references.find((c: any) => c._id === formData.selectedReference);
+        reference = { collectionRef: collection };
       }
 
-      const savedItem: FeaturedItem = {
+      const savedItem: any = {
         _id: item?._id || Date.now().toString(),
         title: formData.title,
         type: formData.type,
@@ -509,6 +521,11 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
           value: category._id,
           label: category.title
         }));
+      case 'guide':
+        return references.map((guide: any) => ({
+          value: guide._id,
+          label: guide.title
+        }));
       default:
         return [];
     }
@@ -601,9 +618,9 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
             </div>
 
             {/* Referencia */}
-            {['review', 'venue', 'category'].includes(formData.type) && (
+            {['review', 'venue', 'category', 'guide'].includes(formData.type) && (
               <div className="space-y-2">
-                <Label>Seleccionar {formData.type === 'review' ? 'Reseña' : formData.type === 'venue' ? 'Local' : 'Categoría'}</Label>
+                <Label>Seleccionar {formData.type === 'review' ? 'Reseña' : formData.type === 'venue' ? 'Local' : formData.type === 'guide' ? 'Guía' : 'Categoría'}</Label>
                 <Select 
                   value={formData.selectedReference} 
                   onValueChange={(value) => {
@@ -621,13 +638,13 @@ export function FeaturedItemForm({ item, onClose, onSave }: FeaturedItemFormProp
                             Cargando...
                           </div>
                         )
-                        : `Selecciona una ${formData.type === 'review' ? 'reseña' : formData.type === 'venue' ? 'local' : 'categoría'}`
+                        : `Selecciona una ${formData.type === 'review' ? 'reseña' : formData.type === 'venue' ? 'local' : formData.type === 'guide' ? 'guía' : 'categoría'}`
                     } />
                   </SelectTrigger>
                   <SelectContent>
                     {!loadingReferences && getReferenceOptions().length === 0 && !apiError && (
                       <SelectItem value="_empty" disabled>
-                        No hay {formData.type === 'review' ? 'reseñas' : formData.type === 'venue' ? 'locales' : 'categorías'} disponibles
+                        No hay {formData.type === 'review' ? 'reseñas' : formData.type === 'venue' ? 'locales' : formData.type === 'guide' ? 'guías' : 'categorías'} disponibles
                       </SelectItem>
                     )}
                     {getReferenceOptions().map((option: any) => (

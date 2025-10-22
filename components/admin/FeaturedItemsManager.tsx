@@ -54,12 +54,33 @@ async function toggleFeaturedItemStatus(id: string, isActive: boolean) {
 
 async function createFeaturedItem(item: any) {
   try {
+    // Preparar datos para enviar al API
+    const dataToSend: any = {
+      title: item.title,
+      type: item.type,
+      customTitle: item.customTitle,
+      customDescription: item.customDescription,
+      customCTA: item.customCTA,
+      customUrl: item.customUrl,
+      isActive: item.isActive,
+      order: item.order,
+    };
+
+    // Agregar el ID de la referencia
+    if (item.type === 'review' && item.reviewRef?._id) {
+      dataToSend.referenceId = item.reviewRef._id;
+    } else if (item.type === 'venue' && item.venueRef?._id) {
+      dataToSend.referenceId = item.venueRef._id;
+    } else if (item.type === 'category' && item.categoryRef?._id) {
+      dataToSend.referenceId = item.categoryRef._id;
+    }
+
     const response = await fetch('/api/admin/featured-items', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(item),
+      body: JSON.stringify(dataToSend),
     });
     if (response.ok) {
       return await response.json();
@@ -78,12 +99,33 @@ async function createFeaturedItem(item: any) {
 
 async function updateFeaturedItem(id: string, item: any) {
   try {
+    // Preparar datos para enviar al API
+    const dataToSend: any = {
+      title: item.title,
+      type: item.type,
+      customTitle: item.customTitle,
+      customDescription: item.customDescription,
+      customCTA: item.customCTA,
+      customUrl: item.customUrl,
+      isActive: item.isActive,
+      order: item.order,
+    };
+
+    // Agregar el ID de la referencia
+    if (item.type === 'review' && item.reviewRef?._id) {
+      dataToSend.referenceId = item.reviewRef._id;
+    } else if (item.type === 'venue' && item.venueRef?._id) {
+      dataToSend.referenceId = item.venueRef._id;
+    } else if (item.type === 'category' && item.categoryRef?._id) {
+      dataToSend.referenceId = item.categoryRef._id;
+    }
+
     const response = await fetch(`/api/admin/featured-items/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(item),
+      body: JSON.stringify(dataToSend),
     });
     if (response.ok) {
       return await response.json();
@@ -150,11 +192,14 @@ interface FeaturedItem {
   type: 'review' | 'venue' | 'category' | 'collection' | 'guide';
   customTitle?: string;
   customDescription?: string;
+  customUrl?: string;
   isActive: boolean;
   order: number;
-  reviewRef?: { title: string; venue?: { title: string; slug: { current: string } } };
-  venueRef?: { title: string; slug: { current: string } };
-  categoryRef?: { title: string; slug: { current: string } };
+  reviewRef?: { _id: string; title: string; venue?: { title: string; slug: { current: string } } };
+  venueRef?: { _id: string; title: string; slug: { current: string } };
+  categoryRef?: { _id: string; title: string; slug: { current: string } };
+  guideRef?: { _id: string; title: string; slug: { current: string } };
+  collectionRef?: { _id: string; title: string; slug: { current: string } };
   _createdAt: string;
   _updatedAt: string;
 }
@@ -180,20 +225,22 @@ function FeaturedItemsManager() {
     loadData();
   }, []);
 
-  const handleSave = async (item: FeaturedItem) => {
+  const handleSave = async (item: any) => {
     if (editingItem) {
       const updated = await updateFeaturedItem(editingItem._id, item);
       if (updated) {
-        setFeaturedItems(prev => 
-          prev.map(i => i._id === editingItem._id ? updated : i)
-        );
+        // Recargar todos los items para tener las referencias expandidas
+        const allItems = await fetchFeaturedItems();
+        setFeaturedItems(allItems);
         setEditingItem(null);
         setIsFormOpen(false);
       }
     } else {
       const created = await createFeaturedItem(item);
       if (created) {
-        setFeaturedItems(prev => [...prev, created]);
+        // Recargar todos los items para tener las referencias expandidas
+        const allItems = await fetchFeaturedItems();
+        setFeaturedItems(allItems);
         setIsFormOpen(false);
       }
     }
@@ -203,7 +250,9 @@ function FeaturedItemsManager() {
     if (window.confirm('¿Estás seguro de que quieres eliminar este elemento?')) {
       const result = await deleteFeaturedItem(id);
       if (result) {
-        setFeaturedItems(prev => prev.filter(item => item._id !== id));
+        // Recargar todos los items
+        const allItems = await fetchFeaturedItems();
+        setFeaturedItems(allItems);
       }
     }
   };
@@ -211,11 +260,9 @@ function FeaturedItemsManager() {
   const handleToggleStatus = async (id: string, currentStatus: boolean) => {
     const result = await toggleFeaturedItemStatus(id, !currentStatus);
     if (result) {
-      setFeaturedItems(prev => 
-        prev.map(item => 
-          item._id === id ? { ...item, isActive: !currentStatus } : item
-        )
-      );
+      // Recargar todos los items para mantener consistencia
+      const allItems = await fetchFeaturedItems();
+      setFeaturedItems(allItems);
     }
   };
 
@@ -295,20 +342,41 @@ function FeaturedItemsManager() {
     switch (item.type) {
       case 'review':
         if (item.reviewRef?.venue?.slug?.current) {
+          // Las reviews se acceden por venue
           return `/${item.reviewRef.venue.slug.current}`;
         }
         break;
       case 'venue':
         if (item.venueRef?.slug?.current) {
+          // Los venues tienen su propia ruta
           return `/${item.venueRef.slug.current}`;
         }
         break;
       case 'category':
         if (item.categoryRef?.slug?.current) {
+          // Las categorías tienen ruta /categorias/
           return `/categorias/${item.categoryRef.slug.current}`;
         }
         break;
+      case 'guide':
+        if (item.guideRef?.slug?.current) {
+          // Las guías tienen ruta dinámica por ciudad
+          return `/guias/${item.guideRef.slug.current}`;
+        }
+        break;
+      case 'collection':
+        if (item.collectionRef?.slug?.current) {
+          // Placeholder para colecciones
+          return `/colecciones/${item.collectionRef.slug.current}`;
+        }
+        break;
     }
+    
+    // Si hay customUrl, usarla
+    if (item.customUrl) {
+      return item.customUrl;
+    }
+    
     return '#';
   };
 
