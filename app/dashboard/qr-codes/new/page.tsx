@@ -52,7 +52,32 @@ export default function NewQRCodePage() {
     setSaving(true);
 
     try {
-      const uniqueCode = generateUniqueCode();
+      // Generar código único y verificar que no exista
+      let uniqueCode = generateUniqueCode();
+      let attempts = 0;
+      const maxAttempts = 5;
+
+      while (attempts < maxAttempts) {
+        // Verificar si el código ya existe
+        const existingQR = await adminSanityClient.fetch(
+          `*[_type == "qrCode" && code == $code][0]`,
+          { code: uniqueCode }
+        );
+
+        if (!existingQR) {
+          break; // Código único encontrado
+        }
+
+        // Generar nuevo código
+        uniqueCode = generateUniqueCode();
+        attempts++;
+      }
+
+      if (attempts === maxAttempts) {
+        alert('No se pudo generar un código único. Por favor, inténtalo de nuevo.');
+        setSaving(false);
+        return;
+      }
       
       const qrCodeData = {
         _type: 'qrCode',
@@ -73,6 +98,7 @@ export default function NewQRCodePage() {
       
       router.push('/dashboard/qr-codes');
     } catch (error) {
+      console.error("Error creating QR code:", error);
       alert('Error al crear el código QR');
     } finally {
       setSaving(false);

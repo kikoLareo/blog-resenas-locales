@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { adminSanityClient } from "@/lib/admin-sanity";
+import { adminSanityClient, adminSanityWriteClient } from "@/lib/admin-sanity";
 import { qrCodesListQuery } from "@/sanity/lib/queries";
 import { generateUniqueCode, generateQRCode, generateQRAccessURL } from "@/lib/qr-utils";
 import Link from "next/link";
@@ -34,6 +34,8 @@ export default function QRCodesPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [showQRModal, setShowQRModal] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const fetchQRCodes = async () => {
@@ -79,7 +81,7 @@ export default function QRCodesPage() {
 
   const handleToggleStatus = async (qrCodeId: string, currentStatus: boolean) => {
     try {
-      await adminSanityClient
+      await adminSanityWriteClient
         .patch(qrCodeId)
         .set({ isActive: !currentStatus })
         .commit();
@@ -89,6 +91,25 @@ export default function QRCodesPage() {
         qr._id === qrCodeId ? { ...qr, isActive: !currentStatus } : qr
       ));
     } catch (error) {
+      console.error("Error toggling status:", error);
+      alert("Error al cambiar el estado del QR");
+    }
+  };
+
+  const handleDelete = async (qrCodeId: string) => {
+    setDeleting(true);
+    try {
+      await adminSanityWriteClient.delete(qrCodeId);
+      
+      // Actualizar la lista local
+      setQrCodes(prev => prev.filter(qr => qr._id !== qrCodeId));
+      setShowDeleteModal(null);
+      alert("Código QR eliminado correctamente");
+    } catch (error) {
+      console.error("Error deleting QR code:", error);
+      alert("Error al eliminar el código QR");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -223,6 +244,13 @@ export default function QRCodesPage() {
                     >
                       Editar
                     </Link>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setShowDeleteModal(qrCode._id)}
+                    >
+                      Eliminar
+                    </Button>
                   </div>
                 </div>
               ))
@@ -259,6 +287,36 @@ export default function QRCodesPage() {
               <p className="text-xs text-gray-500 font-mono">
                 {generateQRAccessURL(showQRModal)}
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              ¿Eliminar código QR?
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Esta acción no se puede deshacer. El código QR será eliminado permanentemente.
+            </p>
+            <div className="flex justify-end space-x-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteModal(null)}
+                disabled={deleting}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => handleDelete(showDeleteModal)}
+                disabled={deleting}
+              >
+                {deleting ? "Eliminando..." : "Eliminar"}
+              </Button>
             </div>
           </div>
         </div>

@@ -572,6 +572,85 @@ export const qrCodesByVenueQuery = `
   } | order(_createdAt desc)
 `;
 
+// ===== QR FEEDBACK =====
+
+// Obtener todo el feedback de QR
+export const qrFeedbackListQuery = `
+  *[_type == "qrFeedback"] {
+    _id,
+    _createdAt,
+    venue->{
+      _id,
+      title,
+      slug,
+      city->{
+        title,
+        slug
+      }
+    },
+    qrCode,
+    name,
+    email,
+    phone,
+    visitDate,
+    visitTime,
+    partySize,
+    occasion,
+    specialRequests,
+    rating,
+    feedback,
+    submittedAt,
+    status
+  } | order(_createdAt desc)
+`;
+
+// Obtener feedback por local
+export const qrFeedbackByVenueQuery = `
+  *[_type == "qrFeedback" && venue._ref == $venueId] {
+    _id,
+    _createdAt,
+    qrCode,
+    name,
+    email,
+    phone,
+    visitDate,
+    visitTime,
+    partySize,
+    occasion,
+    specialRequests,
+    rating,
+    feedback,
+    submittedAt,
+    status
+  } | order(_createdAt desc)
+`;
+
+// Obtener feedback pendiente
+export const qrFeedbackPendingQuery = `
+  *[_type == "qrFeedback" && status == "pending"] {
+    _id,
+    _createdAt,
+    venue->{
+      _id,
+      title,
+      slug
+    },
+    qrCode,
+    name,
+    email,
+    phone,
+    visitDate,
+    visitTime,
+    partySize,
+    occasion,
+    specialRequests,
+    rating,
+    feedback,
+    submittedAt,
+    status
+  } | order(_createdAt desc)
+`;
+
 // ===== HOMEPAGE CONFIGURATION =====
 
 // Obtener configuración de homepage
