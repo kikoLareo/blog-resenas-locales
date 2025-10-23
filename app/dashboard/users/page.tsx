@@ -619,9 +619,13 @@ export default function AdminUsersPage() {
                           <div className="flex items-center gap-2">
                             <span className="font-medium">{user.name || user.email}</span>
                             {user.emailVerified ? (
-                              <CheckCircle className="h-4 w-4 text-green-600" title="Email verificado" />
+                              <span title="Email verificado">
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              </span>
                             ) : (
-                              <XCircle className="h-4 w-4 text-gray-400" title="Email no verificado" />
+                              <span title="Email no verificado">
+                                <XCircle className="h-4 w-4 text-gray-400" />
+                              </span>
                             )}
                             <span className={`px-2 py-0.5 rounded text-xs ${getRoleColor(user.role)}`}>
                               {user.role}
