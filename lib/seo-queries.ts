@@ -21,7 +21,8 @@ export const getGuidesQuery = groq`
     stats,
     seoTitle,
     seoDescription,
-    seoKeywords
+    seoKeywords,
+    "venueCount": count(sections[].venues[].venue)
   }
 `;
 
