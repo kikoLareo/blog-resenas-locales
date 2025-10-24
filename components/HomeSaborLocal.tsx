@@ -6,7 +6,6 @@ import { ThemeToggle } from "./ThemeToggle";
 import { TrendingUp, Heart, Award, Sparkles, ChevronRight } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { adminSanityClient } from "@/lib/admin-sanity";
 
 // Tipos para los datos
 interface ReviewData {
@@ -54,60 +53,6 @@ interface HomeSaborLocalProps {
   categories?: CategoryData[];
   venues?: any[];
   className?: string;
-}
-
-// Función para obtener reseñas destacadas desde Sanity
-async function getFeaturedReviews(): Promise<ReviewData[]> {
-  try {
-    const reviews = await adminSanityClient.fetch(`
-      *[_type == "review" && published == true] | order(publishedAt desc)[0...3] {
-        _id,
-        title,
-        slug,
-        venue->{
-          title,
-          slug,
-          city->{
-            title,
-            slug
-          }
-        },
-        ratings,
-        publishedAt,
-        summary,
-        tags
-      }
-    `);
-    
-    return reviews.map((review: any) => ({
-      id: review._id,
-      title: review.title,
-      image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&h=600&fit=crop&q=85", // Imagen por defecto
-      rating: review.ratings?.overall || 4.5,
-      location: `${review.venue?.city?.title || 'Madrid'}`,
-      readTime: "5 min lectura",
-      tags: review.tags || ["Gastronomía"],
-      description: review.summary || "Reseña gastronómica detallada",
-      href: `/${review.venue?.city?.slug?.current || 'madrid'}/${review.venue?.slug?.current || 'local'}/review/${review.slug?.current || 'review'}`,
-      isNew: true,
-      isTrending: true,
-      isPopular: true,
-      author: "Equipo SaborLocal",
-      publishedDate: new Date(review.publishedAt).toISOString().split('T')[0],
-      viewCount: Math.floor(Math.random() * 2000) + 500,
-      shareCount: Math.floor(Math.random() * 100) + 20,
-      commentCount: Math.floor(Math.random() * 30) + 5,
-      cuisine: "Gastronomía",
-      priceRange: "$$",
-      neighborhood: review.venue?.city?.title || "Madrid",
-      openNow: true,
-      deliveryAvailable: false,
-      reservationRequired: false,
-    }));
-  } catch (error) {
-    console.error('Error fetching featured reviews:', error);
-    return [];
-  }
 }
 
 // Datos de fallback vacíos - ahora usamos datos reales de Sanity

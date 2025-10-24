@@ -454,7 +454,38 @@ export const homepageQuery = `{
     icon,
     color,
     description,
+    heroImage {
+      asset->{
+        _id,
+        url
+      }
+    },
     "venueCount": count(*[_type == "venue" && ^._id in categories[]._ref])
+  },
+  "featuredVenues": *[_type == "venue" && featured == true] | order(order asc)[0...8] {
+    _id,
+    title,
+    slug,
+    address,
+    priceRange,
+    openingHours,
+    images[0] {
+      asset->{
+        _id,
+        url
+      }
+    },
+    city->{
+      _id,
+      title,
+      slug
+    },
+    categories[0]->{
+      title
+    },
+    "reviews": *[_type == "review" && venue._ref == ^._id] {
+      ratings
+    }
   }
 }`;
 

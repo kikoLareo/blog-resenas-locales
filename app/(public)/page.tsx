@@ -37,13 +37,27 @@ const transformSanityReviews = (reviews: any[]) => {
   return reviews.map((review) => ({
     id: review._id,
     title: review.title,
-    image: review.gallery?.[0]?.asset?.url ?? '',
-    rating: review.ratings?.food ?? 4.5,
-    location: review.venue?.city ?? '',
+    image: review.gallery?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop&q=85',
+    rating: review.ratings?.food || review.ratings?.overall || 4.5,
+    location: review.venue?.city || 'Madrid',
     readTime: '5 min',
-    tags: review.tags || [],
-    description: review.tldr ?? '',
+    tags: review.tags || ['Gastronomía'],
+    description: review.tldr || review.title,
     href: `/${review.venue?.citySlug}/${review.venue?.slug?.current}/review/${review.slug?.current}`,
+    isNew: false,
+    isTrending: true,
+    isPopular: review.ratings?.food >= 8.0,
+    author: 'Equipo SaborLocal',
+    publishedDate: review.publishedAt || new Date().toISOString(),
+    viewCount: Math.floor(Math.random() * 2000) + 500,
+    shareCount: Math.floor(Math.random() * 100) + 20,
+    commentCount: Math.floor(Math.random() * 30) + 5,
+    cuisine: review.venue?.title || 'Local',
+    priceRange: '$$' as const,
+    neighborhood: review.venue?.city || 'Madrid',
+    openNow: true,
+    deliveryAvailable: false,
+    reservationRequired: false,
   }));
 };
 
@@ -68,11 +82,11 @@ const transformSanityCategories = (categories: any[]) => {
   return categories.map(category => ({
     id: category._id,
     name: category.title,
-    slug: category.slug?.current,
+    slug: category.slug?.current || category.slug,
     count: category.venueCount || 0,
     color: category.color || '#3b82f6',
     emoji: category.icon || '🍴',
-    image: category.heroImage?.asset?.url || '',
+    image: category.heroImage?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop&q=85',
     description: category.description || '',
   }));
 };
@@ -174,6 +188,7 @@ export default async function HomePage() {
       featuredPosts: any[];
       featuredCities: any[];
       featuredCategories: any[];
+      featuredVenues: any[];
     }>({
       query: homepageQuery,
       revalidate: 3600, // Cache por 1 hora
@@ -186,7 +201,8 @@ export default async function HomePage() {
         topReviews: [],
         featuredPosts: [],
         featuredCities: [],
-        featuredCategories: []
+        featuredCategories: [],
+        featuredVenues: []
       };
     }),
     
@@ -209,7 +225,7 @@ export default async function HomePage() {
   const sanityData = {
     trendingReviews: transformSanityReviews(data.trendingReviews || []),
     topReviews: transformSanityReviews(data.topReviews || []),
-    venues: transformSanityVenues([]), // Will be populated when we add venues to the homepage query
+    venues: transformSanityVenues(data.featuredVenues || []),
     categories: transformSanityCategories(data.featuredCategories || []),
   };
 
