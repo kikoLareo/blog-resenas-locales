@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X } from "lucide-react";
 import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
 
@@ -18,6 +19,7 @@ interface City {
 }
 
 export default function NewGuidePage() {
+  const router = useRouter();
   const initialFormData = {
     title: "",
     slug: "",
@@ -112,7 +114,7 @@ export default function NewGuidePage() {
 
       if (response.ok) {
         alert('Guía guardada exitosamente');
-        window.location.href = '/dashboard/content/guides';
+        router.push('/dashboard/content/guides');
       } else {
         alert(result.error || 'Error al guardar la guía');
       }
@@ -139,7 +141,7 @@ export default function NewGuidePage() {
           </Button>
         </Link>
         <div className="flex space-x-2">
-          <Button variant="outline" onClick={() => window.location.href = '/dashboard/content/guides'}>
+          <Button variant="outline" onClick={() => router.push('/dashboard/content/guides')}>
             <X className="mr-2 h-4 w-4" />
             Cancelar
           </Button>

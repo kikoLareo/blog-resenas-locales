@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
 import { ArrowLeft, Save, X, Trash2 } from "lucide-react";
 import { useUnsavedChangesWarning } from "@/hooks/useUnsavedChangesWarning";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 interface City {
   _id: string;
@@ -42,6 +42,7 @@ interface Guide {
 
 export default function EditGuidePage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
 
   const [formData, setFormData] = useState({
@@ -95,7 +96,7 @@ export default function EditGuidePage() {
           setInitialFormData(formValues);
         } else {
           alert('Error al cargar la guía');
-          window.location.href = '/dashboard/content/guides';
+          router.push('/dashboard/content/guides');
         }
       } catch (error) {
         console.error('Error fetching guide:', error);
@@ -108,7 +109,7 @@ export default function EditGuidePage() {
     if (id) {
       fetchGuide();
     }
-  }, [id]);
+  }, [id, router]);
 
   // Fetch cities
   useEffect(() => {
@@ -171,7 +172,7 @@ export default function EditGuidePage() {
       if (response.ok) {
         alert('Guía actualizada exitosamente');
         setInitialFormData(formData); // Update initial state to prevent unsaved changes warning
-        window.location.href = '/dashboard/content/guides';
+        router.push('/dashboard/content/guides');
       } else {
         alert(result.error || 'Error al actualizar la guía');
       }
@@ -199,7 +200,7 @@ export default function EditGuidePage() {
 
       if (response.ok) {
         alert('Guía eliminada exitosamente');
-        window.location.href = '/dashboard/content/guides';
+        router.push('/dashboard/content/guides');
       } else {
         alert(result.error || 'Error al eliminar la guía');
         setIsLoading(false);
@@ -245,7 +246,7 @@ export default function EditGuidePage() {
             <Trash2 className="mr-2 h-4 w-4" />
             Eliminar
           </Button>
-          <Button variant="outline" onClick={() => window.location.href = '/dashboard/content/guides'}>
+          <Button variant="outline" onClick={() => router.push('/dashboard/content/guides')}>
             <X className="mr-2 h-4 w-4" />
             Cancelar
           </Button>

@@ -88,12 +88,17 @@ export async function PUT(
       return NextResponse.json({ error: 'Guía no encontrada' }, { status: 404 });
     }
 
+    // Normalizar slug si es necesario
+    const normalizedSlug = typeof data.slug === 'string' 
+      ? data.slug 
+      : data.slug?.current || '';
+
     // Actualizar documento
     const updated = await adminSanityWriteClient
       .patch(id)
       .set({
         title: data.title,
-        slug: data.slug ? { current: data.slug.current || data.slug, _type: 'slug' } : undefined,
+        slug: normalizedSlug ? { current: normalizedSlug, _type: 'slug' } : undefined,
         excerpt: data.excerpt,
         type: data.type,
         city: data.city ? { _type: 'reference', _ref: data.city } : undefined,
