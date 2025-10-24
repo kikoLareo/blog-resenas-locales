@@ -53,18 +53,17 @@ export const news = defineType({
       description: 'Resumen para listados y SEO',
     }),
     defineField({
-      name: 'newsType',
-      title: 'Tipo de noticia',
+      name: 'category',
+      title: 'Categoría de noticia',
       type: 'string',
       group: 'basic',
       options: {
         list: [
-          { title: 'Aperturas', value: 'aperturas' },
-          { title: 'Pop-ups', value: 'pop-ups' },
-          { title: 'Temporada', value: 'temporada' },
-          { title: 'Eventos', value: 'eventos' },
-          { title: 'Tendencias', value: 'tendencias' },
-          { title: 'Cierres', value: 'cierres' },
+          { title: 'Aperturas', value: 'opening' },
+          { title: 'Cierres', value: 'closing' },
+          { title: 'Eventos', value: 'event' },
+          { title: 'Premios', value: 'award' },
+          { title: 'Tendencias', value: 'trend' },
         ],
         layout: 'dropdown',
       },
@@ -246,7 +245,7 @@ export const news = defineType({
       type: 'date',
       group: 'basic',
       description: 'Fecha específica si es un evento',
-      hidden: ({ document }) => document?.newsType !== 'eventos',
+      hidden: ({ document }) => document?.category !== 'event',
     }),
     defineField({
       name: 'eventTime',
@@ -254,7 +253,7 @@ export const news = defineType({
       type: 'string',
       group: 'basic',
       description: 'Hora específica del evento',
-      hidden: ({ document }) => document?.newsType !== 'eventos',
+      hidden: ({ document }) => document?.category !== 'event',
     }),
     defineField({
       name: 'location',
@@ -262,7 +261,7 @@ export const news = defineType({
       type: 'string',
       group: 'basic',
       description: 'Dirección específica del evento',
-      hidden: ({ document }) => document?.newsType !== 'eventos',
+      hidden: ({ document }) => document?.category !== 'event',
     }),
     defineField({
       name: 'tags',
@@ -315,6 +314,39 @@ export const news = defineType({
       validation: (rule) => rule.max(10),
     }),
     defineField({
+      name: 'stats',
+      title: 'Estadísticas',
+      type: 'object',
+      group: 'settings',
+      fields: [
+        {
+          name: 'views',
+          title: 'Visualizaciones',
+          type: 'number',
+          initialValue: 0,
+        },
+        {
+          name: 'shares',
+          title: 'Compartidos',
+          type: 'number',
+          initialValue: 0,
+        },
+        {
+          name: 'bookmarks',
+          title: 'Guardados',
+          type: 'number',
+          initialValue: 0,
+        },
+      ],
+    }),
+    defineField({
+      name: 'lastUpdated',
+      title: 'Última actualización',
+      type: 'datetime',
+      group: 'settings',
+      initialValue: () => new Date().toISOString(),
+    }),
+    defineField({
       name: 'featured',
       title: 'Noticia destacada',
       type: 'boolean',
@@ -345,9 +377,9 @@ export const news = defineType({
       initialValue: () => new Date().toISOString(),
     }),
     defineField({
-      name: 'expiresAt',
+      name: 'expiryDate',
       title: 'Fecha de expiración',
-      type: 'date',
+      type: 'datetime',
       group: 'settings',
       description: 'Fecha después de la cual la noticia ya no es relevante',
     }),
@@ -355,20 +387,19 @@ export const news = defineType({
   preview: {
     select: {
       title: 'title',
-      newsType: 'newsType',
+      category: 'category',
       city: 'city.title',
       featured: 'featured',
       urgent: 'urgent',
       media: 'heroImage',
     },
-    prepare({ title, newsType, city, featured, urgent, media }) {
+    prepare({ title, category, city, featured, urgent, media }) {
       const typeEmoji = {
-        aperturas: '🆕',
-        'pop-ups': '⏰',
-        temporada: '🍂',
-        eventos: '🎉',
-        tendencias: '📈',
-        cierres: '🔒',
+        opening: '🆕',
+        closing: '🔒',
+        event: '🎉',
+        award: '🏆',
+        trend: '📈',
       };
 
       const badges = [];
@@ -377,7 +408,7 @@ export const news = defineType({
 
       return {
         title: `${badges.join(' ')} ${title || 'Noticia sin título'}`,
-        subtitle: `${typeEmoji[newsType as keyof typeof typeEmoji] || ''} ${newsType} • ${city}`,
+        subtitle: `${typeEmoji[category as keyof typeof typeEmoji] || ''} ${category} • ${city}`,
         media,
       };
     },

@@ -332,6 +332,32 @@ export const guide = defineType({
       validation: (rule) => rule.max(10),
     }),
     defineField({
+      name: 'stats',
+      title: 'Estadísticas',
+      type: 'object',
+      group: 'settings',
+      fields: [
+        {
+          name: 'views',
+          title: 'Visualizaciones',
+          type: 'number',
+          initialValue: 0,
+        },
+        {
+          name: 'shares',
+          title: 'Compartidos',
+          type: 'number',
+          initialValue: 0,
+        },
+        {
+          name: 'bookmarks',
+          title: 'Guardados',
+          type: 'number',
+          initialValue: 0,
+        },
+      ],
+    }),
+    defineField({
       name: 'lastUpdated',
       title: 'Última actualización',
       type: 'datetime',
