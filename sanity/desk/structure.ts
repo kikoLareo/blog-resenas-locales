@@ -381,6 +381,20 @@ export const structure = (S: StructureBuilder) =>
       // Divisor
       S.divider(),
 
+      // Configuración de Homepage
+      S.listItem()
+        .title('🎨 Configuración de Homepage')
+        .icon(() => '🎨')
+        .child(
+          S.document()
+            .schemaType('homepageConfig')
+            .documentId('homepage-config')
+            .title('Configuración de Homepage')
+        ),
+
+      // Divisor
+      S.divider(),
+
       // Sección de Análisis y Reportes
       S.listItem()
         .title('📊 Análisis y Reportes')
