@@ -24,6 +24,7 @@ export const homepageConfig = defineType({
               name: 'id',
               title: 'ID',
               type: 'string',
+              validation: (Rule) => Rule.required(),
               readOnly: true,
               initialValue: () => `section_${Date.now()}`
             },
@@ -36,11 +37,11 @@ export const homepageConfig = defineType({
                   { title: 'Hero Principal', value: 'hero' },
                   { title: 'Reseñas Destacadas', value: 'featured' },
                   { title: 'Trending', value: 'trending' },
-                  { title: 'Top Rated', value: 'topRated' },
                   { title: 'Categorías', value: 'categories' },
                   { title: 'Newsletter', value: 'newsletter' },
                 ]
-              }
+              },
+              validation: (Rule) => Rule.required()
             },
             {
               name: 'enabled',
@@ -51,7 +52,15 @@ export const homepageConfig = defineType({
             {
               name: 'title',
               title: 'Título personalizado',
-              type: 'string'
+              type: 'string',
+              validation: (Rule) => Rule.required()
+            },
+            {
+              name: 'order',
+              title: 'Orden',
+              type: 'number',
+              validation: (Rule) => Rule.required().min(1),
+              initialValue: 1
             },
             {
               name: 'config',
@@ -59,9 +68,21 @@ export const homepageConfig = defineType({
               type: 'object',
               fields: [
                 {
+                  name: 'title',
+                  title: 'Título visible',
+                  type: 'string'
+                },
+                {
+                  name: 'subtitle',
+                  title: 'Subtítulo',
+                  type: 'text',
+                  rows: 2
+                },
+                {
                   name: 'itemCount',
                   title: 'Número de elementos',
                   type: 'number',
+                  validation: (Rule) => Rule.min(1).max(12),
                   initialValue: 6
                 },
                 {
@@ -88,13 +109,14 @@ export const homepageConfig = defineType({
           ],
           preview: {
             select: {
-              title: 'type',
+              title: 'title',
+              type: 'type',
               enabled: 'enabled'
             },
-            prepare({ title, enabled }) {
+            prepare({ title, type, enabled }) {
               return {
-                title: title?.toUpperCase(),
-                subtitle: enabled ? 'Habilitado' : 'Deshabilitado'
+                title: title || 'Sección sin título',
+                subtitle: `${type} - ${enabled ? 'Habilitado' : 'Deshabilitado'}`
               }
             }
           }
@@ -110,7 +132,14 @@ export const homepageConfig = defineType({
   ],
   preview: {
     select: {
-      title: 'title'
+      title: 'title',
+      sections: 'sections'
+    },
+    prepare({ title, sections }) {
+      return {
+        title: title || 'Configuración de Homepage',
+        subtitle: `${sections?.length || 0} secciones configuradas`
+      }
     }
   }
 })
