@@ -321,7 +321,7 @@ export const guide = defineType({
       description: 'Si está vacía, se usará el extracto',
     }),
     defineField({
-      name: 'keywords',
+      name: 'seoKeywords',
       title: 'Keywords',
       type: 'array',
       group: 'seo',

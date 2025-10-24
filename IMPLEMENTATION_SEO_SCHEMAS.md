@@ -67,7 +67,14 @@ Añadido campo `lastUpdated` (tipo datetime) a los schemas que no lo tenían:
 
 **Nota:** Los schemas `guide.ts` y `list.ts` ya tenían este campo implementado.
 
-### 3. Correcciones en News Schema
+### 3. Campo `seoKeywords` (antes `keywords`)
+
+Para alinear con las queries GROQ, el campo de keywords se renombró:
+- **Cambio:** Renombrado de `keywords` a `seoKeywords` en todos los schemas
+- **Motivo:** Las queries GROQ esperan `seoKeywords`, no `keywords`
+- **Afectados:** Todos los 6 schemas SEO
+
+### 4. Correcciones en News Schema
 
 Para alinear el schema de News con las queries GROQ:
 
@@ -99,7 +106,7 @@ Para alinear el schema de News con las queries GROQ:
 {
   title, slug, excerpt, type, city, neighborhood, theme,
   heroImage, introduction, sections, mapData, faq,
-  seoTitle, seoDescription, keywords,
+  seoTitle, seoDescription, seoKeywords,
   stats, lastUpdated, featured, published, publishedAt
 }
 ```
@@ -110,7 +117,7 @@ Para alinear el schema de News con las queries GROQ:
   title, slug, excerpt, listType, dish, city, neighborhoods,
   priceRange, occasion, heroImage, introduction, criteria,
   rankedVenues, comparisonTable, verdict, faq, relatedGuides,
-  seoTitle, seoDescription, keywords,
+  seoTitle, seoDescription, seoKeywords,
   stats, lastUpdated, featured, published, publishedAt
 }
 ```
@@ -122,7 +129,7 @@ Para alinear el schema de News con las queries GROQ:
   prepTime, cookTime, totalTime, servings, heroImage,
   ingredients, instructions, tips, variations, substitutions,
   nutritionalInfo, dietaryInfo, relatedVenues, relatedDishGuides,
-  seoTitle, seoDescription, keywords,
+  seoTitle, seoDescription, seoKeywords,
   stats, lastUpdated, featured, published, publishedAt
 }
 ```
@@ -133,7 +140,7 @@ Para alinear el schema de News con las queries GROQ:
   title, slug, dishName, excerpt, heroImage,
   origin, description, howToEat, variations, ingredients,
   seasonality, bestVenues, relatedRecipes, relatedLists, faq,
-  seoTitle, seoDescription, keywords,
+  seoTitle, seoDescription, seoKeywords,
   stats, lastUpdated, featured, published, publishedAt
 }
 ```
@@ -144,7 +151,7 @@ Para alinear el schema de News con las queries GROQ:
   title, slug, excerpt, category, city, heroImage,
   content, venues, eventDate, eventTime, location, tags,
   relatedNews,
-  seoTitle, seoDescription, keywords,
+  seoTitle, seoDescription, seoKeywords,
   stats, lastUpdated, featured, urgent, published, publishedAt, expiryDate
 }
 ```
@@ -155,7 +162,7 @@ Para alinear el schema de News con las queries GROQ:
   title, slug, excerpt, offerType, city, neighborhood,
   priceRange, heroImage, introduction, venuesWithOffers,
   validFrom, validUntil, recurring, generalConditions, conclusion,
-  seoTitle, seoDescription, keywords,
+  seoTitle, seoDescription, seoKeywords,
   stats, lastUpdated, featured, published, publishedAt
 }
 ```
@@ -227,7 +234,7 @@ Si ya existen documentos de tipo `news` con los campos antiguos (`newsType`, `ex
 
 ## 📚 Referencias
 
-- **Issue original:** kikoLareo/blog-resenas-locales#[número]
+- **Issue original:** Issue de prioridad baja sobre schemas de contenido SEO
 - **Queries:** `lib/seo-queries.ts`
 - **Schemas:** `sanity/schemas/index.ts`
 - **Documentación Sanity:** https://www.sanity.io/docs/schema-types

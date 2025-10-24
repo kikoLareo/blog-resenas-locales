@@ -388,7 +388,7 @@ export const dishGuide = defineType({
       validation: (rule) => rule.max(160),
     }),
     defineField({
-      name: 'keywords',
+      name: 'seoKeywords',
       title: 'Keywords',
       type: 'array',
       group: 'seo',
