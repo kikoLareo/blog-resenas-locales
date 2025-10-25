@@ -43,6 +43,7 @@ async function addSampleReviews() {
       title: 'Tapas modernas con producto de temporada',
       slug: { current: 'tapas-modernas-producto-temporada' },
       published: true,
+      featured: false,
       trending: true,
       publishedAt: new Date(Date.now() - 86400000).toISOString(), // Ayer
       summary: 'Un viaje culinario por las tapas españolas reinventadas con técnicas modernas y productos de km 0.',
@@ -63,6 +64,8 @@ async function addSampleReviews() {
       title: 'Sushi de autor con pescado de lonja local',
       slug: { current: 'sushi-autor-pescado-lonja-local' },
       published: true,
+      featured: false,
+      trending: false,
       publishedAt: new Date(Date.now() - 172800000).toISOString(), // Hace 2 días
       summary: 'Fusión perfecta entre la técnica japonesa y el producto español en este restaurante de sushi de autor.',
       tldr: 'Sushi excepcional con pescado fresco de lonja española.',
