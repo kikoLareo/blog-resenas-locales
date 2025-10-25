@@ -3,10 +3,9 @@ import { SITE_CONFIG } from '@/lib/constants';
 import { HomeSaborLocal } from '@/components/HomeSaborLocal';
 import { sanityFetch } from '@/lib/sanity.client';
 import { homepageQuery, homepageConfigQuery } from '@/sanity/lib/queries';
-import { getAllFeaturedItems } from '@/lib/featured-admin';
 import { defaultHomepageConfig } from '@/lib/homepage-admin';
 import { FeaturedSectionsModern, HeroModern } from '@/components';
-// Removed mock data imports - now using real Sanity data only
+// Now using real Sanity data only - heroItems from reviews
 
 // Force dynamic rendering in build environments to avoid timeout issues
 export const dynamic = 'force-dynamic';
@@ -180,8 +179,9 @@ function renderSection(
 
 export default async function HomePage() {
   // Fetch paralelo para optimizar rendimiento
-  const [data, homepageConfig, featuredItems] = await Promise.all([
+  const [data, homepageConfig] = await Promise.all([
     sanityFetch<{
+      heroItems: any[];
       featuredReviews: any[];
       trendingReviews: any[];
       topReviews: any[];
@@ -196,6 +196,7 @@ export default async function HomePage() {
     }).catch((error) => {
       console.warn('Failed to fetch Sanity homepage data:', error.message);
       return {
+        heroItems: [],
         featuredReviews: [],
         trendingReviews: [],
         topReviews: [],
@@ -213,13 +214,29 @@ export default async function HomePage() {
     }).catch((error) => {
       console.warn('Failed to fetch homepage config:', error.message);
       return null;
-    }),
-    
-    getAllFeaturedItems().catch((error) => {
-      console.warn('Failed to fetch featured items:', error.message);
-      return []; // Fallback en caso de error
     })
   ]);
+
+  // Transformar heroItems para el carrusel principal
+  const heroFeaturedItems = data.heroItems.map((review: any) => ({
+    id: review._id,
+    type: 'review' as const,
+    title: review.title,
+    description: review.summary || review.tldr || '',
+    image: review.gallery?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&q=85',
+    href: `/${review.venue?.city?.slug?.current || 'madrid'}/${review.venue?.slug?.current || 'local'}/review/${review.slug?.current || 'review'}`,
+    rating: review.ratings?.overall || review.ratings?.food || 4.5,
+    location: `${review.venue?.city?.title || 'Madrid'}, España`,
+    readTime: review.readTime ? `${review.readTime} min lectura` : '5 min lectura',
+    tags: review.tags || [],
+    isActive: true,
+    order: 0,
+    cuisine: review.venue?.cuisine || 'Gastronomía',
+    neighborhood: review.venue?.address?.split(',')[0] || review.venue?.city?.title || '',
+    priceRange: review.venue?.priceRange || '$$',
+    author: review.author || 'Equipo SaborLocal',
+    publishedDate: review.publishedAt ? new Date(review.publishedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+  }));
 
   // Preparar datos de Sanity transformados
   const sanityData = {
@@ -234,7 +251,7 @@ export default async function HomePage() {
 
   return (
     <HomeSaborLocal
-      featuredItems={featuredItems}
+      featuredItems={heroFeaturedItems}
       trendingReviews={sanityData.trendingReviews}
       topRatedReviews={sanityData.topReviews}
       categories={sanityData.categories}

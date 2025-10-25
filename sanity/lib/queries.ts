@@ -368,6 +368,37 @@ export const venuesByCategoryCountQuery = `
 
 // Datos para homepage
 export const homepageQuery = `{
+  "heroItems": *[_type == "review" && published == true] | order(publishedAt desc)[0...3] {
+    _id,
+    title,
+    slug,
+    ratings,
+    tldr,
+    summary,
+    tags,
+    publishedAt,
+    readTime,
+    gallery[0] {
+      asset->{
+        _id,
+        url
+      },
+      alt,
+      caption
+    },
+    "venue": venue-> {
+      title,
+      slug,
+      address,
+      priceRange,
+      cuisine,
+      "city": city->{
+        title,
+        slug
+      }
+    },
+    author
+  },
   "featuredReviews": *[_type == "review" && featured == true] | order(publishedAt desc)[0...3] {
     _id,
     title,
