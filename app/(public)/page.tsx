@@ -3,9 +3,10 @@ import { SITE_CONFIG } from '@/lib/constants';
 import { HomeSaborLocal } from '@/components/HomeSaborLocal';
 import { sanityFetch } from '@/lib/sanity.client';
 import { homepageQuery, homepageConfigQuery } from '@/sanity/lib/queries';
+import { getAllFeaturedItems } from '@/lib/featured-admin';
 import { defaultHomepageConfig } from '@/lib/homepage-admin';
 import { FeaturedSectionsModern, HeroModern } from '@/components';
-// Now using real Sanity data only - heroItems from reviews
+// Using featuredItems from Sanity for hero carousel
 
 // Force dynamic rendering in build environments to avoid timeout issues
 export const dynamic = 'force-dynamic';
@@ -179,7 +180,7 @@ function renderSection(
 
 export default async function HomePage() {
   // Fetch paralelo para optimizar rendimiento
-  const [data, homepageConfig] = await Promise.all([
+  const [data, homepageConfig, allFeaturedItems] = await Promise.all([
     sanityFetch<{
       heroItems: any[];
       featuredReviews: any[];
@@ -214,29 +215,80 @@ export default async function HomePage() {
     }).catch((error) => {
       console.warn('Failed to fetch homepage config:', error.message);
       return null;
+    }),
+
+    // Obtener featuredItems del dashboard
+    getAllFeaturedItems().catch((error) => {
+      console.warn('Failed to fetch featured items:', error.message);
+      return [];
     })
   ]);
 
-  // Transformar heroItems para el carrusel principal
-  const heroFeaturedItems = data.heroItems.map((review: any) => ({
-    id: review._id,
-    type: 'review' as const,
-    title: review.title,
-    description: review.summary || review.tldr || '',
-    image: review.gallery?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&q=85',
-    href: `/${review.venue?.city?.slug?.current || 'madrid'}/${review.venue?.slug?.current || 'local'}/review/${review.slug?.current || 'review'}`,
-    rating: review.ratings?.overall || review.ratings?.food || 4.5,
-    location: `${review.venue?.city?.title || 'Madrid'}, España`,
-    readTime: review.readTime ? `${review.readTime} min lectura` : '5 min lectura',
-    tags: review.tags || [],
-    isActive: true,
-    order: 0,
-    cuisine: review.venue?.cuisine || 'Gastronomía',
-    neighborhood: review.venue?.address?.split(',')[0] || review.venue?.city?.title || '',
-    priceRange: review.venue?.priceRange || '$$',
-    author: review.author || 'Equipo SaborLocal',
-    publishedDate: review.publishedAt ? new Date(review.publishedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-  }));
+  // Filtrar solo los featuredItems activos y transformarlos para el hero
+  const heroFeaturedItems = allFeaturedItems
+    .filter((item: any) => item.isActive === true)
+    .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+    .map((item: any) => {
+      // Si es tipo review y tiene reviewRef, usar datos de la review
+      if (item.type === 'review' && item.reviewRef) {
+        const review = item.reviewRef;
+        return {
+          id: item._id,
+          type: 'review' as const,
+          title: item.customTitle || review.title,
+          description: item.customDescription || review.summary || review.tldr || '',
+          image: review.gallery?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&q=85',
+          href: item.customUrl || `/${review.venue?.city?.slug?.current || 'madrid'}/${review.venue?.slug?.current || 'local'}/review/${review.slug?.current || 'review'}`,
+          rating: review.ratings?.overall || review.ratings?.food || 4.5,
+          location: `${review.venue?.city?.title || 'Madrid'}, España`,
+          readTime: review.readTime ? `${review.readTime} min lectura` : '5 min lectura',
+          tags: review.tags || [],
+          isActive: true,
+          order: item.order || 0,
+          cuisine: review.venue?.cuisine || 'Gastronomía',
+          neighborhood: review.venue?.address?.split(',')[0] || review.venue?.city?.title || '',
+          priceRange: review.venue?.priceRange || '$$',
+          author: review.author || 'Equipo SaborLocal',
+          publishedDate: review.publishedAt ? new Date(review.publishedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          ctaText: item.customCTA || 'Leer reseña completa',
+        };
+      }
+      // Si no tiene reviewRef o no es review, usar los datos custom del featuredItem
+      return {
+        id: item._id,
+        type: item.type,
+        title: item.customTitle || item.title,
+        description: item.customDescription || '',
+        image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&q=85',
+        href: item.customUrl || '/',
+        isActive: true,
+        order: item.order || 0,
+        ctaText: item.customCTA || 'Ver más',
+      };
+    });
+
+  // Si no hay featuredItems activos, usar heroItems de reviews como fallback
+  const finalHeroItems = heroFeaturedItems.length > 0 
+    ? heroFeaturedItems 
+    : data.heroItems.map((review: any) => ({
+        id: review._id,
+        type: 'review' as const,
+        title: review.title,
+        description: review.summary || review.tldr || '',
+        image: review.gallery?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&q=85',
+        href: `/${review.venue?.city?.slug?.current || 'madrid'}/${review.venue?.slug?.current || 'local'}/review/${review.slug?.current || 'review'}`,
+        rating: review.ratings?.overall || review.ratings?.food || 4.5,
+        location: `${review.venue?.city?.title || 'Madrid'}, España`,
+        readTime: review.readTime ? `${review.readTime} min lectura` : '5 min lectura',
+        tags: review.tags || [],
+        isActive: true,
+        order: 0,
+        cuisine: review.venue?.cuisine || 'Gastronomía',
+        neighborhood: review.venue?.address?.split(',')[0] || review.venue?.city?.title || '',
+        priceRange: review.venue?.priceRange || '$$',
+        author: review.author || 'Equipo SaborLocal',
+        publishedDate: review.publishedAt ? new Date(review.publishedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      }));
 
   // Preparar datos de Sanity transformados
   const sanityData = {
@@ -251,7 +303,7 @@ export default async function HomePage() {
 
   return (
     <HomeSaborLocal
-      featuredItems={heroFeaturedItems}
+      featuredItems={finalHeroItems}
       trendingReviews={sanityData.trendingReviews}
       topRatedReviews={sanityData.topReviews}
       categories={sanityData.categories}

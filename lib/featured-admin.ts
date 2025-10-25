@@ -85,9 +85,28 @@ export async function getAllFeaturedItems(): Promise<FeaturedItem[]> {
       "reviewRef": reviewRef->{
         _id,
         title,
+        slug,
+        summary,
+        tldr,
+        tags,
+        ratings,
+        publishedAt,
+        author,
+        readTime,
+        gallery[0] {
+          asset->{ url },
+          alt
+        },
         "venue": venue->{
           title,
-          slug
+          slug,
+          address,
+          priceRange,
+          cuisine,
+          "city": city->{
+            title,
+            slug
+          }
         }
       },
       "venueRef": venueRef->{
