@@ -19,6 +19,9 @@ interface ReviewCardSaborLocalProps {
   href: string;
   className?: string;
   
+  // Tipo de contenido
+  contentType?: 'review' | 'venue' | 'category' | 'collection' | 'guide';
+  
   // Nuevos campos para UX mejorada
   isNew?: boolean;
   isPopular?: boolean;
@@ -62,6 +65,7 @@ export function ReviewCardSaborLocal({
   description,
   href,
   className = "",
+  contentType = 'review',
   isNew = false,
   isPopular = false,
   isTrending = false,
@@ -225,6 +229,26 @@ export function ReviewCardSaborLocal({
 
           {/* Badges superiores */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
+            {/* Badge de tipo de contenido */}
+            {(() => {
+              const typeConfig = {
+                review: { label: 'Reseña', icon: '📝', color: 'bg-accent/95' },
+                venue: { label: 'Local', icon: '🏪', color: 'bg-primary/95' },
+                category: { label: 'Categoría', icon: '🏷️', color: 'bg-purple-600/95' },
+                collection: { label: 'Colección', icon: '📚', color: 'bg-blue-600/95' },
+                guide: { label: 'Guía', icon: '🗺️', color: 'bg-green-600/95' },
+              };
+              
+              const config = typeConfig[contentType] || typeConfig.review;
+              
+              return (
+                <span className={`inline-flex items-center gap-1 ${config.color} text-white text-xs font-semibold px-2.5 py-1 rounded-full shadow-lg backdrop-blur-sm`}>
+                  <span className="text-xs">{config.icon}</span>
+                  {config.label}
+                </span>
+              );
+            })()}
+            
             {isNew && (
               <span className="badge badge-new text-xs px-2 py-1 font-medium">
                 Nuevo
