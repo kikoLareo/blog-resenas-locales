@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { sanityClient } from '@/sanity/lib/client';
+import { client } from '@/sanity/lib/client';
 import { MapPin, ChevronRight } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ interface City {
 }
 
 async function getCities(): Promise<City[]> {
-  const cities = await sanityClient.fetch<City[]>(
+  const cities = await client.fetch<City[]>(
     `*[_type == "city"] | order(slug.current asc) {
       _id,
       slug,
