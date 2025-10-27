@@ -29,10 +29,11 @@ interface ReviewDetailModernProps {
     visitDate?: string;
     publishedAt: string;
     ratings: {
-      food: number;
-      service: number;
-      ambience: number;
-      value: number;
+      food?: number;
+      service?: number;
+      ambience?: number;
+      value?: number;
+      valueForMoney?: number;
       overall: number;
     };
     avgTicket?: number;
@@ -93,11 +94,12 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
   review,
   relatedReviews = [],
 }) => {
-  const averageRating = (
-    review.ratings.food + 
-    review.ratings.service + 
-    review.ratings.ambience + 
-    review.ratings.value
+  // Use overall rating if available, otherwise calculate average
+  const averageRating = review.ratings.overall || (
+    (review.ratings.food || 0) + 
+    (review.ratings.service || 0) + 
+    (review.ratings.ambience || 0) + 
+    (review.ratings.value || review.ratings.valueForMoney || 0)
   ) / 4;
 
   const heroImage = review.gallery?.[0]?.asset.url || review.venue.images?.[0]?.asset.url || '';
@@ -200,33 +202,33 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
               <CardTitle>Calificaciones detalladas</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-gray-700">Comida</span>
-                  <RatingStars rating={review.ratings.food / 2} size="sm" showValue={false} />
-                  <span className="font-semibold text-gray-900">
-                    {review.ratings.food.toFixed(1)}
+                  <span className="font-medium">Comida</span>
+                  <RatingStars rating={(review.ratings.food || 0) / 2} size="sm" showValue={false} />
+                  <span className="ml-2 font-semibold text-primary">
+                    {(review.ratings.food || 0).toFixed(1)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-gray-700">Servicio</span>
-                  <RatingStars rating={review.ratings.service / 2} size="sm" showValue={false} />
-                  <span className="font-semibold text-gray-900">
-                    {review.ratings.service.toFixed(1)}
+                  <span className="font-medium">Servicio</span>
+                  <RatingStars rating={(review.ratings.service || 0) / 2} size="sm" showValue={false} />
+                  <span className="ml-2 font-semibold text-primary">
+                    {(review.ratings.service || 0).toFixed(1)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-gray-700">Ambiente</span>
-                  <RatingStars rating={review.ratings.ambience / 2} size="sm" showValue={false} />
-                  <span className="font-semibold text-gray-900">
-                    {review.ratings.ambience.toFixed(1)}
+                  <span className="font-medium">Ambiente</span>
+                  <RatingStars rating={(review.ratings.ambience || 0) / 2} size="sm" showValue={false} />
+                  <span className="ml-2 font-semibold text-primary">
+                    {(review.ratings.ambience || 0).toFixed(1)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-gray-700">Precio</span>
-                  <RatingStars rating={review.ratings.value / 2} size="sm" showValue={false} />
-                  <span className="font-semibold text-gray-900">
-                    {review.ratings.value.toFixed(1)}
+                  <span className="font-medium">Precio</span>
+                  <RatingStars rating={(review.ratings.value || review.ratings.valueForMoney || 0) / 2} size="sm" showValue={false} />
+                  <span className="ml-2 font-semibold text-primary">
+                    {(review.ratings.value || review.ratings.valueForMoney || 0).toFixed(1)}
                   </span>
                 </div>
               </div>

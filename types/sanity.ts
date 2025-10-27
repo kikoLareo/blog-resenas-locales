@@ -79,7 +79,9 @@ export interface Review extends SanityDocument {
     food: number;
     service: number;
     ambience: number;
-    value: number;
+    value?: number;
+    valueForMoney?: number;
+    overall: number;
   };
   avgTicket: number;
   pros: string[];
