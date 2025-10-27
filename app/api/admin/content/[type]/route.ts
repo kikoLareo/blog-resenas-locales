@@ -9,10 +9,11 @@ import type { ContentType, AvailableItem } from '@/types/homepage';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { type: string } }
+  { params }: { params: Promise<{ type: string }> }
 ) {
   try {
-    const contentType = params.type as ContentType;
+    const { type } = await params;
+    const contentType = type as ContentType;
     const searchParams = request.nextUrl.searchParams;
     const search = searchParams.get('search') || '';
     const page = parseInt(searchParams.get('page') || '1');
