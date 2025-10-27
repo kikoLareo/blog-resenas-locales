@@ -119,3 +119,17 @@ model SiteSetting {
   @@index([category])
 }
 
+// Homepage Sections - Gestión de secciones de la página principal
+model HomepageSection {
+  id          String   @id @default(cuid())
+  title       String   // Título interno para dashboard
+  sectionType String   // 'hero', 'poster', 'poster-v2', 'banner', 'card-square'
+  enabled     Boolean  @default(true)
+  order       Int      // Orden de aparición en la página
+  config      Json     // Configuración completa (SectionConfig type)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([enabled, order])
+}
+
