@@ -20,10 +20,12 @@ interface ReviewWithDetails {
   visitDate?: string;
   publishedAt: string | null;
   ratings: {
-    food: number;
-    service: number;
-    ambience: number;
-    value: number;
+    food?: number;
+    service?: number;
+    ambience?: number;
+    value?: number;
+    valueForMoney?: number;
+    overall: number;
   };
   avgTicket?: number;
   pros?: string[];
@@ -248,40 +250,50 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                   <div className="flex items-center justify-between">
                     <span className="font-medium">Puntuación General</span>
                     <div className="flex items-center space-x-2">
-                      <div className="flex">{renderStars((review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4)}</div>
-                      <span className="font-bold">{((review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4).toFixed(1)}/5.0</span>
+                      <div className="flex">{renderStars((
+                        (review.ratings.food || 0) + 
+                        (review.ratings.service || 0) + 
+                        (review.ratings.ambience || 0) + 
+                        (review.ratings.value || review.ratings.valueForMoney || 0)
+                      ) / 4)}</div>
+                      <span className="font-bold">{((
+                        (review.ratings.food || 0) + 
+                        (review.ratings.service || 0) + 
+                        (review.ratings.ambience || 0) + 
+                        (review.ratings.value || review.ratings.valueForMoney || 0)
+                      ) / 4).toFixed(1)}/5.0</span>
                     </div>
                   </div>
                   
                   <div className="flex items-center justify-between">
                     <span>Comida</span>
                     <div className="flex items-center space-x-2">
-                      <div className="flex">{renderStars(review.ratings.food)}</div>
-                      <span>{review.ratings.food.toFixed(1)}</span>
+                      <div className="flex">{renderStars(review.ratings.food || 0)}</div>
+                      <span>{(review.ratings.food || 0).toFixed(1)}</span>
                     </div>
                   </div>
                   
                   <div className="flex items-center justify-between">
                     <span>Servicio</span>
                     <div className="flex items-center space-x-2">
-                      <div className="flex">{renderStars(review.ratings.service)}</div>
-                      <span>{review.ratings.service.toFixed(1)}</span>
+                      <div className="flex">{renderStars(review.ratings.service || 0)}</div>
+                      <span>{(review.ratings.service || 0).toFixed(1)}</span>
                     </div>
                   </div>
                   
                   <div className="flex items-center justify-between">
                     <span>Ambiente</span>
                     <div className="flex items-center space-x-2">
-                      <div className="flex">{renderStars(review.ratings.ambience)}</div>
-                      <span>{review.ratings.ambience.toFixed(1)}</span>
+                      <div className="flex">{renderStars(review.ratings.ambience || 0)}</div>
+                      <span>{(review.ratings.ambience || 0).toFixed(1)}</span>
                     </div>
                   </div>
                   
                   <div className="flex items-center justify-between">
                     <span>Relación Calidad-Precio</span>
                     <div className="flex items-center space-x-2">
-                      <div className="flex">{renderStars(review.ratings.value)}</div>
-                      <span>{review.ratings.value.toFixed(1)}</span>
+                      <div className="flex">{renderStars(review.ratings.value || review.ratings.valueForMoney || 0)}</div>
+                      <span>{(review.ratings.value || review.ratings.valueForMoney || 0).toFixed(1)}</span>
                     </div>
                   </div>
                 </div>
@@ -413,12 +425,17 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                   <div>
                     <Label htmlFor="overall">Puntuación General (Calculada)</Label>
                     <div className="text-sm text-gray-500 p-2 bg-gray-50 rounded">
-                      {((formData.ratings.food + formData.ratings.service + formData.ratings.ambience + formData.ratings.value) / 4).toFixed(1)}
+                      {((
+                        (formData.ratings.food || 0) + 
+                        (formData.ratings.service || 0) + 
+                        (formData.ratings.ambience || 0) + 
+                        (formData.ratings.value || formData.ratings.valueForMoney || 0)
+                      ) / 4).toFixed(1)}
                     </div>
                   </div>
                   <div>
                     <Label htmlFor="food">Comida</Label>
-                    <Select value={formData.ratings.food.toString()} onValueChange={(value) => setFormData({
+                    <Select value={(formData.ratings.food || 0).toString()} onValueChange={(value) => setFormData({
                       ...formData, 
                       ratings: { ...formData.ratings, food: parseFloat(value) }
                     })}>
@@ -438,7 +455,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                   </div>
                   <div>
                     <Label htmlFor="service">Servicio</Label>
-                    <Select value={formData.ratings.service.toString()} onValueChange={(value) => setFormData({
+                    <Select value={(formData.ratings.service || 0).toString()} onValueChange={(value) => setFormData({
                       ...formData, 
                       ratings: { ...formData.ratings, service: parseFloat(value) }
                     })}>
@@ -458,7 +475,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                   </div>
                   <div>
                     <Label htmlFor="ambience">Ambiente</Label>
-                    <Select value={formData.ratings.ambience.toString()} onValueChange={(value) => setFormData({
+                    <Select value={(formData.ratings.ambience || 0).toString()} onValueChange={(value) => setFormData({
                       ...formData, 
                       ratings: { ...formData.ratings, ambience: parseFloat(value) }
                     })}>
@@ -478,7 +495,7 @@ export default function ReviewDetailClient({ review }: { review: ReviewWithDetai
                   </div>
                   <div>
                     <Label htmlFor="value">Relación Calidad-Precio</Label>
-                    <Select value={formData.ratings.value.toString()} onValueChange={(value) => setFormData({
+                    <Select value={(formData.ratings.value || formData.ratings.valueForMoney || 0).toString()} onValueChange={(value) => setFormData({
                       ...formData, 
                       ratings: { ...formData.ratings, value: parseFloat(value) }
                     })}>
