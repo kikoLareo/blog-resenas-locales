@@ -253,7 +253,32 @@ export default async function HomePage() {
           ctaText: item.customCTA || 'Leer reseña completa',
         };
       }
-      // Si no tiene reviewRef o no es review, usar los datos custom del featuredItem
+      
+      // Si es tipo venue y tiene venueRef, usar datos del venue
+      if (item.type === 'venue' && item.venueRef) {
+        const venue = item.venueRef;
+        return {
+          id: item._id,
+          type: 'venue' as const,
+          title: item.customTitle || venue.title,
+          description: item.customDescription || venue.description || `Descubre ${venue.title} en ${venue.city?.title || 'España'}`,
+          image: venue.images?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&q=85',
+          href: item.customUrl || `/${venue.city?.slug?.current || 'madrid'}/${venue.slug?.current}`,
+          rating: venue.averageRating || 4.5,
+          location: `${venue.city?.title || 'Madrid'}, España`,
+          readTime: `${venue.reviewCount || 0} reseñas`,
+          tags: venue.categories?.map((c: any) => c.title) || [],
+          isActive: true,
+          order: item.order || 0,
+          cuisine: venue.cuisine || venue.categories?.[0]?.title || 'Local',
+          neighborhood: venue.address?.split(',')[0] || venue.city?.title || '',
+          priceRange: venue.priceRange || '$$',
+          ctaText: item.customCTA || 'Ver local',
+          reviewCount: venue.reviewCount || 0,
+        };
+      }
+      
+      // Si no tiene reviewRef o venueRef, usar los datos custom del featuredItem
       return {
         id: item._id,
         type: item.type,

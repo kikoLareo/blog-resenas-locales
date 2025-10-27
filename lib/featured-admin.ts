@@ -112,7 +112,25 @@ export async function getAllFeaturedItems(): Promise<FeaturedItem[]> {
       "venueRef": venueRef->{
         _id,
         title,
-        slug
+        slug,
+        description,
+        address,
+        priceRange,
+        cuisine,
+        images[0] {
+          asset->{ url },
+          alt
+        },
+        "city": city->{
+          title,
+          slug
+        },
+        categories[]->{
+          title,
+          slug
+        },
+        "reviewCount": count(*[_type == "review" && venue._ref == ^._id && published == true]),
+        "averageRating": math::avg(*[_type == "review" && venue._ref == ^._id && published == true].ratings.overall)
       },
       "categoryRef": categoryRef->{
         _id,
