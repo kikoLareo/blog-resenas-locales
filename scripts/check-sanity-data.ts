@@ -37,28 +37,44 @@ async function checkSanityData() {
       })));
     }
 
-    // 2. Check Reviews
+    // 2. Check Reviews with FULL details and URLs
     const reviews = await client.fetch(`
-      *[_type == "review" && published == true] | order(publishedAt desc) [0...5] {
+      *[_type == "review"] | order(publishedAt desc) {
         _id,
         title,
-        "venueName": venue->title,
-        "cityName": venue->city->title,
+        slug,
+        published,
+        "venue": venue->{
+          title,
+          slug,
+          "city": city->{
+            title,
+            slug
+          }
+        },
         featured,
         trending,
         ratings
       }
     `);
-    console.log('\n📝 Reviews publicadas:', reviews.length);
-    if (reviews.length > 0) {
-      console.log('   Primeras 3:', reviews.slice(0, 3).map((r: any) => ({
-        title: r.title,
-        venue: r.venueName,
-        city: r.cityName,
-        featured: r.featured,
-        trending: r.trending
-      })));
-    }
+    console.log('\n📝 Reviews TODAS:', reviews.length);
+    
+    console.log('\n🔗 URLs de Reviews:');
+    console.log('='.repeat(70));
+    reviews.forEach((r: any, index: number) => {
+      const citySlug = r.venue?.city?.slug?.current || 'sin-ciudad';
+      const venueSlug = r.venue?.slug?.current || 'sin-venue';
+      const reviewSlug = r.slug?.current || r.slug || 'SIN-SLUG';
+      const url = `/${citySlug}/${venueSlug}/review/${reviewSlug}`;
+      const status = r.published ? '✅ PUB' : '❌ DRAFT';
+      
+      console.log(`\n${index + 1}. ${status} "${r.title}"`);
+      console.log(`   URL: ${url}`);
+      console.log(`   Venue: ${r.venue?.title} (slug: ${venueSlug})`);
+      console.log(`   City: ${r.venue?.city?.title} (slug: ${citySlug})`);
+      console.log(`   Review slug: ${reviewSlug}`);
+      console.log(`   ID: ${r._id}`);
+    });
 
     // 3. Check Venues
     const venues = await client.fetch(`
