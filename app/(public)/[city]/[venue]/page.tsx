@@ -122,9 +122,13 @@ export async function generateMetadata({ params }: VenuePageProps): Promise<Meta
     ? `${venue.title} - ${ratingText} (${averageRating.toFixed(1)}/10) | ${venue.city.title}`
     : `${venue.title} | ${venue.city.title}`;
   
+  const categoryList = venue.categories && venue.categories.length > 0 
+    ? venue.categories.map(c => c.title).join(', ')
+    : 'Restaurante';
+    
   const description = venue.description 
     ? venue.description.slice(0, 160)
-    : `Descubre ${venue.title} en ${venue.city.title}. ${venue.priceRange ? `${venue.priceRange} • ` : ''}${venue.categories.map(c => c.title).join(', ')}`;
+    : `Descubre ${venue.title} en ${venue.city.title}. ${venue.priceRange ? `${venue.priceRange} • ` : ''}${categoryList}`;
 
   const images = venue.images?.map(img => ({
     url: img.asset.url,
