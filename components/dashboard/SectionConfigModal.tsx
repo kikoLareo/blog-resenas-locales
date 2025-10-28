@@ -83,24 +83,30 @@ export default function SectionConfigModal({
     }
   }, [isOpen, section]);
 
+  // Si el layout actual no está disponible para el nuevo tipo, seleccionar el primero disponible
+  useEffect(() => {
+    if (formData) {
+      const availableLayouts = LAYOUTS.filter(layout => 
+        layout.availableFor.includes(formData.sectionType)
+      );
+
+      if (!availableLayouts.find(l => l.value === formData.config.layout)) {
+        setFormData({
+          ...formData,
+          config: {
+            ...formData.config,
+            layout: availableLayouts[0]?.value || 'grid',
+          },
+        });
+      }
+    }
+  }, [formData?.sectionType]);
+
   if (!formData) return null;
 
   const availableLayouts = LAYOUTS.filter(layout => 
     layout.availableFor.includes(formData.sectionType)
   );
-
-  // Si el layout actual no está disponible para el nuevo tipo, seleccionar el primero disponible
-  useEffect(() => {
-    if (formData && !availableLayouts.find(l => l.value === formData.config.layout)) {
-      setFormData({
-        ...formData,
-        config: {
-          ...formData.config,
-          layout: availableLayouts[0]?.value || 'grid',
-        },
-      });
-    }
-  }, [formData?.sectionType]);
 
   const handleSave = () => {
     if (!formData) return;

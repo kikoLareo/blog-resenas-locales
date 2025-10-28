@@ -66,7 +66,8 @@ export default function ItemPickerList({
           setItems(data.items);
         }
       } catch (error) {
-        console.error('Error fetching items:', error);
+        // Error fetching items - silently fail
+        setItems([]);
       } finally {
         setLoading(false);
       }
