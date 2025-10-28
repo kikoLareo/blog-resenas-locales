@@ -34,10 +34,24 @@ export async function GET() {
       sections: mappedSections,
       success: true,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching homepage sections:', error);
+    
+    // Si la tabla no existe aún, retornar array vacío
+    if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
+      return NextResponse.json({
+        sections: [],
+        success: true,
+        message: 'Table not yet created. Please run migrations.',
+      });
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to fetch sections', success: false },
+      { 
+        error: 'Failed to fetch sections', 
+        success: false,
+        details: error?.message 
+      },
       { status: 500 }
     );
   }
