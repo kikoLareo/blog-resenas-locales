@@ -713,6 +713,142 @@ export const qrFeedbackPendingQuery = `
   } | order(_createdAt desc)
 `;
 
+// ===== VENUE SUBMISSIONS =====
+
+// Obtener todas las solicitudes de locales
+export const venueSubmissionsListQuery = `
+  *[_type == "venueSubmission"] {
+    _id,
+    status,
+    title,
+    slug,
+    submittedAt,
+    submittedBy,
+    email,
+    phone,
+    city->{
+      _id,
+      title,
+      slug
+    },
+    categories[]->{
+      _id,
+      title,
+      slug
+    },
+    qrCode->{
+      _id,
+      code,
+      title
+    },
+    approvedAt,
+    createdVenue->{
+      _id,
+      title,
+      slug
+    }
+  } | order(submittedAt desc)
+`;
+
+// Obtener solicitudes pendientes
+export const venueSubmissionsPendingQuery = `
+  *[_type == "venueSubmission" && status == "pending"] {
+    _id,
+    status,
+    title,
+    slug,
+    submittedAt,
+    submittedBy,
+    email,
+    phone,
+    city->{
+      _id,
+      title,
+      slug
+    },
+    categories[]->{
+      _id,
+      title,
+      slug
+    },
+    qrCode->{
+      _id,
+      code,
+      title
+    }
+  } | order(submittedAt desc)
+`;
+
+// Obtener solicitud individual
+export const venueSubmissionByIdQuery = `
+  *[_type == "venueSubmission" && _id == $id][0] {
+    _id,
+    status,
+    title,
+    slug,
+    description,
+    address,
+    postalCode,
+    city->{
+      _id,
+      title,
+      slug
+    },
+    categories[]->{
+      _id,
+      title,
+      slug
+    },
+    phone,
+    email,
+    website,
+    priceRange,
+    openingHours,
+    geo,
+    images,
+    qrCode->{
+      _id,
+      code,
+      title
+    },
+    submittedAt,
+    submittedBy,
+    approvedAt,
+    approvedBy,
+    rejectionReason,
+    createdVenue->{
+      _id,
+      title,
+      slug
+    },
+    internalNotes
+  }
+`;
+
+// Obtener QR code con validación de onboarding
+export const qrCodeOnboardingQuery = `
+  *[_type == "qrCode" && code == $code][0] {
+    _id,
+    title,
+    code,
+    isActive,
+    isOnboarding,
+    isUsed,
+    usedAt,
+    expiresAt,
+    venue->{
+      _id,
+      title,
+      slug
+    },
+    submission->{
+      _id,
+      status,
+      title
+    }
+  }
+`;
+
 // ===== HOMEPAGE CONFIGURATION =====
 
 // Obtener configuración de homepage
