@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { SITE_CONFIG } from '@/lib/constants';
-import { HomeSaborLocal } from '@/components/HomeSaborLocal';
+import HomeSaborLocalServer from '@/components/HomeSaborLocalServer';
 import { sanityFetch } from '@/lib/sanity.client';
 import { homepageQuery, homepageConfigQuery } from '@/sanity/lib/queries';
 import { getAllFeaturedItems } from '@/lib/featured-admin';
@@ -323,16 +323,7 @@ export default async function HomePage() {
     categories: transformSanityCategories(data.featuredCategories || []),
   };
 
-  // Configuración por defecto si no existe en Sanity
-  const sections = homepageConfig?.sections || defaultHomepageConfig;
-
   return (
-    <HomeSaborLocal
-      featuredItems={finalHeroItems}
-      trendingReviews={sanityData.trendingReviews}
-      topRatedReviews={sanityData.topReviews}
-      categories={sanityData.categories}
-      venues={sanityData.venues}
-    />
+    <HomeSaborLocalServer />
   );
 }

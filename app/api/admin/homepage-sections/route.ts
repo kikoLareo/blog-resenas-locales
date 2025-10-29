@@ -8,6 +8,8 @@ import type { HomepageSection, SaveSectionsRequest } from '@/types/homepage';
  */
 export async function GET() {
   try {
+    console.log('🔍 Fetching homepage sections...');
+    
     const query = `*[_type == "homepageSection"] | order(order asc) {
       _id,
       _type,
@@ -20,7 +22,10 @@ export async function GET() {
       _updatedAt
     }`;
 
+    console.log('📋 Query:', query);
     const sections = await client.fetch<HomepageSection[]>(query);
+    console.log('✅ Sections found:', sections.length);
+    console.log('📊 Sections:', sections);
 
     return NextResponse.json({
       success: true,
