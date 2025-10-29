@@ -64,49 +64,26 @@ export default function SectionConfigModal({
     } else if (isOpen && !section) {
       // Nueva sección
       setFormData({
-        id: `new-${Date.now()}`,
+        _id: `new-${Date.now()}`,
+        _type: 'homepageSection',
         title: 'Nueva Sección',
         sectionType: 'poster',
         enabled: true,
         order: 1,
         config: {
-          title: '',
+          displayTitle: '',
           subtitle: '',
-          layout: 'grid',
-          gridColumns: 3,
-          showImages: true,
           contentTypes: [],
           selectedItems: [],
         },
+        _createdAt: new Date().toISOString(),
+        _updatedAt: new Date().toISOString(),
       });
       setActiveTab('config');
     }
   }, [isOpen, section]);
 
-  // Si el layout actual no está disponible para el nuevo tipo, seleccionar el primero disponible
-  useEffect(() => {
-    if (formData) {
-      const availableLayouts = LAYOUTS.filter(layout => 
-        layout.availableFor.includes(formData.sectionType)
-      );
-
-      if (!availableLayouts.find(l => l.value === formData.config.layout)) {
-        setFormData({
-          ...formData,
-          config: {
-            ...formData.config,
-            layout: availableLayouts[0]?.value || 'grid',
-          },
-        });
-      }
-    }
-  }, [formData?.sectionType]);
-
   if (!formData) return null;
-
-  const availableLayouts = LAYOUTS.filter(layout => 
-    layout.availableFor.includes(formData.sectionType)
-  );
 
   const handleSave = () => {
     if (!formData) return;

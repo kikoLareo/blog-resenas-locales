@@ -48,7 +48,7 @@ function SortableItem({ section, onToggle, onEdit, onDelete }: SortableItemProps
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: section.id });
+  } = useSortable({ id: section._id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -90,7 +90,7 @@ function SortableItem({ section, onToggle, onEdit, onDelete }: SortableItemProps
             <div>
               <h3 className="font-medium">{section.title}</h3>
               <p className="text-sm text-gray-500">
-                {section.config.title || 'Sin título configurado'}
+                {section.config.displayTitle || 'Sin título configurado'}
               </p>
             </div>
           </div>
@@ -106,7 +106,7 @@ function SortableItem({ section, onToggle, onEdit, onDelete }: SortableItemProps
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => onToggle(section.id)}
+            onClick={() => onToggle(section._id)}
           >
             {section.enabled ? (
               <Eye className="h-4 w-4 text-green-600" />
@@ -126,7 +126,7 @@ function SortableItem({ section, onToggle, onEdit, onDelete }: SortableItemProps
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => onDelete(section.id)}
+            onClick={() => onDelete(section._id)}
           >
             <Trash2 className="h-4 w-4 text-red-500" />
           </Button>
@@ -184,8 +184,8 @@ export default function HomepageSectionsPage() {
     
     if (over && active.id !== over.id) {
       setSections((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
+        const oldIndex = items.findIndex((item) => item._id === active.id);
+        const newIndex = items.findIndex((item) => item._id === over.id);
         
         const newSections = arrayMove(items, oldIndex, newIndex);
         
@@ -202,14 +202,14 @@ export default function HomepageSectionsPage() {
 
   const toggleSection = (id: string) => {
     setSections(prev => prev.map(section => 
-      section.id === id ? { ...section, enabled: !section.enabled } : section
+      section._id === id ? { ...section, enabled: !section.enabled } : section
     ));
     setHasChanges(true);
   };
 
   const deleteSection = (id: string) => {
     if (confirm('¿Estás seguro de que quieres eliminar esta sección?')) {
-      setSections(prev => prev.filter(section => section.id !== id));
+      setSections(prev => prev.filter(section => section._id !== id));
       setHasChanges(true);
     }
   };
@@ -225,27 +225,44 @@ export default function HomepageSectionsPage() {
   };
 
   const handleSaveSection = (section: HomepageSection) => {
-    if (section.id.startsWith('new-')) {
-      // Nueva sección
-      const newSection = {
-        ...section,
-        order: sections.length + 1,
-      };
-      setSections([...sections, newSection]);
+    if (section._id.startsWith('new-')) {
+      // Nueva sección - usar POST
+      createSection(section);
     } else {
       // Actualizar sección existente
-      setSections(prev => prev.map(s => s.id === section.id ? section : s));
+      setSections(prev => prev.map(s => s._id === section._id ? section : s));
+      setHasChanges(true);
     }
     
-    setHasChanges(true);
     setIsModalOpen(false);
+  };
+
+  const createSection = async (section: HomepageSection) => {
+    try {
+      const response = await fetch('/api/admin/homepage-sections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: section.title,
+          sectionType: section.sectionType,
+          config: section.config
+        }),
+      });
+
+      if (response.ok) {
+        const { section: newSection } = await response.json();
+        setSections(prev => [...prev, newSection]);
+      }
+    } catch (error) {
+      console.error('Error creating section:', error);
+    }
   };
 
   const saveChanges = async () => {
     setSaving(true);
     try {
       const response = await fetch('/api/admin/homepage-sections', {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -335,13 +352,13 @@ export default function HomepageSectionsPage() {
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={sections.map(s => s.id)}
+                items={sections.map(s => s._id)}
                 strategy={verticalListSortingStrategy}
               >
                 <div className="space-y-3">
                   {sections.map((section) => (
                     <SortableItem
-                      key={section.id}
+                      key={section._id}
                       section={section}
                       onToggle={toggleSection}
                       onEdit={editSection}

@@ -1,56 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { client } from '@/lib/sanity';
 import type { HomepageSection, SaveSectionsRequest } from '@/types/homepage';
 
 /**
  * GET /api/admin/homepage-sections
- * Obtiene todas las secciones de homepage configuradas
+ * Obtiene todas las secciones de homepage desde Sanity
  */
 export async function GET() {
   try {
-    // Verificar autenticación (opcional, comentado por ahora)
-    // const session = await getServerSession(authOptions);
-    // if (!session?.user) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
+    const query = `*[_type == "homepageSection"] | order(order asc) {
+      _id,
+      _type,
+      title,
+      sectionType,
+      enabled,
+      order,
+      config,
+      _createdAt,
+      _updatedAt
+    }`;
 
-    const sections = await prisma.homepageSection.findMany({
-      orderBy: { order: 'asc' },
-    });
-
-    // Mapear datos de BD a formato HomepageSection
-    const mappedSections: HomepageSection[] = sections.map((section) => ({
-      id: section.id,
-      title: section.title,
-      sectionType: section.sectionType as any,
-      enabled: section.enabled,
-      order: section.order,
-      config: section.config as any,
-      createdAt: section.createdAt,
-      updatedAt: section.updatedAt,
-    }));
+    const sections = await client.fetch<HomepageSection[]>(query);
 
     return NextResponse.json({
-      sections: mappedSections,
       success: true,
+      sections,
     });
-  } catch (error: any) {
+
+  } catch (error) {
     console.error('Error fetching homepage sections:', error);
     
-    // Si la tabla no existe aún, retornar array vacío
-    if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
-      return NextResponse.json({
-        sections: [],
-        success: true,
-        message: 'Table not yet created. Please run migrations.',
-      });
-    }
-    
     return NextResponse.json(
-      { 
-        error: 'Failed to fetch sections', 
+      {
         success: false,
-        details: error?.message 
+        error: 'Error al obtener las secciones',
+        sections: [],
       },
       { status: 500 }
     );
@@ -59,108 +43,96 @@ export async function GET() {
 
 /**
  * POST /api/admin/homepage-sections
- * Guarda/actualiza configuración de secciones
+ * Crea una nueva sección de homepage en Sanity
  */
 export async function POST(request: NextRequest) {
   try {
-    // Verificar autenticación (opcional, comentado por ahora)
-    // const session = await getServerSession(authOptions);
-    // if (!session?.user || session.user.role !== 'ADMIN') {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
+    const body = await request.json();
+    const { title, sectionType, config } = body;
 
-    const body: SaveSectionsRequest = await request.json();
-    const { sections } = body;
-
-    if (!sections || !Array.isArray(sections)) {
+    if (!title || !sectionType || !config) {
       return NextResponse.json(
-        { error: 'Invalid sections data', success: false },
+        { error: 'Faltan campos requeridos: title, sectionType, config' },
         { status: 400 }
       );
     }
 
-    // Validar cada sección
-    for (const section of sections) {
-      if (!section.title || !section.sectionType) {
-        return NextResponse.json(
-          { error: 'Missing required section fields', success: false },
-          { status: 400 }
-        );
-      }
-    }
+    const maxOrderQuery = `*[_type == "homepageSection"] | order(order desc) [0].order`;
+    const maxOrder = await client.fetch<number>(maxOrderQuery);
+    const nextOrder = (maxOrder || 0) + 1;
 
-    // Actualizar todas las secciones en una transacción
-    const result = await prisma.$transaction(async (tx) => {
-      // Eliminar secciones que ya no existen
-      const sectionIds = sections.map(s => s.id).filter(id => id && !id.startsWith('new-'));
-      await tx.homepageSection.deleteMany({
-        where: {
-          id: {
-            notIn: sectionIds.length > 0 ? sectionIds : ['dummy'], // Evitar query vacío
-          },
-        },
-      });
+    const newSection = {
+      _type: 'homepageSection',
+      title,
+      sectionType,
+      enabled: true,
+      order: nextOrder,
+      config,
+    };
 
-      // Upsert cada sección
-      const savedSections = [];
-      for (const section of sections) {
-        const isNew = !section.id || section.id.startsWith('new-');
-        
-        if (isNew) {
-          // Crear nueva sección
-          const created = await tx.homepageSection.create({
-            data: {
-              title: section.title,
-              sectionType: section.sectionType,
-              enabled: section.enabled,
-              order: section.order,
-              config: section.config as any,
-            },
-          });
-          savedSections.push(created);
-        } else {
-          // Actualizar sección existente
-          const updated = await tx.homepageSection.update({
-            where: { id: section.id },
-            data: {
-              title: section.title,
-              sectionType: section.sectionType,
-              enabled: section.enabled,
-              order: section.order,
-              config: section.config as any,
-            },
-          });
-          savedSections.push(updated);
-        }
-      }
-
-      return savedSections;
-    });
-
-    // Mapear respuesta
-    const mappedSections: HomepageSection[] = result.map((section) => ({
-      id: section.id,
-      title: section.title,
-      sectionType: section.sectionType as any,
-      enabled: section.enabled,
-      order: section.order,
-      config: section.config as any,
-      createdAt: section.createdAt,
-      updatedAt: section.updatedAt,
-    }));
-
-    // Revalidar homepage
-    // await revalidatePath('/');
+    const createdSection = await client.create(newSection);
 
     return NextResponse.json({
-      sections: mappedSections,
       success: true,
-      message: 'Sections saved successfully',
+      section: createdSection,
     });
+
   } catch (error) {
-    console.error('Error saving homepage sections:', error);
+    console.error('Error creating homepage section:', error);
+    
     return NextResponse.json(
-      { error: 'Failed to save sections', success: false },
+      { 
+        success: false,
+        error: 'Error al crear la sección',
+      },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * PUT /api/admin/homepage-sections
+ * Actualiza múltiples secciones
+ */
+export async function PUT(request: NextRequest) {
+  try {
+    const { sections }: SaveSectionsRequest = await request.json();
+
+    if (!sections || !Array.isArray(sections)) {
+      return NextResponse.json(
+        { error: 'Se requiere un array de secciones' },
+        { status: 400 }
+      );
+    }
+
+    const updatePromises = sections.map((section) => {
+      return client
+        .patch(section._id)
+        .set({
+          title: section.title,
+          sectionType: section.sectionType,
+          enabled: section.enabled,
+          order: section.order,
+          config: section.config,
+        })
+        .commit();
+    });
+
+    const updatedSections = await Promise.all(updatePromises);
+
+    return NextResponse.json({
+      success: true,
+      sections: updatedSections,
+    });
+
+  } catch (error) {
+    console.error('Error updating homepage sections:', error);
+    
+    return NextResponse.json(
+      { 
+        success: false,
+        error: 'Error al actualizar las secciones',
+      },
       { status: 500 }
     );
   }

@@ -10,7 +10,7 @@ export const homepageSection = defineType({
       title: 'Título de la Sección',
       type: 'string',
       validation: Rule => Rule.required(),
-      description: 'Nombre identificativo de la sección (ej: "Hero", "Trending", "Top Rated")'
+      description: 'Nombre identificativo de la sección (ej: "Hero Principal", "Mejores Reseñas")'
     }),
     defineField({
       name: 'sectionType',
@@ -19,16 +19,16 @@ export const homepageSection = defineType({
       options: {
         list: [
           { title: 'Hero Principal', value: 'hero' },
-          { title: 'Reseñas Trending', value: 'trending' },
-          { title: 'Mejor Valoradas', value: 'topRated' },
-          { title: 'Newsletter CTA', value: 'newsletter' },
-          { title: 'Sección Personalizada', value: 'custom' }
+          { title: 'Poster Clásico', value: 'poster' },
+          { title: 'Poster Moderno', value: 'poster-v2' },
+          { title: 'Banner Horizontal', value: 'banner' },
+          { title: 'Cards Cuadrados', value: 'card-square' }
         ]
       },
       validation: Rule => Rule.required()
     }),
     defineField({
-      name: 'isEnabled',
+      name: 'enabled',
       title: 'Sección Activa',
       type: 'boolean',
       initialValue: true,
@@ -42,137 +42,107 @@ export const homepageSection = defineType({
       description: 'Número que determina el orden (0 = primero, 1 = segundo, etc.)'
     }),
     defineField({
-      name: 'displayTitle',
-      title: 'Título Mostrado',
-      type: 'string',
-      description: 'Título que se muestra al usuario (opcional, algunos tipos no lo usan)'
-    }),
-    defineField({
-      name: 'subtitle',
-      title: 'Subtítulo',
-      type: 'text',
-      rows: 2,
-      description: 'Texto descriptivo bajo el título'
-    }),
-    defineField({
-      name: 'maxItems',
-      title: 'Máximo de Elementos',
-      type: 'number',
-      initialValue: 6,
-      description: 'Número máximo de elementos a mostrar en esta sección'
-    }),
-    defineField({
-      name: 'contentSource',
-      title: 'Fuente del Contenido',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Automático (por rating/fecha)', value: 'auto' },
-          { title: 'Selección Manual', value: 'manual' },
-          { title: 'Contenido Destacado', value: 'featured' }
-        ]
-      },
-      initialValue: 'auto',
-      hidden: ({ document }) => {
-        const sectionType = document?.sectionType as string;
-        return !['trending', 'topRated', 'custom'].includes(sectionType);
-      }
-    }),
-    defineField({
-      name: 'manualContent',
-      title: 'Contenido Seleccionado',
-      type: 'array',
-      of: [
-        {
-          type: 'reference',
-          to: [
-            { type: 'review' },
-            { type: 'venue' },
-            { type: 'post' }
-          ]
-        }
-      ],
-      hidden: ({ document }) => {
-        const contentSource = document?.contentSource as string;
-        return contentSource !== 'manual';
-      }
-    }),
-    defineField({
-      name: 'filterCriteria',
-      title: 'Criterios de Filtrado',
+      name: 'config',
+      title: 'Configuración de la Sección',
       type: 'object',
       fields: [
         {
-          name: 'cities',
-          title: 'Filtrar por Ciudades',
-          type: 'array',
-          of: [{ type: 'reference', to: [{ type: 'city' }] }]
-        },
-        {
-          name: 'categories',
-          title: 'Filtrar por Categorías',
-          type: 'array',
-          of: [{ type: 'reference', to: [{ type: 'category' }] }]
-        },
-        {
-          name: 'minRating',
-          title: 'Rating Mínimo',
-          type: 'number',
-          validation: Rule => Rule.min(0).max(5)
-        }
-      ],
-      hidden: ({ document }) => {
-        const contentSource = document?.contentSource as string;
-        return contentSource !== 'auto';
-      }
-    }),
-    defineField({
-      name: 'styling',
-      title: 'Configuración Visual',
-      type: 'object',
-      fields: [
-        {
-          name: 'backgroundColor',
-          title: 'Color de Fondo',
+          name: 'displayTitle',
+          title: 'Título Mostrado',
           type: 'string',
-          options: {
-            list: [
-              { title: 'Blanco', value: 'white' },
-              { title: 'Gris Claro', value: 'gray-50' },
-              { title: 'Gris Medio', value: 'gray-100' }
-            ]
-          },
-          initialValue: 'white'
+          description: 'Título que se muestra al usuario'
         },
         {
-          name: 'layout',
-          title: 'Diseño de la Sección',
-          type: 'string',
-          options: {
-            list: [
-              { title: 'Grid 2 Columnas', value: 'grid-2' },
-              { title: 'Grid 3 Columnas', value: 'grid-3' },
-              { title: 'Lista Vertical', value: 'list' },
-              { title: 'Carrusel', value: 'carousel' }
-            ]
-          },
-          initialValue: 'grid-3'
+          name: 'subtitle',
+          title: 'Subtítulo',
+          type: 'text',
+          rows: 2,
+          description: 'Texto descriptivo bajo el título'
+        },
+        {
+          name: 'contentTypes',
+          title: 'Tipos de Contenido',
+          type: 'array',
+          of: [{
+            type: 'string',
+            options: {
+              list: [
+                { title: 'Locales', value: 'venue' },
+                { title: 'Reseñas', value: 'review' },
+                { title: 'Categorías', value: 'category' },
+                { title: 'Ciudades', value: 'city' }
+              ]
+            }
+          }],
+          validation: Rule => Rule.required().min(1),
+          description: 'Tipos de contenido que pueden aparecer en esta sección'
+        },
+        {
+          name: 'selectedItems',
+          title: 'Elementos Seleccionados',
+          type: 'array',
+          of: [{
+            type: 'object',
+            fields: [
+              {
+                name: 'type',
+                title: 'Tipo',
+                type: 'string',
+                options: {
+                  list: [
+                    { title: 'Local', value: 'venue' },
+                    { title: 'Reseña', value: 'review' },
+                    { title: 'Categoría', value: 'category' },
+                    { title: 'Ciudad', value: 'city' }
+                  ]
+                },
+                validation: Rule => Rule.required()
+              },
+              {
+                name: 'id',
+                title: 'ID del Elemento',
+                type: 'string',
+                validation: Rule => Rule.required(),
+                description: 'ID del elemento en Sanity'
+              },
+              {
+                name: 'title',
+                title: 'Título',
+                type: 'string',
+                description: 'Título del elemento (se rellena automáticamente)'
+              }
+            ],
+            preview: {
+              select: {
+                title: 'title',
+                type: 'type'
+              },
+              prepare({ title, type }) {
+                return {
+                  title: title || 'Sin título',
+                  subtitle: type
+                }
+              }
+            }
+          }],
+          description: 'Lista específica de elementos a mostrar en esta sección'
         }
       ]
-    })
+    }),
+
   ],
   preview: {
     select: {
       title: 'title',
       sectionType: 'sectionType',
       order: 'order',
-      isEnabled: 'isEnabled'
+      enabled: 'enabled'
     },
-    prepare({ title, sectionType, order, isEnabled }) {
+    prepare({ title, sectionType, order, enabled }) {
       return {
         title: `${order}. ${title}`,
-        subtitle: `${sectionType} - ${isEnabled ? '✅ Activa' : '❌ Inactiva'}`,
-        media: isEnabled ? '✅' : '❌'
+        subtitle: `${sectionType} - ${enabled ? '✅ Activa' : '❌ Inactiva'}`,
+        media: enabled ? '✅' : '❌'
       }
     }
   },

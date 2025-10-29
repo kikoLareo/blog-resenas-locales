@@ -43,30 +43,28 @@ export interface SelectedItem {
 }
 
 /**
- * Configuración de una sección
+ * Configuración de una sección (compatible con Sanity)
  */
 export interface SectionConfig {
-  title?: string;                // Título visible en frontend
+  displayTitle?: string;         // Título visible en frontend
   subtitle?: string;             // Subtítulo descriptivo
-  layout: SectionLayout;         // Grid, lista o carrusel
-  gridColumns?: GridColumns;     // Número de columnas (solo para grid)
-  showImages?: boolean;          // Mostrar imágenes
-  contentTypes: ContentType[];   // Tipos de contenido seleccionados (puede ser múltiple)
+  contentTypes: ContentType[];   // Tipos de contenido seleccionados
   selectedItems: SelectedItem[]; // Items específicos seleccionados
 }
 
 /**
- * Sección completa de homepage
+ * Sección completa de homepage (compatible con Sanity)
  */
 export interface HomepageSection {
-  id: string;                    // ID único de la sección
+  _id: string;                   // ID único de la sección (Sanity)
+  _type: 'homepageSection';      // Tipo de documento Sanity
   title: string;                 // Título interno (para dashboard)
   sectionType: SectionType;      // Tipo visual (hero, poster, banner, etc)
   enabled: boolean;              // Si la sección está activa
   order: number;                 // Orden en la página
   config: SectionConfig;         // Configuración completa
-  createdAt?: Date;              // Fecha de creación
-  updatedAt?: Date;              // Última actualización
+  _createdAt?: string;           // Fecha de creación (Sanity)
+  _updatedAt?: string;           // Última actualización (Sanity)
 }
 
 /**
