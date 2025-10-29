@@ -6,6 +6,25 @@ const nextConfig = {
     typedRoutes: false,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
+  // Excluir archivos de Sanity Studio del build
+  webpack: (config, { isServer }) => {
+    // Excluir sanity.config.ts del build de Next.js
+    config.resolve.alias = {
+      ...config.resolve.alias,
+    };
+    
+    // Ignorar archivos de Sanity Studio
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        os: false,
+      };
+    }
+    
+    return config;
+  },
   // Improve build performance and handle network timeouts
   staticPageGenerationTimeout: 60,
   images: {
@@ -121,21 +140,6 @@ const nextConfig = {
           },
         },
       };
-    }
-    
-    // Incluir Prisma binaries en el bundle serverless
-    if (isServer) {
-      const externals = config.externals || [];
-      config.externals = [
-        ...externals,
-        ({ context, request }, callback) => {
-          // No externalizar @prisma/client para asegurar que los binaries se incluyan
-          if (request === '@prisma/client' || request === '.prisma/client') {
-            return callback();
-          }
-          return callback(null, request);
-        },
-      ];
     }
     
     return config;
