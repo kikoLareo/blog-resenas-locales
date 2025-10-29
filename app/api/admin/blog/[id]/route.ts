@@ -3,7 +3,7 @@ import {
   getBlogPostById, 
   updateBlogPost,
   deleteBlogPost,
-  type CreateBlogPostData 
+  CreateBlogPostData 
 } from '@/lib/blog-admin';
 
 /**

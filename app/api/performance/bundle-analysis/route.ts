@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile, readdir, stat } from 'fs/promises';
+import { promises as fs } from 'fs';
 import { join } from 'path';
+
+const { readFile, readdir, stat } = fs;
 
 interface BundleStats {
   file: string;

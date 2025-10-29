@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { 
-  getAllBlogPosts, 
+  getAllBlogPosts,
   createBlogPost,
-  type CreateBlogPostData 
+  CreateBlogPostData 
 } from '@/lib/blog-admin';
 
 /**
