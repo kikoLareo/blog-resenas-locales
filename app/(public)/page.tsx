@@ -232,13 +232,19 @@ export default async function HomePage() {
       // Si es tipo review y tiene reviewRef, usar datos de la review
       if (item.type === 'review' && item.reviewRef) {
         const review = item.reviewRef;
+        
+        // Asegurar datos de ciudad/venue para URL correcta
+        const citySlug = review.venue?.city?.slug?.current;
+        const venueSlug = review.venue?.slug?.current;
+        const reviewSlug = review.slug?.current;
+        
         return {
           id: item._id,
           type: 'review' as const,
           title: item.customTitle || review.title,
           description: item.customDescription || review.summary || review.tldr || '',
           image: review.gallery?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&q=85',
-          href: item.customUrl || `/${review.venue?.city?.slug?.current || 'madrid'}/${review.venue?.slug?.current || 'local'}/review/${review.slug?.current || 'review'}`,
+          href: item.customUrl || `/${citySlug || 'a-coruna'}/${venueSlug || 'local'}/review/${reviewSlug || 'review'}`,
           rating: review.ratings?.overall || review.ratings?.food || 4.5,
           location: `${review.venue?.city?.title || 'Madrid'}, España`,
           readTime: review.readTime ? `${review.readTime} min lectura` : '5 min lectura',
@@ -257,13 +263,20 @@ export default async function HomePage() {
       // Si es tipo venue y tiene venueRef, usar datos del venue
       if (item.type === 'venue' && item.venueRef) {
         const venue = item.venueRef;
+        
+        // Asegurar que el venue tiene ciudad antes de generar URL
+        const citySlug = venue.city?.slug?.current;
+        const venueSlug = venue.slug?.current;
+        
+        // Si no tiene ciudad asignada, usar A Coruña como default (90% de reseñas)
+        
         return {
           id: item._id,
           type: 'venue' as const,
           title: item.customTitle || venue.title,
-          description: item.customDescription || venue.description || `Descubre ${venue.title} en ${venue.city?.title || 'España'}`,
+          description: item.customDescription || venue.description || `Descubre ${venue.title} en ${venue.city?.title || 'A Coruña'}`,
           image: venue.images?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&q=85',
-          href: item.customUrl || `/${venue.city?.slug?.current || 'madrid'}/${venue.slug?.current}`,
+          href: item.customUrl || `/${citySlug || 'a-coruna'}/${venueSlug || 'local'}`,
           rating: venue.averageRating || 4.5,
           location: `${venue.city?.title || 'Madrid'}, España`,
           readTime: `${venue.reviewCount || 0} reseñas`,
