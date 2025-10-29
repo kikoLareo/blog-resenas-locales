@@ -11,7 +11,7 @@ import {
 
 /**
  * GET /api/admin/analytics
- * Obtiene todas las estadísticas del dashboard
+ * Obtiene todas las estadísticas del dashboard administrativo
  * Query params:
  * - type: 'overview' | 'content' | 'popular' | 'growth' | 'ratings' | 'cities' | 'categories' | 'all'
  */
