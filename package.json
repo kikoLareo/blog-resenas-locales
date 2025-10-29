@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "postinstall": "node scripts/prisma-setup.js",
+    "postinstall": "node scripts/prisma-setup.js && prisma generate",
     "prebuild": "rm -rf .next/cache && tsx scripts/indexnow-verify.ts",
     "generate-admin": "node scripts/generate-admin-password.js",
     "build": "prisma generate && prisma migrate deploy && next build",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",

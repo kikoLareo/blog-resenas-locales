@@ -122,6 +122,26 @@ const nextConfig = {
         },
       };
     }
+    
+    // Incluir Prisma binaries en el bundle serverless
+    if (isServer) {
+      config.externals = config.externals || [];
+      // No externalizar @prisma/client para asegurar que los binaries se incluyan
+      if (Array.isArray(config.externals)) {
+        config.externals = config.externals.map((external) => {
+          if (typeof external === 'function') {
+            return (context, request, callback) => {
+              if (request === '@prisma/client' || request === '.prisma/client') {
+                return callback();
+              }
+              return external(context, request, callback);
+            };
+          }
+          return external;
+        });
+      }
+    }
+    
     return config;
   },
 };
