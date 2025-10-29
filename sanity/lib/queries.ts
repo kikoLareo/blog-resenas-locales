@@ -338,7 +338,7 @@ export const searchQuery = `
 
 // Filtrar por categoría con paginación
 export const venuesByCategoryQuery = `
-  *[_type == "venue" && $categorySlug in categories[]->slug.current] | order(title asc) [$offset...$limit] {
+  *[_type == "venue" && categories[0]->slug.current == $categorySlug] | order(title asc) [$offset...$limit] {
     _id,
     title,
     slug,
@@ -361,7 +361,7 @@ export const venuesByCategoryQuery = `
 
 // Contar locales por categoría para paginación
 export const venuesByCategoryCountQuery = `
-  count(*[_type == "venue" && $categorySlug in categories[]->slug.current])
+  count(*[_type == "venue" && categories[0]->slug.current == $categorySlug])
 `;
 
 // ===== QUERIES PARA PÁGINAS ESPECIALES =====
