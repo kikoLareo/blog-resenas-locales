@@ -186,7 +186,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
               items={[
                 { name: 'Inicio', url: '/' },
                 { name: 'Categorías', url: '/categorias' },
-                { name: category.title, url: `/categorias/${category.slug.current}` },
+                { name: category.title, url: `/categorias/${category.slug?.current || slug}` },
               ]}
             />
           </div>
