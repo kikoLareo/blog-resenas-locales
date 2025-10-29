@@ -19,6 +19,7 @@ export const homepageSection = defineType({
       options: {
         list: [
           { title: 'Hero Principal', value: 'hero' },
+          { title: 'Hero Clásico (Carousel)', value: 'hero-v3' },
           { title: 'Poster Clásico', value: 'poster' },
           { title: 'Poster Moderno', value: 'poster-v2' },
           { title: 'Banner Horizontal', value: 'banner' },

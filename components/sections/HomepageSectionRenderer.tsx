@@ -6,6 +6,7 @@ import PosterV2Section from './PosterV2Section';
 import BannerSection from './BannerSection';
 import CardSquareSection from './CardSquareSection';
 import HomepageHeroSection from './HomepageHeroSection';
+import { HeroV3Section } from './HeroV3Section';
 
 interface HomepageSectionRendererProps {
   section: HomepageSection;
@@ -27,6 +28,9 @@ export default function HomepageSectionRenderer({ section }: HomepageSectionRend
     case 'hero':
       return <HomepageHeroSection section={section} />;
     
+    case 'hero-v3':
+      return <HeroV3Section config={section.config} />;
+    
     case 'poster':
       return <PosterSection section={section} />;
     
@@ -40,7 +44,7 @@ export default function HomepageSectionRenderer({ section }: HomepageSectionRend
       return <CardSquareSection section={section} />;
     
     default:
-      console.warn(`Unknown section type: ${section.sectionType}`);
+      // Unknown section type - skip silently
       return null;
   }
 }

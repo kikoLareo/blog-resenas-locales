@@ -5,7 +5,8 @@
 
 // Tipos de sección (visual/layout)
 export type SectionType = 
-  | 'hero'           // Hero con carrusel
+  | 'hero'           // Hero principal moderno
+  | 'hero-v3'        // Hero clásico con carrusel
   | 'poster'         // Card horizontal alargado
   | 'poster-v2'      // Poster menos alto
   | 'banner'         // Formato 16:9
