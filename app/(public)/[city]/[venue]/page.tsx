@@ -86,6 +86,26 @@ type VenueWithReviews = {
   reviewCount: number;
 };
 
+// Generate static paths for all city/venue combinations
+export async function generateStaticParams() {
+  try {
+    const venues = await client.fetch(`
+      *[_type == "venue"] {
+        "venue": slug.current,
+        "city": city->slug.current
+      }[defined(venue) && defined(city)]
+    `);
+
+    return venues.map((venue: { venue: string; city: string }) => ({
+      city: venue.city,
+      venue: venue.venue,
+    }));
+  } catch (error) {
+    // En caso de error, devolver array vacío para evitar fallos de build
+    return [];
+  }
+}
+
 async function getVenue(citySlug: string, venueSlug: string): Promise<VenueWithReviews | null> {
   try {
     const venue = await client.fetch(venueWithReviewsQuery, {
@@ -106,7 +126,12 @@ async function getVenue(citySlug: string, venueSlug: string): Promise<VenueWithR
 
 export async function generateMetadata({ params }: VenuePageProps): Promise<Metadata> {
   const { city, venue: venueSlug } = await params;
-  const venue = await getVenue(city, venueSlug);
+  
+  // Normalizar parámetros a minúsculas para compatibilidad con slugs de Sanity
+  const normalizedCity = city.toLowerCase();
+  const normalizedVenueSlug = venueSlug.toLowerCase();
+  
+  const venue = await getVenue(normalizedCity, normalizedVenueSlug);
 
   if (!venue) {
     return {
@@ -161,7 +186,12 @@ export async function generateMetadata({ params }: VenuePageProps): Promise<Meta
 
 export default async function VenuePage({ params }: VenuePageProps) {
   const { city, venue: venueSlug } = await params;
-  const venue = await getVenue(city, venueSlug);
+  
+  // Normalizar parámetros a minúsculas para compatibilidad con slugs de Sanity
+  const normalizedCity = city.toLowerCase();
+  const normalizedVenueSlug = venueSlug.toLowerCase();
+  
+  const venue = await getVenue(normalizedCity, normalizedVenueSlug);
 
   if (!venue) {
     notFound();
