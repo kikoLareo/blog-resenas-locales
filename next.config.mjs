@@ -6,6 +6,25 @@ const nextConfig = {
     typedRoutes: false,
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
+  // Excluir archivos de Sanity Studio del build
+  webpack: (config, { isServer }) => {
+    // Excluir sanity.config.ts del build de Next.js
+    config.resolve.alias = {
+      ...config.resolve.alias,
+    };
+    
+    // Ignorar archivos de Sanity Studio
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        os: false,
+      };
+    }
+    
+    return config;
+  },
   // Improve build performance and handle network timeouts
   staticPageGenerationTimeout: 60,
   images: {
@@ -122,6 +141,7 @@ const nextConfig = {
         },
       };
     }
+    
     return config;
   },
 };

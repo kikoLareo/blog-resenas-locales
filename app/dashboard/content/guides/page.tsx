@@ -47,6 +47,7 @@ interface Guide {
     shares: number;
     bookmarks: number;
   };
+  venueCount?: number;
 }
 
 async function getGuides(): Promise<Guide[]> {
@@ -63,8 +64,7 @@ export default async function GuidesManagementPage() {
   const guides = await getGuides();
   
   const totalVenues = (guide: Guide) => {
-    // Por ahora retornamos un número estimado, en el futuro se puede calcular desde las secciones
-    return Math.floor(Math.random() * 20) + 5;
+    return guide.venueCount || 0;
   };
 
   const totalViews = guides.reduce((acc, guide) => acc + (guide.stats?.views || 0), 0);

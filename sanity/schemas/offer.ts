@@ -378,7 +378,7 @@ export const offer = defineType({
       validation: (rule) => rule.max(160),
     }),
     defineField({
-      name: 'keywords',
+      name: 'seoKeywords',
       title: 'Keywords',
       type: 'array',
       group: 'seo',
@@ -387,6 +387,39 @@ export const offer = defineType({
         layout: 'tags',
       },
       validation: (rule) => rule.max(10),
+    }),
+    defineField({
+      name: 'stats',
+      title: 'Estadísticas',
+      type: 'object',
+      group: 'settings',
+      fields: [
+        {
+          name: 'views',
+          title: 'Visualizaciones',
+          type: 'number',
+          initialValue: 0,
+        },
+        {
+          name: 'shares',
+          title: 'Compartidos',
+          type: 'number',
+          initialValue: 0,
+        },
+        {
+          name: 'clicks',
+          title: 'Clicks',
+          type: 'number',
+          initialValue: 0,
+        },
+      ],
+    }),
+    defineField({
+      name: 'lastUpdated',
+      title: 'Última actualización',
+      type: 'datetime',
+      group: 'settings',
+      initialValue: () => new Date().toISOString(),
     }),
     defineField({
       name: 'featured',

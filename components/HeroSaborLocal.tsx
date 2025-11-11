@@ -415,6 +415,29 @@ export function HeroSaborLocal({
           >
             {/* Badges superiores - Mobile optimizado */}
             <div className="flex flex-wrap items-center gap-2 mb-4">
+              {/* Badge de tipo de contenido */}
+              {(() => {
+                const item = featuredItems?.[currentIndex] || fallbackItems?.[currentIndex];
+                if (!item) return null;
+                
+                const typeConfig = {
+                  review: { label: 'Reseña', icon: '📝', color: 'bg-accent/90' },
+                  venue: { label: 'Local', icon: '🏪', color: 'bg-primary/90' },
+                  category: { label: 'Categoría', icon: '🏷️', color: 'bg-purple-500/90' },
+                  collection: { label: 'Colección', icon: '📚', color: 'bg-blue-500/90' },
+                  guide: { label: 'Guía', icon: '🗺️', color: 'bg-green-500/90' },
+                };
+                
+                const config = typeConfig[item.type] || typeConfig.review;
+                
+                return (
+                  <span className={`inline-flex items-center gap-1.5 ${config.color} text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg`}>
+                    <span className="text-sm">{config.icon}</span>
+                    {config.label}
+                  </span>
+                );
+              })()}
+              
               {currentReview.isNew && (
                 <span className="badge badge-new text-xs px-2 py-1">
                   Nuevo

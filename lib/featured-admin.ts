@@ -11,27 +11,36 @@ interface FeaturedItem {
   customTitle?: string;
   customDescription?: string;
   customCTA?: string;
+  customUrl?: string;
   isActive: boolean;
   order: number;
   reviewRef?: {
-    _ref: string;
-    _type: 'reference';
+    _id: string;
+    title: string;
+    venue?: {
+      title: string;
+      slug: { current: string };
+    };
   };
   venueRef?: {
-    _ref: string;
-    _type: 'reference';
+    _id: string;
+    title: string;
+    slug: { current: string };
   };
   categoryRef?: {
-    _ref: string;
-    _type: 'reference';
+    _id: string;
+    title: string;
+    slug: { current: string };
   };
   collectionRef?: {
-    _ref: string;
-    _type: 'reference';
+    _id: string;
+    title: string;
+    slug: { current: string };
   };
   guideRef?: {
-    _ref: string;
-    _type: 'reference';
+    _id: string;
+    title: string;
+    slug: { current: string };
   };
   seo?: {
     metaTitle?: string;
@@ -48,6 +57,7 @@ interface CreateFeaturedItemData {
   customTitle?: string;
   customDescription?: string;
   customCTA?: string;
+  customUrl?: string;
   isActive: boolean;
   order: number;
   referenceId?: string; // ID del contenido referenciado
@@ -69,13 +79,74 @@ export async function getAllFeaturedItems(): Promise<FeaturedItem[]> {
       customTitle,
       customDescription,
       customCTA,
+      customUrl,
       isActive,
       order,
-      reviewRef,
-      venueRef,
-      categoryRef,
-      collectionRef,
-      guideRef,
+      "reviewRef": reviewRef->{
+        _id,
+        title,
+        slug,
+        summary,
+        tldr,
+        tags,
+        ratings,
+        publishedAt,
+        author,
+        readTime,
+        gallery[0] {
+          asset->{ url },
+          alt
+        },
+        "venue": venue->{
+          title,
+          slug,
+          address,
+          priceRange,
+          cuisine,
+          "city": city->{
+            title,
+            slug
+          }
+        }
+      },
+      "venueRef": venueRef->{
+        _id,
+        title,
+        slug,
+        description,
+        address,
+        priceRange,
+        cuisine,
+        images[0] {
+          asset->{ url },
+          alt
+        },
+        "city": city->{
+          title,
+          slug
+        },
+        categories[]->{
+          title,
+          slug
+        },
+        "reviewCount": count(*[_type == "review" && venue._ref == ^._id && published == true]),
+        "averageRating": math::avg(*[_type == "review" && venue._ref == ^._id && published == true].ratings.overall)
+      },
+      "categoryRef": categoryRef->{
+        _id,
+        title,
+        slug
+      },
+      "collectionRef": collectionRef->{
+        _id,
+        title,
+        slug
+      },
+      "guideRef": guideRef->{
+        _id,
+        title,
+        slug
+      },
       seo,
       _createdAt,
       _updatedAt
@@ -98,13 +169,37 @@ export async function getFeaturedItemById(id: string): Promise<FeaturedItem | nu
       customTitle,
       customDescription,
       customCTA,
+      customUrl,
       isActive,
       order,
-      reviewRef,
-      venueRef,
-      categoryRef,
-      collectionRef,
-      guideRef,
+      "reviewRef": reviewRef->{
+        _id,
+        title,
+        "venue": venue->{
+          title,
+          slug
+        }
+      },
+      "venueRef": venueRef->{
+        _id,
+        title,
+        slug
+      },
+      "categoryRef": categoryRef->{
+        _id,
+        title,
+        slug
+      },
+      "collectionRef": collectionRef->{
+        _id,
+        title,
+        slug
+      },
+      "guideRef": guideRef->{
+        _id,
+        title,
+        slug
+      },
       seo,
       _createdAt,
       _updatedAt
@@ -128,13 +223,37 @@ export async function getActiveFeaturedItems(limit?: number): Promise<FeaturedIt
       customTitle,
       customDescription,
       customCTA,
+      customUrl,
       isActive,
       order,
-      reviewRef,
-      venueRef,
-      categoryRef,
-      collectionRef,
-      guideRef,
+      "reviewRef": reviewRef->{
+        _id,
+        title,
+        "venue": venue->{
+          title,
+          slug
+        }
+      },
+      "venueRef": venueRef->{
+        _id,
+        title,
+        slug
+      },
+      "categoryRef": categoryRef->{
+        _id,
+        title,
+        slug
+      },
+      "collectionRef": collectionRef->{
+        _id,
+        title,
+        slug
+      },
+      "guideRef": guideRef->{
+        _id,
+        title,
+        slug
+      },
       seo,
       _createdAt,
       _updatedAt
@@ -152,13 +271,14 @@ export async function getActiveFeaturedItems(limit?: number): Promise<FeaturedIt
 export async function createFeaturedItem(data: CreateFeaturedItemData): Promise<FeaturedItem | null> {
   try {
     // Construir el documento
-    const doc: Omit<FeaturedItem, '_id' | '_createdAt' | '_updatedAt'> = {
+    const doc: any = {
       _type: 'featuredItem',
       title: data.title,
       type: data.type,
       customTitle: data.customTitle,
       customDescription: data.customDescription,
       customCTA: data.customCTA,
+      customUrl: data.customUrl,
       isActive: data.isActive,
       order: data.order,
     };
@@ -203,6 +323,7 @@ export async function updateFeaturedItem(data: UpdateFeaturedItemData): Promise<
       customTitle: data.customTitle,
       customDescription: data.customDescription,
       customCTA: data.customCTA,
+      customUrl: data.customUrl,
       isActive: data.isActive,
       order: data.order,
     };
@@ -283,9 +404,9 @@ export async function updateFeaturedItemOrder(items: { _id: string; order: numbe
   }
 }
 
-export async function toggleFeaturedItemStatus(id: string, isActive: boolean): Promise<boolean> {
+export async function toggleFeaturedItemStatus(id: string, isActive: boolean): Promise<FeaturedItem | null> {
   try {
-    await adminSanityWriteClient
+    const result = await adminSanityWriteClient
       .patch(id)
       .set({ isActive })
       .commit();
@@ -293,9 +414,9 @@ export async function toggleFeaturedItemStatus(id: string, isActive: boolean): P
     // Revalidar cache
     revalidateTag(REVALIDATE_TAGS.featuredItem);
     
-    return true;
+    return result as unknown as FeaturedItem;
   } catch (error) {
-    return false;
+    return null;
   }
 }
 
@@ -330,11 +451,15 @@ export async function getReferencesForSelect(type: 'review' | 'venue' | 'categor
           slug
         }`;
         break;
+      case 'guide':
+        query = `*[_type == "guide" && slug.current != null] | order(title asc) {
+          _id,
+          title,
+          slug
+        }`;
+        break;
       case 'collection':
         // Placeholder - implementar cuando tengas schema de collections
-        return [];
-      case 'guide':
-        // Placeholder - implementar cuando tengas schema de guides
         return [];
       default:
         return [];

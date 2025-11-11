@@ -161,6 +161,18 @@ export default defineType({
       validation: (Rule) => Rule.max(50),
     }),
 
+    defineField({
+      name: 'customUrl',
+      title: 'URL Personalizada (Opcional)',
+      type: 'url',
+      group: 'customization',
+      description: 'URL externa personalizada. Si se deja vacía, se usará la URL del elemento referenciado.',
+      validation: (Rule) => Rule.uri({
+        allowRelative: false,
+        scheme: ['http', 'https']
+      }),
+    }),
+
     // SEO específico del carrusel
     defineField({
       name: 'seoTitle',

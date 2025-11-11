@@ -174,6 +174,12 @@ function ReviewCard({ review }: { review: Review }) {
 export default async function CityPage({ params }: CityPageProps) {
   const { city: citySlug } = await params;
   
+  // Prevent known non-city routes from being processed
+  const nonCityRoutes = ['categorias', 'test-categoria', 'buscar', 'blog', 'ciudades', 'platos', 'recetas', 'api'];
+  if (nonCityRoutes.includes(citySlug)) {
+    notFound();
+  }
+  
   try {
     // Fetch city data
     const city = await sanityFetch<City | null>({

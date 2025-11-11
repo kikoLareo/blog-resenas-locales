@@ -71,7 +71,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
         {/* Categories and Price Range */}
         <div className="flex items-center justify-between">
           <div className="flex flex-wrap gap-1">
-            {venue.categories.slice(0, 2).map((category) => (
+            {venue.categories && venue.categories.slice(0, 2).map((category) => (
               <span
                 key={category._id}
                 className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800"

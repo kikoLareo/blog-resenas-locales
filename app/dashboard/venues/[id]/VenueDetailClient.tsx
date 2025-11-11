@@ -68,6 +68,7 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
   const [images, setImages] = useState<any[]>([]);
   const [phoneError, setPhoneError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [cities, setCities] = useState<{_id: string, title: string}[]>([]);
 
   const publicVenueUrl = venue.slug?.current && venue.city?.slug?.current
     ? `/${venue.city.slug.current}/venue/${venue.slug.current}`
@@ -87,6 +88,25 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
         return acc + (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4;
       }, 0) / venue.reviews.length
     : 0;
+
+  // Función para cargar ciudades
+  const loadCities = async () => {
+    try {
+      const res = await fetch('/api/admin/cities');
+      if (res.ok) {
+        const cities = await res.json();
+        setCities(cities || []);
+      }
+    } catch (error) {
+      console.error('Error cargando ciudades:', error);
+    }
+  };
+
+  // Función para abrir modal y cargar ciudades
+  const openEditModal = () => {
+    setIsEditModalOpen(true);
+    loadCities();
+  };
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -173,7 +193,7 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
                 </Button>
               </a>
             )}
-            <Button onClick={() => setIsEditModalOpen(true)}>
+            <Button onClick={openEditModal}>
               <Edit className="mr-2 h-4 w-4" />
               Editar Local
             </Button>
@@ -469,22 +489,50 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
                       />
                     </div>
                   </div>
-                  <div>
-                    <Label htmlFor="priceRange">Rango de Precios</Label>
-                    <Select 
-                      value={formData.priceRange || ''} 
-                      onValueChange={(value) => setFormData({...formData, priceRange: value})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Seleccionar rango de precios" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="€">€ - Económico</SelectItem>
-                        <SelectItem value="€€">€€ - Moderado</SelectItem>
-                        <SelectItem value="€€€">€€€ - Caro</SelectItem>
-                        <SelectItem value="€€€€">€€€€ - Muy Caro</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="city">Ciudad</Label>
+                      <Select 
+                        value={formData.city?._id || ''} 
+                        onValueChange={(value) => {
+                          const selectedCity = cities.find(city => city._id === value);
+                          if (selectedCity) {
+                            setFormData({
+                              ...formData, 
+                              city: { _id: selectedCity._id, title: selectedCity.title, slug: { current: '' } }
+                            });
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar ciudad" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {cities.map((city) => (
+                            <SelectItem key={city._id} value={city._id}>
+                              {city.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="priceRange">Rango de Precios</Label>
+                      <Select 
+                        value={formData.priceRange || ''} 
+                        onValueChange={(value) => setFormData({...formData, priceRange: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar rango de precios" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="€">€ - Económico</SelectItem>
+                          <SelectItem value="€€">€€ - Moderado</SelectItem>
+                          <SelectItem value="€€€">€€€ - Caro</SelectItem>
+                          <SelectItem value="€€€€">€€€€ - Muy Caro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
               </div>

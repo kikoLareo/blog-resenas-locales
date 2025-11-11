@@ -1,5 +1,5 @@
 // Funciones para gestionar la configuración de homepage en Sanity
-import { adminSanityClient } from './admin-sanity';
+import { adminSanityClient, adminSanityWriteClient } from './admin-sanity';
 
 // Tipos para la configuración de homepage
 export interface HomepageSectionConfig {
@@ -66,10 +66,10 @@ export async function saveHomepageConfiguration(config: HomepageSectionConfig[])
 
     if (existingConfig?._id) {
       // Actualizar configuración existente
-      await adminSanityClient.patch(existingConfig._id).set(configData).commit();
+      await adminSanityWriteClient.patch(existingConfig._id).set(configData).commit();
     } else {
       // Crear nueva configuración
-      await adminSanityClient.create(configData);
+      await adminSanityWriteClient.create(configData);
     }
 
     return true;

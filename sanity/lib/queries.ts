@@ -338,7 +338,7 @@ export const searchQuery = `
 
 // Filtrar por categoría con paginación
 export const venuesByCategoryQuery = `
-  *[_type == "venue" && $categorySlug in categories[]->slug.current] | order(title asc) [$offset...$limit] {
+  *[_type == "venue" && categories[0]->slug.current == $categorySlug] | order(title asc) [$offset...$limit] {
     _id,
     title,
     slug,
@@ -361,13 +361,44 @@ export const venuesByCategoryQuery = `
 
 // Contar locales por categoría para paginación
 export const venuesByCategoryCountQuery = `
-  count(*[_type == "venue" && $categorySlug in categories[]->slug.current])
+  count(*[_type == "venue" && categories[0]->slug.current == $categorySlug])
 `;
 
 // ===== QUERIES PARA PÁGINAS ESPECIALES =====
 
 // Datos para homepage
 export const homepageQuery = `{
+  "heroItems": *[_type == "review" && published == true] | order(publishedAt desc)[0...3] {
+    _id,
+    title,
+    slug,
+    ratings,
+    tldr,
+    summary,
+    tags,
+    publishedAt,
+    readTime,
+    gallery[0] {
+      asset->{
+        _id,
+        url
+      },
+      alt,
+      caption
+    },
+    "venue": venue-> {
+      title,
+      slug,
+      address,
+      priceRange,
+      cuisine,
+      "city": city->{
+        title,
+        slug
+      }
+    },
+    author
+  },
   "featuredReviews": *[_type == "review" && featured == true] | order(publishedAt desc)[0...3] {
     _id,
     title,
@@ -454,7 +485,38 @@ export const homepageQuery = `{
     icon,
     color,
     description,
+    heroImage {
+      asset->{
+        _id,
+        url
+      }
+    },
     "venueCount": count(*[_type == "venue" && ^._id in categories[]._ref])
+  },
+  "featuredVenues": *[_type == "venue" && featured == true] | order(order asc)[0...8] {
+    _id,
+    title,
+    slug,
+    address,
+    priceRange,
+    openingHours,
+    images[0] {
+      asset->{
+        _id,
+        url
+      }
+    },
+    city->{
+      _id,
+      title,
+      slug
+    },
+    categories[0]->{
+      title
+    },
+    "reviews": *[_type == "review" && venue._ref == ^._id] {
+      ratings
+    }
   }
 }`;
 
@@ -570,6 +632,221 @@ export const qrCodesByVenueQuery = `
     lastUsedAt,
     description
   } | order(_createdAt desc)
+`;
+
+// ===== QR FEEDBACK =====
+
+// Obtener todo el feedback de QR
+export const qrFeedbackListQuery = `
+  *[_type == "qrFeedback"] {
+    _id,
+    _createdAt,
+    venue->{
+      _id,
+      title,
+      slug,
+      city->{
+        title,
+        slug
+      }
+    },
+    qrCode,
+    name,
+    email,
+    phone,
+    visitDate,
+    visitTime,
+    partySize,
+    occasion,
+    specialRequests,
+    rating,
+    feedback,
+    submittedAt,
+    status
+  } | order(_createdAt desc)
+`;
+
+// Obtener feedback por local
+export const qrFeedbackByVenueQuery = `
+  *[_type == "qrFeedback" && venue._ref == $venueId] {
+    _id,
+    _createdAt,
+    qrCode,
+    name,
+    email,
+    phone,
+    visitDate,
+    visitTime,
+    partySize,
+    occasion,
+    specialRequests,
+    rating,
+    feedback,
+    submittedAt,
+    status
+  } | order(_createdAt desc)
+`;
+
+// Obtener feedback pendiente
+export const qrFeedbackPendingQuery = `
+  *[_type == "qrFeedback" && status == "pending"] {
+    _id,
+    _createdAt,
+    venue->{
+      _id,
+      title,
+      slug
+    },
+    qrCode,
+    name,
+    email,
+    phone,
+    visitDate,
+    visitTime,
+    partySize,
+    occasion,
+    specialRequests,
+    rating,
+    feedback,
+    submittedAt,
+    status
+  } | order(_createdAt desc)
+`;
+
+// ===== VENUE SUBMISSIONS =====
+
+// Obtener todas las solicitudes de locales
+export const venueSubmissionsListQuery = `
+  *[_type == "venueSubmission"] {
+    _id,
+    status,
+    title,
+    slug,
+    submittedAt,
+    submittedBy,
+    email,
+    phone,
+    city->{
+      _id,
+      title,
+      slug
+    },
+    categories[]->{
+      _id,
+      title,
+      slug
+    },
+    qrCode->{
+      _id,
+      code,
+      title
+    },
+    approvedAt,
+    createdVenue->{
+      _id,
+      title,
+      slug
+    }
+  } | order(submittedAt desc)
+`;
+
+// Obtener solicitudes pendientes
+export const venueSubmissionsPendingQuery = `
+  *[_type == "venueSubmission" && status == "pending"] {
+    _id,
+    status,
+    title,
+    slug,
+    submittedAt,
+    submittedBy,
+    email,
+    phone,
+    city->{
+      _id,
+      title,
+      slug
+    },
+    categories[]->{
+      _id,
+      title,
+      slug
+    },
+    qrCode->{
+      _id,
+      code,
+      title
+    }
+  } | order(submittedAt desc)
+`;
+
+// Obtener solicitud individual
+export const venueSubmissionByIdQuery = `
+  *[_type == "venueSubmission" && _id == $id][0] {
+    _id,
+    status,
+    title,
+    slug,
+    description,
+    address,
+    postalCode,
+    city->{
+      _id,
+      title,
+      slug
+    },
+    categories[]->{
+      _id,
+      title,
+      slug
+    },
+    phone,
+    email,
+    website,
+    priceRange,
+    openingHours,
+    geo,
+    images,
+    qrCode->{
+      _id,
+      code,
+      title
+    },
+    submittedAt,
+    submittedBy,
+    approvedAt,
+    approvedBy,
+    rejectionReason,
+    createdVenue->{
+      _id,
+      title,
+      slug
+    },
+    internalNotes
+  }
+`;
+
+// Obtener QR code con validación de onboarding
+export const qrCodeOnboardingQuery = `
+  *[_type == "qrCode" && code == $code][0] {
+    _id,
+    title,
+    code,
+    isActive,
+    isOnboarding,
+    isUsed,
+    usedAt,
+    expiresAt,
+    venue->{
+      _id,
+      title,
+      slug
+    },
+    submission->{
+      _id,
+      status,
+      title
+    }
+  }
 `;
 
 // ===== HOMEPAGE CONFIGURATION =====

@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -105,4 +106,20 @@ enum SubscriptionStatus {
   PENDING
 }
 
+// Site Settings - Configuración del sitio
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String?  @db.Text
+  category  String   // 'site', 'seo', 'ads', 'sanity', 'general'
+  label     String
+  type      String   // 'string', 'boolean', 'number', 'url', 'json'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+}
+
+// Homepage Sections ahora se manejan en Sanity CMS
+// Ver sanity/schemas/homepageSection.ts
 

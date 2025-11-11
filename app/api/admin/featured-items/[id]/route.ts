@@ -100,16 +100,16 @@ export async function PATCH(
       );
     }
 
-    const success = await toggleFeaturedItemStatus(id, isActive);
+    const result = await toggleFeaturedItemStatus(id, isActive);
     
-    if (!success) {
+    if (!result) {
       return NextResponse.json(
         { error: 'Error updating featured item status' },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(
       { error: 'Error updating featured item status' },

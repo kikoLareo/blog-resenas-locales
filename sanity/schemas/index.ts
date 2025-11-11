@@ -11,6 +11,7 @@ import review from './review';
 import post from './post';
 import qrCode from './qr-code';
 import qrFeedback from './qr-feedback';
+import venueSubmission from './venue-submission';
 
 // New SEO-focused content types
 import { guide } from './guide';
@@ -39,6 +40,7 @@ export const schemaTypes = [
   post,        // Crónicas y artículos del blog
   qrCode,      // Códigos QR para acceso a locales
   qrFeedback,  // Feedback de códigos QR
+  venueSubmission, // Solicitudes de registro de locales
   
   // ===== CONTENIDO SEO ESPECIALIZADO =====
   // Nuevos tipos de contenido para arquitectura SEO

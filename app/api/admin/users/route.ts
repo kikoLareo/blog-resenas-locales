@@ -4,6 +4,66 @@ import prisma from '@/lib/prisma';
 
 const ADMIN_API_SECRET = process.env.ADMIN_API_SECRET || '';
 
+/**
+ * GET /api/admin/users
+ * Lista todos los usuarios (requiere x-admin-secret)
+ */
+export async function GET(req: NextRequest) {
+  // simple protection: require header with admin api secret
+  const provided = req.headers.get('x-admin-secret') || '';
+  if (!ADMIN_API_SECRET || provided !== ADMIN_API_SECRET) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        username: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        emailVerified: true,
+        image: true,
+        _count: {
+          select: {
+            accounts: true,
+            sessions: true,
+            paywallSubscriptions: true,
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    // Agrupar por rol
+    const stats = {
+      total: users.length,
+      byRole: {
+        ADMIN: users.filter(u => u.role === 'ADMIN').length,
+        EDITOR: users.filter(u => u.role === 'EDITOR').length,
+        MEMBER: users.filter(u => u.role === 'MEMBER').length,
+        GUEST: users.filter(u => u.role === 'GUEST').length,
+      },
+      verified: users.filter(u => u.emailVerified).length,
+      withImage: users.filter(u => u.image).length,
+    };
+
+    return NextResponse.json({ users, stats }, { status: 200 });
+  } catch (err: any) {
+    console.error('Error fetching users:', err);
+    return NextResponse.json({ error: 'internal_error' }, { status: 500 });
+  }
+}
+
+/**
+ * POST /api/admin/users
+ * Crea un nuevo usuario (requiere x-admin-secret)
+ */
 export async function POST(req: NextRequest) {
   // simple protection: require header with admin api secret
   const provided = req.headers.get('x-admin-secret') || '';
@@ -13,18 +73,36 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { email, password, role } = body;
+    const { email, password, role, name } = body;
 
+    // Validaciones
     if (!email || !password) {
-      return NextResponse.json({ error: 'email and password required' }, { status: 400 });
+      return NextResponse.json({ error: 'Email y contraseña son requeridos' }, { status: 400 });
     }
 
-    const emailNorm = (email as string).toLowerCase();
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Formato de email inválido' }, { status: 400 });
+    }
+
+    // Validar longitud de contraseña
+    if (password.length < 8) {
+      return NextResponse.json({ error: 'La contraseña debe tener al menos 8 caracteres' }, { status: 400 });
+    }
+
+    // Validar rol válido
+    const validRoles = ['GUEST', 'MEMBER', 'EDITOR', 'ADMIN'];
+    if (role && !validRoles.includes(role)) {
+      return NextResponse.json({ error: 'Rol inválido' }, { status: 400 });
+    }
+
+    const emailNorm = (email as string).toLowerCase().trim();
 
     // check existing
     const existing = await prisma.user.findUnique({ where: { email: emailNorm } });
     if (existing) {
-      return NextResponse.json({ error: 'User already exists' }, { status: 409 });
+      return NextResponse.json({ error: 'El usuario ya existe' }, { status: 409 });
     }
 
     const saltRounds = parseInt(process.env.PASSWORD_SALT_ROUNDS || '10', 10);
@@ -35,10 +113,12 @@ export async function POST(req: NextRequest) {
         email: emailNorm,
         passwordHash: hash,
         role: role || 'MEMBER',
+        name: name ? name.trim() : null,
       },
       select: {
         id: true,
         email: true,
+        name: true,
         role: true,
         createdAt: true,
       }
@@ -46,6 +126,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ user: created }, { status: 201 });
   } catch (err: any) {
-    return NextResponse.json({ error: 'internal_error' }, { status: 500 });
+    console.error('Error creating user:', err);
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }

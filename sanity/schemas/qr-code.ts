@@ -62,6 +62,37 @@ export default defineType({
       type: 'text',
       description: 'Descripción opcional del código QR',
     }),
+    // Campos para QR de onboarding (un solo uso)
+    defineField({
+      name: 'isOnboarding',
+      title: 'Es QR de onboarding',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Si es true, este QR es para registro de nuevo local (un solo uso)',
+    }),
+    defineField({
+      name: 'isUsed',
+      title: 'Usado',
+      type: 'boolean',
+      initialValue: false,
+      readOnly: true,
+      description: 'Marca si el QR de onboarding ya fue utilizado',
+    }),
+    defineField({
+      name: 'usedAt',
+      title: 'Fecha de uso',
+      type: 'datetime',
+      readOnly: true,
+      description: 'Cuándo se usó el QR de onboarding',
+    }),
+    defineField({
+      name: 'submission',
+      title: 'Solicitud asociada',
+      type: 'reference',
+      to: [{ type: 'venueSubmission' }],
+      readOnly: true,
+      description: 'Referencia a la solicitud de local creada',
+    }),
   ],
   preview: {
     select: {

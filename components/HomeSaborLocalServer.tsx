@@ -1,5 +1,6 @@
 import { adminSanityClient } from "@/lib/admin-sanity";
-import { HomeSaborLocal } from "./HomeSaborLocal";
+import { HomepageSection } from "@/types/homepage";
+import HomepageSectionRenderer from "./sections/HomepageSectionRenderer";
 
 // Función para obtener reseñas destacadas desde Sanity
 async function getFeaturedReviews() {
@@ -86,6 +87,31 @@ async function getCategories() {
   }
 }
 
+// Función para obtener secciones de homepage desde Sanity
+async function getHomepageSections(): Promise<HomepageSection[]> {
+  try {
+    const sections = await adminSanityClient.fetch(`
+      *[_type == "homepageSection" && enabled == true] | order(order asc) {
+        _id,
+        _type,
+        title,
+        sectionType,
+        enabled,
+        order,
+        config,
+        _createdAt,
+        _updatedAt
+      }
+    `);
+    
+    console.log('Fetched homepage sections:', sections.length);
+    return sections || [];
+  } catch (error) {
+    console.error('Error fetching homepage sections:', error);
+    return [];
+  }
+}
+
 // Función para obtener contenido SEO destacado
 async function getFeaturedSEOContent() {
   try {
@@ -148,19 +174,26 @@ interface HomeSaborLocalServerProps {
 }
 
 export default async function HomeSaborLocalServer({ className }: HomeSaborLocalServerProps) {
-  const [featuredReviews, seoContent, categories] = await Promise.all([
-    getFeaturedReviews(),
-    getFeaturedSEOContent(),
-    getCategories()
-  ]);
+  // Obtener secciones de homepage desde Sanity
+  const homepageSections = await getHomepageSections();
 
   return (
-    <HomeSaborLocal 
-      className={className}
-      featuredItems={featuredReviews}
-      trendingReviews={featuredReviews}
-      topRatedReviews={featuredReviews}
-      categories={categories}
-    />
+    <div className={className}>
+      {/* Render dynamic homepage sections from Sanity */}
+      {homepageSections.length > 0 ? (
+        homepageSections.map((section) => (
+          <HomepageSectionRenderer key={section._id} section={section} />
+        ))
+      ) : (
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h2 className="text-2xl font-bold text-gray-600 mb-4">
+            No hay secciones configuradas
+          </h2>
+          <p className="text-gray-500">
+            Configura las secciones de la página principal desde el dashboard.
+          </p>
+        </div>
+      )}
+    </div>
   );
 }

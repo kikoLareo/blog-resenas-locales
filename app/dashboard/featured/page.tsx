@@ -1,9 +1,13 @@
 import { Suspense } from 'react';
 import FeaturedItemsManager from '../../../components/admin/FeaturedItemsManager';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Star, TrendingUp, Settings } from 'lucide-react';
+import { Star, FileText, Eye, EyeOff } from 'lucide-react';
+import { getFeaturedItemsStats } from '@/lib/featured-admin';
 
-export default function FeaturedPage() {
+export default async function FeaturedPage() {
+  // Obtener estadísticas reales
+  const stats = await getFeaturedItemsStats();
+
   return (
     <div className="space-y-6">
       <div>
@@ -12,14 +16,27 @@ export default function FeaturedPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Elementos Activos</CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Total</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4</div>
+            <div className="text-2xl font-bold">{stats.total || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              Elementos configurados
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Activos</CardTitle>
+            <Eye className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{stats.active || 0}</div>
             <p className="text-xs text-muted-foreground">
               Mostrándose en carrusel
             </p>
@@ -28,26 +45,28 @@ export default function FeaturedPage() {
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Más Popular</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Inactivos</CardTitle>
+            <EyeOff className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">78%</div>
+            <div className="text-2xl font-bold text-red-600">{stats.inactive || 0}</div>
             <p className="text-xs text-muted-foreground">
-              CTR del elemento principal
+              Ocultos del carrusel
             </p>
           </CardContent>
         </Card>
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Auto-rotación</CardTitle>
-            <Settings className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Reseñas</CardTitle>
+            <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">7s</div>
+            <div className="text-2xl font-bold text-blue-600">
+              {stats.byType?.find((t: any) => t.type === 'review')?.count || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
-              Intervalo de cambio
+              Elementos tipo reseña
             </p>
           </CardContent>
         </Card>

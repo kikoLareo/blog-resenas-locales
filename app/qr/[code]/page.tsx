@@ -1,6 +1,6 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { sanityFetch } from '@/lib/sanity.client';
-import { qrCodeByCodeQuery } from '@/sanity/lib/queries';
+import { qrCodeOnboardingQuery } from '@/sanity/lib/queries';
 import { isQRCodeValid, recordQRUsage } from '@/lib/qr-utils';
 import QRVenueForm from '@/components/QrVenueForm';
 
@@ -13,14 +13,19 @@ interface QRCodePageProps {
 export default async function QRCodePage({ params }: QRCodePageProps) {
   const { code } = await params;
   
-  // Obtener datos del código QR
-  const qrCode = await sanityFetch({ query: qrCodeByCodeQuery, params: { code } });
+  // Obtener datos del código QR (con info de onboarding)
+  const qrCode = await sanityFetch({ query: qrCodeOnboardingQuery, params: { code } });
   
   if (!qrCode) {
     notFound();
   }
 
-  // Validar el código QR
+  // Si es un QR de onboarding, redirigir a la página de onboarding
+  if (qrCode && typeof qrCode === 'object' && 'isOnboarding' in qrCode && qrCode.isOnboarding) {
+    redirect(`/qr/onboarding/${code}`);
+  }
+
+  // Validar el código QR (solo para QRs normales de feedback)
   const validation = qrCode && typeof qrCode === 'object' && 'isActive' in qrCode ? isQRCodeValid(qrCode as any) : { valid: false, reason: 'Código QR no encontrado' };
   
   if (!validation.valid) {
