@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import PortableTextEditor, { PortableTextBlock } from "@/components/PortableTextEditor";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -60,7 +61,7 @@ export default function EditBlogPostPage() {
     title: "",
     slug: "",
     excerpt: "",
-    content: "",
+    body: [] as PortableTextBlock[],
     categories: [] as string[],
     relatedVenues: [] as string[],
     tags: [] as string[],
@@ -92,25 +93,11 @@ export default function EditBlogPostPage() {
           const data: BlogPost = await response.json();
           setPost(data);
           
-          // Extraer texto del body para el textarea
-          let contentText = "";
-          if (data.body && Array.isArray(data.body)) {
-            data.body.forEach((block: any) => {
-              if (block._type === 'block' && block.children) {
-                block.children.forEach((child: any) => {
-                  if (child.text) {
-                    contentText += child.text + "\n";
-                  }
-                });
-              }
-            });
-          }
-
           setFormData({
             title: data.title,
             slug: data.slug.current,
             excerpt: data.excerpt,
-            content: contentText.trim(),
+            body: data.body || [],
             categories: data.categories.map(cat => cat._id),
             relatedVenues: data.relatedVenues?.map(venue => venue._id) || [],
             tags: data.tags || [],
@@ -126,7 +113,6 @@ export default function EditBlogPostPage() {
           setErrors({ general: 'Post no encontrado' });
         }
       } catch (error) {
-        console.error('Error cargando post:', error);
         setErrors({ general: 'Error al cargar el post' });
       } finally {
         setLoading(false);
@@ -156,7 +142,6 @@ export default function EditBlogPostPage() {
         }
         setLoadingVenues(false);
       } catch (error) {
-        console.error('Error cargando datos:', error);
         setLoadingCategories(false);
         setLoadingVenues(false);
       }
@@ -253,28 +238,13 @@ export default function EditBlogPostPage() {
 
     setIsSaving(true);
     try {
-      // Convertir content a body de Portable Text
-      const body = formData.content ? [
-        {
-          _type: 'block',
-          children: [
-            {
-              _type: 'span',
-              text: formData.content
-            }
-          ]
-        }
-      ] : [];
 
       const response = await fetch(`/api/admin/blog/${postId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          body,
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {
@@ -284,7 +254,6 @@ export default function EditBlogPostPage() {
         setErrors({ general: error.error || 'Error al actualizar el post' });
       }
     } catch (error) {
-      console.error('Error actualizando post:', error);
       setErrors({ general: 'Error de conexión al actualizar el post' });
     } finally {
       setIsSaving(false);
@@ -306,7 +275,6 @@ export default function EditBlogPostPage() {
         setErrors({ general: error.error || 'Error al eliminar el post' });
       }
     } catch (error) {
-      console.error('Error eliminando post:', error);
       setErrors({ general: 'Error de conexión al eliminar el post' });
     } finally {
       setIsDeleting(false);
@@ -489,14 +457,13 @@ export default function EditBlogPostPage() {
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="content">Contenido del Post</Label>
-                <Textarea
-                  id="content"
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  rows={15}
+                <PortableTextEditor
+                  value={formData.body}
+                  onChange={(body) => setFormData({ ...formData, body })}
+                  placeholder="Escribe el contenido del post aquí..."
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Para contenido avanzado, edita desde Sanity Studio
+                  Editor visual para contenido enriquecido con formato, listas e imágenes
                 </p>
               </div>
 

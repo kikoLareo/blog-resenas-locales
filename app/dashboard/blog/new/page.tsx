@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import PortableTextEditor, { PortableTextBlock } from "@/components/PortableTextEditor";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -29,13 +30,15 @@ interface FAQItem {
   answer: string;
 }
 
+
+
 export default function NewBlogPostPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
     excerpt: "",
-    content: "",
+    body: [] as PortableTextBlock[],
     categories: [] as string[],
     relatedVenues: [] as string[],
     tags: [] as string[],
@@ -76,7 +79,6 @@ export default function NewBlogPostPage() {
         }
         setLoadingVenues(false);
       } catch (error) {
-        console.error('Error cargando datos:', error);
         setLoadingCategories(false);
         setLoadingVenues(false);
       }
@@ -188,28 +190,13 @@ export default function NewBlogPostPage() {
 
     setIsLoading(true);
     try {
-      // Convertir content simple a body de Portable Text
-      const body = formData.content ? [
-        {
-          _type: 'block',
-          children: [
-            {
-              _type: 'span',
-              text: formData.content
-            }
-          ]
-        }
-      ] : [];
 
       const response = await fetch('/api/admin/blog', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          body,
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {
@@ -220,7 +207,6 @@ export default function NewBlogPostPage() {
         setErrors({ general: error.error || 'Error al guardar el post' });
       }
     } catch (error) {
-      console.error('Error guardando post:', error);
       setErrors({ general: 'Error de conexión al guardar el post' });
     } finally {
       setIsLoading(false);
@@ -335,15 +321,13 @@ export default function NewBlogPostPage() {
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="content">Contenido del Post</Label>
-                <Textarea
-                  id="content"
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  rows={15}
+                <PortableTextEditor
+                  value={formData.body}
+                  onChange={(body) => setFormData({ ...formData, body })}
                   placeholder="Escribe el contenido del post aquí..."
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Nota: Para contenido más avanzado, edita desde Sanity Studio
+                  Editor visual para contenido enriquecido con formato, listas e imágenes
                 </p>
               </div>
 
