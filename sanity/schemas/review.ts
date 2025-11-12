@@ -23,49 +23,114 @@ export default defineType({
     }),
     defineField({
       name: 'venue',
-      title: 'Local',
+      title: 'Local/Establecimiento',
       type: 'reference',
       to: [{ type: 'venue' }],
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'reviewType',
+      title: 'Tipo de Reseña',
+      type: 'string',
+      options: {
+        list: [
+          { title: '🍽️ Gastronomía', value: 'gastronomy' },
+          { title: '🎭 Ocio & Entretenimiento', value: 'leisure' },
+          { title: '⚽ Deportes & Fitness', value: 'sports' },
+        ],
+        layout: 'radio',
+      },
+      validation: (Rule) => Rule.required(),
+      initialValue: 'gastronomy',
+      description: 'Selecciona el tipo de establecimiento para adaptar los campos de evaluación',
+    }),
+    defineField({
       name: 'visitDate',
-      title: 'Fecha de Visita',
+      title: 'Fecha de Visita/Experiencia',
       type: 'date',
       validation: (Rule) => Rule.required().max(new Date().toISOString().split('T')[0]),
+      description: 'Fecha en que tuviste la experiencia',
     }),
     defineField({
       name: 'ratings',
       title: 'Puntuaciones',
       type: 'object',
       fields: [
-        {
-          name: 'food',
-          title: 'Comida',
-          type: 'number',
-          validation: (Rule) => Rule.required().min(0).max(10).precision(1),
-          description: 'Puntuación de 0 a 10',
-        },
+        // COMÚN A TODOS LOS TIPOS
         {
           name: 'service',
-          title: 'Servicio',
+          title: 'Servicio/Atención',
           type: 'number',
           validation: (Rule) => Rule.required().min(0).max(10).precision(1),
-          description: 'Puntuación de 0 a 10',
+          description: 'Calidad del servicio y atención al cliente (0-10)',
         },
         {
           name: 'ambience',
-          title: 'Ambiente',
+          title: 'Ambiente/Instalaciones',
           type: 'number',
           validation: (Rule) => Rule.required().min(0).max(10).precision(1),
-          description: 'Puntuación de 0 a 10',
+          description: 'Ambiente general y calidad de instalaciones (0-10)',
         },
         {
           name: 'value',
           title: 'Relación Calidad-Precio',
           type: 'number',
           validation: (Rule) => Rule.required().min(0).max(10).precision(1),
-          description: 'Puntuación de 0 a 10',
+          description: 'Relación calidad-precio del servicio/producto (0-10)',
+        },
+
+        // ESPECÍFICO PARA GASTRONOMÍA
+        {
+          name: 'food',
+          title: 'Comida/Producto',
+          type: 'number',
+          validation: (Rule) => Rule.min(0).max(10).precision(1),
+          description: 'Calidad de la comida y productos ofrecidos (0-10)',
+          hidden: ({ document }) => document?.reviewType !== 'gastronomy',
+        },
+
+        // ESPECÍFICO PARA OCIO
+        {
+          name: 'entertainment',
+          title: 'Entretenimiento/Diversión',
+          type: 'number',
+          validation: (Rule) => Rule.min(0).max(10).precision(1),
+          description: 'Nivel de entretenimiento y diversión proporcionado (0-10)',
+          hidden: ({ document }) => document?.reviewType !== 'leisure',
+        },
+        {
+          name: 'accessibility',
+          title: 'Accesibilidad',
+          type: 'number',
+          validation: (Rule) => Rule.min(0).max(10).precision(1),
+          description: 'Facilidad de acceso y comodidades generales (0-10)',
+          hidden: ({ document }) => document?.reviewType !== 'leisure',
+        },
+
+        // ESPECÍFICO PARA DEPORTES
+        {
+          name: 'facilities',
+          title: 'Instalaciones/Equipamiento',
+          type: 'number',
+          validation: (Rule) => Rule.min(0).max(10).precision(1),
+          description: 'Calidad de instalaciones y equipamiento deportivo (0-10)',
+          hidden: ({ document }) => document?.reviewType !== 'sports',
+        },
+        {
+          name: 'coaching',
+          title: 'Entrenamiento/Instructores',
+          type: 'number',
+          validation: (Rule) => Rule.min(0).max(10).precision(1),
+          description: 'Calidad de instructores y programas de entrenamiento (0-10)',
+          hidden: ({ document }) => document?.reviewType !== 'sports',
+        },
+        {
+          name: 'cleanliness',
+          title: 'Limpieza/Mantenimiento',
+          type: 'number',
+          validation: (Rule) => Rule.min(0).max(10).precision(1),
+          description: 'Limpieza y mantenimiento de las instalaciones (0-10)',
+          hidden: ({ document }) => document?.reviewType !== 'sports',
         },
       ],
       validation: (Rule) => Rule.required(),
@@ -78,19 +143,43 @@ export default defineType({
       description: 'Puntuación media calculada automáticamente',
     }),
     defineField({
-      name: 'avgTicket',
-      title: 'Ticket Medio (€)',
-      type: 'number',
-      validation: (Rule) => Rule.required().min(0).max(500),
-      description: 'Coste medio por persona en euros',
+      name: 'cost',
+      title: 'Información de Coste',
+      type: 'object',
+      fields: [
+        {
+          name: 'avgTicket',
+          title: 'Ticket Medio por Persona (€)',
+          type: 'number',
+          validation: (Rule) => Rule.min(0).max(500),
+          description: 'Coste medio por persona incluyendo bebidas',
+          hidden: ({ document }) => document?.reviewType !== 'gastronomy',
+        },
+        {
+          name: 'entryPrice',
+          title: 'Precio de Entrada/Actividad (€)',
+          type: 'number',
+          validation: (Rule) => Rule.min(0).max(200),
+          description: 'Precio de entrada o coste por actividad',
+          hidden: ({ document }) => document?.reviewType !== 'leisure',
+        },
+        {
+          name: 'monthlyFee',
+          title: 'Cuota Mensual/Sesión (€)',
+          type: 'number',
+          validation: (Rule) => Rule.min(0).max(300),
+          description: 'Cuota mensual, precio por sesión o clase',
+          hidden: ({ document }) => document?.reviewType !== 'sports',
+        },
+      ],
     }),
     defineField({
       name: 'highlights',
-      title: 'Platos Estrella',
+      title: 'Aspectos Destacados',
       type: 'array',
       of: [{ type: 'string' }],
       validation: (Rule) => Rule.max(8),
-      description: 'Mejores platos probados',
+      description: 'Aspectos más destacados: platos estrella (gastronomía), actividades principales (ocio), o programas destacados (deportes)',
     }),
     defineField({
       name: 'pros',
@@ -302,19 +391,47 @@ export default defineType({
   preview: {
     select: {
       title: 'title',
+      reviewType: 'reviewType',
       venue: 'venue.title',
       visitDate: 'visitDate',
       media: 'gallery.0',
       ratings: 'ratings',
     },
     prepare(selection) {
-      const { title, venue, visitDate, media, ratings } = selection;
-      const avgRating = ratings 
-        ? ((ratings.food + ratings.service + ratings.ambience + ratings.value) / 4).toFixed(1)
-        : 'N/A';
+      const { title, reviewType, venue, visitDate, media, ratings } = selection;
+      
+      // Icono según tipo
+      const typeIcons: { [key: string]: string } = {
+        gastronomy: '🍽️',
+        leisure: '🎭', 
+        sports: '⚽'
+      };
+      const typeIcon = typeIcons[reviewType] || '📝';
+      
+      // Calcular rating promedio según el tipo
+      let avgRating = 'N/A';
+      if (ratings) {
+        const { service, ambience, value, food, entertainment, facilities } = ratings;
+        let total = service + ambience + value;
+        let count = 3;
+        
+        // Agregar rating específico según tipo
+        if (reviewType === 'gastronomy' && food) {
+          total += food;
+          count += 1;
+        } else if (reviewType === 'leisure' && entertainment) {
+          total += entertainment;
+          count += 1;
+        } else if (reviewType === 'sports' && facilities) {
+          total += facilities;
+          count += 1;
+        }
+        
+        avgRating = (total / count).toFixed(1);
+      }
       
       return {
-        title,
+        title: `${typeIcon} ${title}`,
         subtitle: `${venue} • ${visitDate} • ⭐ ${avgRating}`,
         media,
       };

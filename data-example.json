@@ -1,0 +1,193 @@
+{
+  "cities": [
+    {
+      "title": "Madrid",
+      "slug": "madrid",
+      "region": "Madrid",
+      "description": "Capital de España con una vibrante escena gastronómica y cultural",
+      "geo": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "population": 3223334,
+      "timezone": "Europe/Madrid",
+      "featured": true
+    },
+    {
+      "title": "Barcelona",
+      "slug": "barcelona", 
+      "region": "Cataluña",
+      "description": "Ciudad cosmopolita con excelente gastronomía y vida nocturna",
+      "geo": {
+        "lat": 41.3851,
+        "lng": 2.1734
+      },
+      "population": 1620343,
+      "timezone": "Europe/Madrid",
+      "featured": true
+    }
+  ],
+  "categories": [
+    {
+      "title": "Restaurante",
+      "slug": "restaurante", 
+      "description": "Establecimientos dedicados a ofrecer comidas y cenas completas con servicio de mesa",
+      "icon": "🍽️",
+      "color": "#FF6B6B"
+    },
+    {
+      "title": "Bar de Tapas",
+      "slug": "bar-tapas",
+      "description": "Locales especializados en tapas y aperitivos con ambiente informal",
+      "icon": "🍻",
+      "color": "#4ECDC4"
+    },
+    {
+      "title": "Gimnasio",
+      "slug": "gimnasio",
+      "description": "Centros de fitness y entrenamiento con equipamiento completo",
+      "icon": "💪",
+      "color": "#45B7D1"
+    },
+    {
+      "title": "Teatro",
+      "slug": "teatro",
+      "description": "Espacios culturales dedicados a representaciones teatrales y espectáculos",
+      "icon": "🎭",
+      "color": "#96CEB4"
+    }
+  ],
+  "venues": [
+    {
+      "title": "Casa Mingo Madrid",
+      "slug": "casa-mingo-madrid",
+      "city_slug": "madrid",
+      "address": "Paseo de la Florida, 34",
+      "postalCode": "28008",
+      "phone": "+34 915 477 918",
+      "website": "https://www.casamingo.es",
+      "geo": {
+        "lat": 40.4251,
+        "lng": -3.7249
+      },
+      "openingHours": ["Mo-Su 11:00-01:00"],
+      "priceRange": "€€",
+      "category_slugs": ["restaurante"],
+      "description": "Tradicional sidrería madrileña desde 1888, famosa por su pollo asado y sidra natural. Un clásico imprescindible de Madrid.",
+      "social": {
+        "instagram": "https://www.instagram.com/casamingo"
+      }
+    },
+    {
+      "title": "Fitness Plus Barcelona",
+      "slug": "fitness-plus-barcelona",
+      "city_slug": "barcelona",
+      "address": "Carrer de València, 123", 
+      "postalCode": "08011",
+      "phone": "+34 932 123 456",
+      "website": "https://www.fitnessplus.es",
+      "geo": {
+        "lat": 41.3926,
+        "lng": 2.1637
+      },
+      "openingHours": ["Mo-Fr 06:00-23:00", "Sa-Su 08:00-21:00"],
+      "priceRange": "€€",
+      "category_slugs": ["gimnasio"],
+      "description": "Moderno centro de fitness con equipamiento de última generación y clases dirigidas. Perfecto para entrenamientos completos."
+    },
+    {
+      "title": "Teatro Real Madrid", 
+      "slug": "teatro-real-madrid",
+      "city_slug": "madrid",
+      "address": "Plaza de Isabel II, s/n",
+      "postalCode": "28013",
+      "phone": "+34 915 160 600",
+      "website": "https://www.teatro-real.com",
+      "geo": {
+        "lat": 40.4182,
+        "lng": -3.7094
+      },
+      "openingHours": ["Ma-Do 18:00-22:00"],
+      "priceRange": "€€€",
+      "category_slugs": ["teatro"],
+      "description": "El teatro de ópera más importante de España, con una programación excepcional y una acústica perfecta."
+    }
+  ],
+  "reviews": [
+    {
+      "title": "Casa Mingo Madrid: Tradición y sabor auténtico",
+      "slug": "casa-mingo-madrid-review",
+      "venue_slug": "casa-mingo-madrid",
+      "reviewType": "gastronomy",
+      "visitDate": "2024-11-10",
+      "ratings": {
+        "service": 8.0,
+        "ambience": 9.0, 
+        "value": 8.5,
+        "food": 9.2
+      },
+      "cost": {
+        "avgTicket": 25
+      },
+      "highlights": ["Pollo asado", "Sidra natural", "Tortilla española"],
+      "pros": ["Ambiente auténtico", "Comida tradicional", "Precios justos", "Historia del local"],
+      "cons": ["Puede haber cola", "Ruido en horas pico"],
+      "tldr": "Sidrería histórica con excelente pollo asado y ambiente tradicional madrileño.",
+      "author": "Foodie Galicia",
+      "tags": ["sidreria", "tradicional", "pollo", "madrid"],
+      "featured": true,
+      "published": true
+    },
+    {
+      "title": "Fitness Plus Barcelona: Entrenamiento de calidad",
+      "slug": "fitness-plus-barcelona-review",
+      "venue_slug": "fitness-plus-barcelona", 
+      "reviewType": "sports",
+      "visitDate": "2024-11-08",
+      "ratings": {
+        "service": 8.5,
+        "ambience": 9.0,
+        "value": 7.5,
+        "facilities": 9.0,
+        "coaching": 8.0,
+        "cleanliness": 9.5
+      },
+      "cost": {
+        "monthlyFee": 45
+      },
+      "highlights": ["Equipamiento Technogym", "Clases de CrossFit", "Zona de pesas libre"],
+      "pros": ["Instalaciones modernas", "Horario amplio", "Entrenadores cualificados"],
+      "cons": ["Precio algo elevado", "Masificado en horas pico"],
+      "tldr": "Gimnasio moderno con excelentes instalaciones y amplia oferta de clases.",
+      "author": "Fitness Reviewer",
+      "tags": ["gimnasio", "fitness", "crossfit", "barcelona"],
+      "featured": false,
+      "published": true
+    },
+    {
+      "title": "Teatro Real: Experiencia cultural excepcional",
+      "slug": "teatro-real-madrid-review",
+      "venue_slug": "teatro-real-madrid",
+      "reviewType": "leisure",
+      "visitDate": "2024-11-05",
+      "ratings": {
+        "service": 9.0,
+        "ambience": 10.0,
+        "value": 8.0,
+        "entertainment": 9.5,
+        "accessibility": 8.5
+      },
+      "cost": {
+        "entryPrice": 65
+      },
+      "highlights": ["La Bohème", "Acústica perfecta", "Arquitectura histórica"],
+      "pros": ["Programación excelente", "Instalaciones impecables", "Experiencia única"],
+      "cons": ["Precios elevados", "Acceso limitado para PMR"],
+      "tldr": "Teatro de ópera de clase mundial con programación excepcional y ambiente único.",
+      "author": "Culture Critic",
+      "tags": ["teatro", "opera", "cultura", "madrid"],
+      "featured": true,
+      "published": true
+    }
+  ]
+}
