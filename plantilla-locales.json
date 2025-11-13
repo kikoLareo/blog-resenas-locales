@@ -1,0 +1,102 @@
+{
+  "cities": [
+    {
+      "title": "Madrid",
+      "slug": "madrid",
+      "region": "Madrid",
+      "description": "Capital de España con una vibrante escena gastronómica",
+      "geo": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "population": 3223334,
+      "timezone": "Europe/Madrid",
+      "featured": true
+    }
+  ],
+  "categories": [
+    {
+      "title": "Restaurante",
+      "slug": "restaurante", 
+      "description": "Establecimientos dedicados a ofrecer comidas y cenas completas",
+      "icon": "🍽️",
+      "color": "#FF6B6B"
+    },
+    {
+      "title": "Bar de Tapas",
+      "slug": "bar-tapas",
+      "description": "Locales especializados en tapas y aperitivos",
+      "icon": "🍻",
+      "color": "#4ECDC4"
+    },
+    {
+      "title": "Sidrería",
+      "slug": "sidreria",
+      "description": "Establecimientos especializados en sidra y comida asturiana",
+      "icon": "🍺",
+      "color": "#F7DC6F"
+    },
+    {
+      "title": "Cafetería",
+      "slug": "cafeteria",
+      "description": "Locales especializados en café y desayunos",
+      "icon": "☕",
+      "color": "#D2B4DE"
+    },
+    {
+      "title": "Gimnasio",
+      "slug": "gimnasio",
+      "description": "Centros de fitness y entrenamiento",
+      "icon": "💪",
+      "color": "#45B7D1"
+    },
+    {
+      "title": "Teatro",
+      "slug": "teatro",
+      "description": "Espacios culturales para espectáculos",
+      "icon": "🎭",
+      "color": "#96CEB4"
+    },
+    {
+      "title": "Cine",
+      "slug": "cine",
+      "description": "Salas de proyección cinematográfica",
+      "icon": "🎬",
+      "color": "#85C1E9"
+    },
+    {
+      "title": "Discoteca",
+      "slug": "discoteca",
+      "description": "Locales de música y baile nocturno",
+      "icon": "🕺",
+      "color": "#F8C471"
+    }
+  ],
+  "venues": [
+    {
+      "title": "NOMBRE_DEL_LOCAL",
+      "slug": "nombre-del-local-ciudad",
+      "city_slug": "SLUG_CIUDAD",
+      "address": "Dirección completa del local",
+      "postalCode": "28001",
+      "phone": "+34 XXX XXX XXX",
+      "website": "https://www.website.com",
+      "geo": {
+        "lat": 40.4168,
+        "lng": -3.7038
+      },
+      "openingHours": [
+        "Mo-Fr 10:00-22:00",
+        "Sa-Su 11:00-23:00"
+      ],
+      "priceRange": "€€",
+      "category_slugs": ["categoria1", "categoria2"],
+      "description": "Descripción detallada del local (mínimo 50 caracteres, máximo 300)",
+      "social": {
+        "instagram": "https://www.instagram.com/usuario",
+        "facebook": "https://www.facebook.com/pagina",
+        "twitter": "https://twitter.com/usuario"
+      }
+    }
+  ]
+}

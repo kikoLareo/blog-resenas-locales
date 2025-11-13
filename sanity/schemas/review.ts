@@ -368,24 +368,33 @@ export default defineType({
     }),
     defineField({
       name: 'featured',
-      title: 'Reseña Destacada',
+      title: '⭐ Destacar Reseña',
       type: 'boolean',
       initialValue: false,
-      description: 'Mostrar en homepage y secciones destacadas',
+      description: '🌟 Mostrar en homepage y carruseles destacados | Solo para reseñas excepcionales',
+      options: {
+        layout: 'switch',
+      },
+      hidden: ({ document }) => !document?.published,
     }),
     defineField({
       name: 'published',
-      title: 'Publicado',
+      title: '🚀 Estado de Publicación',
       type: 'boolean',
       initialValue: false,
-      description: 'Indica si la reseña está publicada',
+      description: '✅ Activar para publicar la reseña en el sitio web | ❌ Desactivar para mantenerla como borrador',
+      options: {
+        layout: 'switch',
+      },
     }),
     defineField({
       name: 'publishedAt',
-      title: 'Fecha de Publicación',
+      title: '📅 Fecha y Hora de Publicación',
       type: 'datetime',
       initialValue: () => new Date().toISOString(),
       validation: (Rule) => Rule.required(),
+      description: 'Fecha y hora en que la reseña aparecerá publicada (se puede programar para el futuro)',
+      hidden: ({ document }) => !document?.published,
     }),
   ],
   preview: {
@@ -396,9 +405,11 @@ export default defineType({
       visitDate: 'visitDate',
       media: 'gallery.0',
       ratings: 'ratings',
+      published: 'published',
+      featured: 'featured',
     },
     prepare(selection) {
-      const { title, reviewType, venue, visitDate, media, ratings } = selection;
+      const { title, reviewType, venue, visitDate, media, ratings, published, featured } = selection;
       
       // Icono según tipo
       const typeIcons: { [key: string]: string } = {
@@ -430,9 +441,14 @@ export default defineType({
         avgRating = (total / count).toFixed(1);
       }
       
+      // Estado de publicación
+      const statusIcon = published ? '🟢' : '⚫';
+      const statusText = published ? 'PUBLICADA' : 'BORRADOR';
+      const featuredIcon = featured && published ? '⭐' : '';
+      
       return {
-        title: `${typeIcon} ${title}`,
-        subtitle: `${venue} • ${visitDate} • ⭐ ${avgRating}`,
+        title: `${statusIcon} ${typeIcon} ${title} ${featuredIcon}`,
+        subtitle: `${statusText} • ${venue} • ${visitDate} • ⭐ ${avgRating}`,
         media,
       };
     },

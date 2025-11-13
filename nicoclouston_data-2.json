@@ -1,0 +1,470 @@
+{
+  "cities": [
+    {
+      "title": "A Coruña",
+      "slug": "a-coruna",
+      "region": "Galicia",
+      "description": "Ciudad costera de Galicia conocida por su ambiente cultural y gastronómico.",
+      "geo": {
+        "lat": 43.362343,
+        "lng": -8.41154
+      },
+      "population": 249255,
+      "timezone": "Europe/Madrid",
+      "featured": true
+    },
+    {
+      "title": "Arteixo",
+      "slug": "arteixo",
+      "region": "Galicia",
+      "description": "Municipio cercano a A Coruña, famoso por sus playas y por su tejido industrial.",
+      "geo": {
+        "lat": 43.30482,
+        "lng": -8.50749
+      },
+      "population": 34264,
+      "timezone": "Europe/Madrid",
+      "featured": false
+    },
+    {
+      "title": "Oleiros",
+      "slug": "oleiros",
+      "region": "Galicia",
+      "description": "Localidad del área metropolitana de A Coruña con playas y zonas residenciales.",
+      "geo": {
+        "lat": 43.33333,
+        "lng": -8.31667
+      },
+      "population": 38304,
+      "timezone": "Europe/Madrid",
+      "featured": false
+    },
+    {
+      "title": "Santiago de Compostela",
+      "slug": "santiago-de-compostela",
+      "region": "Galicia",
+      "description": "Capital de Galicia y destino del Camino de Santiago, famosa por su catedral y casco histórico.",
+      "geo": {
+        "lat": 42.87941,
+        "lng": -8.54165
+      },
+      "population": 99491,
+      "timezone": "Europe/Madrid",
+      "featured": false
+    }
+  ],
+  "categories": [
+    {
+      "title": "Bar de Picoteo",
+      "slug": "bar-picoteo",
+      "description": "Establecimientos dedicados a tapas, picoteo y cenas informales.",
+      "icon": "🍢",
+      "color": "#FFB703"
+    },
+    {
+      "title": "Spa",
+      "slug": "spa",
+      "description": "Centros de relajación y bienestar que ofrecen circuitos de agua, masajes y tratamientos.",
+      "icon": "💆",
+      "color": "#6BCB77"
+    },
+    {
+      "title": "Restaurante peruano",
+      "slug": "restaurante-peruano",
+      "description": "Restaurantes especializados en cocina tradicional peruana.",
+      "icon": "🌶️",
+      "color": "#FFC857"
+    },
+    {
+      "title": "Milanesería",
+      "slug": "milaneseria",
+      "description": "Restaurantes especializados en milanesas argentinas y otros platos caseros.",
+      "icon": "🥩",
+      "color": "#D62828"
+    },
+    {
+      "title": "Tienda de skate",
+      "slug": "tienda-skate",
+      "description": "Tiendas de ropa y artículos para skateboarding y cultura urbana.",
+      "icon": "🛹",
+      "color": "#4361EE"
+    },
+    {
+      "title": "Restaurante italiano",
+      "slug": "restaurante-italiano",
+      "description": "Restaurantes que ofrecen cocina italiana como pasta y pizza.",
+      "icon": "🍝",
+      "color": "#FF6F61"
+    },
+    {
+      "title": "Parque de trampolines",
+      "slug": "parque-trampolines",
+      "description": "Espacios de ocio con camas elásticas y actividades de salto y diversión.",
+      "icon": "🤸",
+      "color": "#00A8E8"
+    },
+    {
+      "title": "Cafetería",
+      "slug": "cafeteria",
+      "description": "Locales especializados en café y desayunos.",
+      "icon": "☕",
+      "color": "#D2B4DE"
+    },
+    {
+      "title": "Centro comercial",
+      "slug": "centro-comercial",
+      "description": "Grandes centros comerciales con tiendas, restaurantes y ocio.",
+      "icon": "🛍️",
+      "color": "#EE8958"
+    },
+    {
+      "title": "Heladería",
+      "slug": "heladeria",
+      "description": "Heladerías artesanales con helados, gofres y postres.",
+      "icon": "🍨",
+      "color": "#F4A261"
+    },
+    {
+      "title": "Espacio gastronómico",
+      "slug": "espacio-gastronomico",
+      "description": "Locales que combinan diferentes cocinas, bar y eventos en un mismo espacio.",
+      "icon": "🎉",
+      "color": "#9B5DE5"
+    }
+  ],
+  "venues": [
+    {
+      "title": "Picoteo A Coruña",
+      "slug": "picoteo-coruna",
+      "city_slug": "a-coruna",
+      "address": "Rúa Emilia Pardo Bazán 7",
+      "postalCode": "15005",
+      "phone": "",
+      "website": "",
+      "geo": {
+        "lat": 43.36356,
+        "lng": -8.41389
+      },
+      "openingHours": [
+        "Mo-Su 10:00-22:00"
+      ],
+      "priceRange": "€€",
+      "category_slugs": [
+        "bar-picoteo"
+      ],
+      "description": "Pequeño local familiar reformado con gusto, especializado en picoteo y cenas. Un sitio nuevo para tomar algo en A Coruña recomendado por Nico Clouston【725671183418857†screenshot】.",
+      "social": {
+        "instagram": "https://www.instagram.com/picoteocoruna",
+        "facebook": ""
+      },
+      "images": []
+    },
+    {
+      "title": "Auga de Maio Spa A Coruña",
+      "slug": "auga-de-maio-coruna",
+      "city_slug": "a-coruna",
+      "address": "Avenida Finisterre 11",
+      "postalCode": "15004",
+      "phone": "+34 881 298 780",
+      "website": "https://augademaio.com",
+      "geo": {
+        "lat": 43.35854,
+        "lng": -8.42118
+      },
+      "openingHours": [
+        "Mo-Su 10:00-21:00"
+      ],
+      "priceRange": "€€€",
+      "category_slugs": [
+        "spa"
+      ],
+      "description": "Spa urbano inaugurado en otoño de 2025 con circuitos de agua, masajes y tratamientos. Nico Clouston lo describió como un sitio para relajarse y cuidarse【789409514795201†screenshot】. La web oficial confirma su dirección en Avenida Finisterre 11 y ofrece un teléfono de contacto【174103102437189†L176-L179】.",
+      "social": {
+        "instagram": "https://www.instagram.com/auga_de_maio_spa",
+        "facebook": "https://www.facebook.com/AugaDeMaioSpa"
+      },
+      "images": []
+    },
+    {
+      "title": "La Conquista Cocina Peruana",
+      "slug": "la-conquista-cocina-peruana",
+      "city_slug": "a-coruna",
+      "address": "Rúa Emilia Pardo Bazán 23",
+      "postalCode": "15005",
+      "phone": "+34 981 928 792",
+      "website": "",
+      "geo": {
+        "lat": 43.3641,
+        "lng": -8.4135
+      },
+      "openingHours": [
+        "We 13:30-15:30, 20:00-23:30",
+        "Th 13:30-15:30, 20:00-23:30",
+        "Fr 13:30-15:30, 20:00-23:30",
+        "Sa 13:30-15:30, 20:00-23:30",
+        "Su 13:30-15:30, 20:30-23:30"
+      ],
+      "priceRange": "€€",
+      "category_slugs": [
+        "restaurante-peruano"
+      ],
+      "description": "Restaurante peruano que conquista por sus sabores tradicionales y coctelería de pisco sours, recomendado por Nico Clouston【153959161819446†screenshot】. Su página de contacto indica la dirección en Rúa Emilia Pardo Bazán 23 y el teléfono 981 92 87 92【518679483007055†L12-L15】, así como horarios de miércoles a domingo【518679483007055†L36-L48】.",
+      "social": {
+        "instagram": "https://www.instagram.com/laconquistacocinaperuana",
+        "facebook": "https://www.facebook.com/laconquistacocinaperuana"
+      },
+      "images": []
+    },
+    {
+      "title": "Milá Milanesería",
+      "slug": "mila-milaneseria-arteixo",
+      "city_slug": "arteixo",
+      "address": "Paseo del Balneario 6",
+      "postalCode": "15142",
+      "phone": "+34 626 210 930",
+      "website": "",
+      "geo": {
+        "lat": 43.3335,
+        "lng": -8.516
+      },
+      "openingHours": [
+        "Tu-Su 13:00-23:00"
+      ],
+      "priceRange": "€€",
+      "category_slugs": [
+        "milaneseria"
+      ],
+      "description": "Proyecto familiar que trae a Galicia la auténtica milanesa argentina. Nico Clouston visitó este local y destacó sus milanesas, la atención cercana y el ambiente acogedor【291502854384001†screenshot】. Un artículo de Cadena SER confirma que el establecimiento abrió el 8 de octubre de 2025 en Paseo del Balneario nº6 y ofrece milanesas, empanadas y postres argentinos【447469384162849†L199-L202】.",
+      "social": {
+        "instagram": "https://www.instagram.com/milalamilaneseria",
+        "facebook": ""
+      },
+      "images": []
+    },
+    {
+      "title": "Vazva Calle Real",
+      "slug": "vazva-calle-real-coruna",
+      "city_slug": "a-coruna",
+      "address": "Calle Real 69",
+      "postalCode": "15003",
+      "phone": "+34 981 900 048",
+      "website": "https://vazva.es",
+      "geo": {
+        "lat": 43.3682,
+        "lng": -8.4009
+      },
+      "openingHours": [
+        "Mo-Sa 10:00-14:00, 17:00-21:00"
+      ],
+      "priceRange": "€€",
+      "category_slugs": [
+        "tienda-skate"
+      ],
+      "description": "Tienda de moda y skate que reabrió su espacio en Calle Real 69 con más superficie y marcas core como Dickies y Real Skateboards. Nico Clouston anunció la reapertura y señaló que es un referente para los skaters coruñeses【539849279202063†screenshot】. La web de VAZVA confirma la dirección, teléfono y horario de lunes a sábado【463431392087462†L176-L213】.",
+      "social": {
+        "instagram": "https://www.instagram.com/vazvaclothing",
+        "facebook": "https://www.facebook.com/vazvashop"
+      },
+      "images": []
+    },
+    {
+      "title": "Cometta A Coruña",
+      "slug": "cometta-coruna",
+      "city_slug": "a-coruna",
+      "address": "Calle Federico Tapia 6",
+      "postalCode": "15005",
+      "phone": "+34 981 819 846",
+      "website": "https://bycometta.es",
+      "geo": {
+        "lat": 43.36473,
+        "lng": -8.40945
+      },
+      "openingHours": [
+        "Mo-Th 08:30-00:00",
+        "Fr-Sa 08:30-01:00",
+        "Su 08:30-00:00"
+      ],
+      "priceRange": "€€",
+      "category_slugs": [
+        "restaurante-italiano"
+      ],
+      "description": "Restaurante de cocina italiana con estética moderna y minimalista que ofrece desayunos, pizzas y pastas artesanales. Nico Clouston participó en un pop‑up y elogió el menú especial【881941209082074†screenshot】. La ficha de Páxinas Galegas indica su dirección en Federico Tapia 6, teléfono 981 819 846, web bycometta.es y horario de lunes a domingo【572474838047300†L40-L56】【601471633649839†L75-L89】.",
+      "social": {
+        "instagram": "https://www.instagram.com/by.cometta",
+        "facebook": "https://www.facebook.com/bycometta"
+      },
+      "images": []
+    },
+    {
+      "title": "Urban Planet Jump Oleiros",
+      "slug": "urban-planet-oleiros",
+      "city_slug": "oleiros",
+      "address": "CC Parque Oleiros, Rúa O Morrazo s/n",
+      "postalCode": "15171",
+      "phone": "+34 881 244 287",
+      "website": "https://urbanplanetjump.es",
+      "geo": {
+        "lat": 43.331,
+        "lng": -8.3205
+      },
+      "openingHours": [
+        "Mo-Th 17:00-21:00",
+        "Fr 17:00-22:00",
+        "Sa 11:00-22:00",
+        "Su 11:00-21:00"
+      ],
+      "priceRange": "€",
+      "category_slugs": [
+        "parque-trampolines"
+      ],
+      "description": "Parque de trampolines y ocio con distintas zonas de salto, ideal para un plan diferente con amigos. Nico Clouston lo describió como un planazo para divertirse y mantenerse en forma【323101172049599†screenshot】. La web de Urban Planet indica que el centro de Oleiros está en el CC Parque Oleiros, Rúa O Morrazo s/n, con teléfono y horarios específicos【824251153801427†L69-L112】.",
+      "social": {
+        "instagram": "https://www.instagram.com/urbanplanetoleiros",
+        "facebook": "https://www.facebook.com/UrbanPlanetOleiros"
+      },
+      "images": []
+    },
+    {
+      "title": "Centro Comercial Marineda City",
+      "slug": "marineda-city-coruna",
+      "city_slug": "a-coruna",
+      "address": "Ctra. Baños de Arteixo 43",
+      "postalCode": "15008",
+      "phone": "+34 881 888 888",
+      "website": "https://www.marinedacity.com",
+      "geo": {
+        "lat": 43.34436,
+        "lng": -8.42854
+      },
+      "openingHours": [
+        "Mo-Sa 10:00-22:00"
+      ],
+      "priceRange": "€€",
+      "category_slugs": [
+        "centro-comercial"
+      ],
+      "description": "Uno de los mayores centros comerciales de Galicia con más de 200 tiendas, restaurantes y ocio. Nico Clouston visitó el centro para descubrir las nuevas aperturas y destacó marcas como IKEA, H&M, Zara y un cine【841183766210615†screenshot】. El mapa de Mapcarta lo sitúa en la Estrada dos Baños de Arteixo 43, con coordenadas 43.34436° N, -8.42854° W【758588556800048†L24-L27】【758588556800048†L109-L116】. La guía Wanderlog señala que el teléfono de contacto es 881 88 88 88 y la web marinedacity.com【763076589809853†L215-L225】.",
+      "social": {
+        "instagram": "https://www.instagram.com/marinedacity",
+        "facebook": "https://www.facebook.com/marinedacity"
+      },
+      "images": []
+    },
+    {
+      "title": "A Café Santiago",
+      "slug": "a-cafe-santiago",
+      "city_slug": "santiago-de-compostela",
+      "address": "Praza San Fiz de Solovio, Mercado de Abastos",
+      "postalCode": "15704",
+      "phone": "",
+      "website": "https://acafecafe.com",
+      "geo": {
+        "lat": 42.87941,
+        "lng": -8.54165
+      },
+      "openingHours": [
+        "Mo-Fr 09:00-13:00",
+        "Sa 09:00-15:00"
+      ],
+      "priceRange": "€€",
+      "category_slugs": [
+        "cafeteria"
+      ],
+      "description": "Cafetería de especialidad ubicada en el Mercado de Abastos de Santiago de Compostela. Según Nico Clouston, es un rincón que se siente como casa y ofrece un menú formado casi en su totalidad por verduras【272925892707324†screenshot】. La ficha de Páxinas Galegas indica que abre de lunes a viernes de 9:00 a 13:00 y los sábados de 9:00 a 15:00【696876301490126†L87-L90】, y se encuentra en la plaza de San Fiz de Solovio【696876301490126†L75-L76】. Mapcarta proporciona las coordenadas de la plaza, 42.87941° N y -8.54165° W【873286400719046†L107-L114】.",
+      "social": {
+        "instagram": "https://www.instagram.com/acafecafe_",
+        "facebook": "",
+        "twitter": ""
+      },
+      "images": []
+    },
+    {
+      "title": "Greca Bar A Coruña",
+      "slug": "greca-bar-coruna",
+      "city_slug": "a-coruna",
+      "address": "Rúa Historiador Vedia 34",
+      "postalCode": "15004",
+      "phone": "+34 981 262 176",
+      "website": "https://grecabar.metro.rest",
+      "geo": {
+        "lat": 43.37126587,
+        "lng": -8.39550194
+      },
+      "openingHours": [
+        "Tu 13:00-16:00",
+        "We 13:00-16:00",
+        "Th 13:00-16:00, 21:00-23:30",
+        "Fr 13:00-16:00, 21:00-23:45",
+        "Sa 13:00-16:00, 21:00-23:45",
+        "Su 13:00-16:00"
+      ],
+      "priceRange": "€€",
+      "category_slugs": [
+        "bar-picoteo"
+      ],
+      "description": "Bar y restaurante de cocina casera en el barrio de Santa Margarita. Nico Clouston lo calificó como un 'gran descubrimiento' y destacó sus platos fuera de carta y el trato cercano. La web de Greca muestra su dirección en Rúa Historiador Vedia 34, A Coruña, los horarios de martes a domingo y el teléfono 981 26 21 76【544488514843775†L10-L55】. El portal de códigos postales ofrece las coordenadas del distrito 15004 (latitud 43.37126587 y longitud -8.39550194)【681117505632061†L11-L13】.",
+      "social": {
+        "instagram": "https://www.instagram.com/grecabar",
+        "facebook": "https://www.facebook.com/grecabar"
+      },
+      "images": []
+    },
+    {
+      "title": "Amorino A Coruña",
+      "slug": "amorino-coruna",
+      "city_slug": "a-coruna",
+      "address": "Calle Real 63",
+      "postalCode": "15003",
+      "phone": "",
+      "website": "https://www.amorino.com",
+      "geo": {
+        "lat": 43.3683,
+        "lng": -8.4017
+      },
+      "openingHours": [
+        "Mo-Su 10:00-23:00"
+      ],
+      "priceRange": "€€",
+      "category_slugs": [
+        "heladeria"
+      ],
+      "description": "Boutique de helados italianos artesanales que abrió sus puertas en la antigua Farmacia Europea de la calle Real 63. Nico Clouston visitó la nueva heladería y destacó sus helados, gofres, sorbetes, macarons, opciones veganas y un gran café【212337370356950†L246-L259】. Un reportaje de Quincemil indica que el local elegido es el número 63 de la calle Real y ocupa un espacio de 300 m²【112915813346113†L216-L251】.",
+      "social": {
+        "instagram": "https://www.instagram.com/amorino_esp",
+        "facebook": "",
+        "twitter": ""
+      },
+      "images": []
+    },
+    {
+      "title": "O’Culto",
+      "slug": "oculto-coruna",
+      "city_slug": "a-coruna",
+      "address": "Rúa Panaderas 26",
+      "postalCode": "15001",
+      "phone": "+34 611 781 435",
+      "website": "https://www.oculto.es",
+      "geo": {
+        "lat": 43.3718,
+        "lng": -8.397
+      },
+      "openingHours": [
+        "Th 19:00-01:00",
+        "Fr 19:00-03:30",
+        "Sa 13:00-03:30",
+        "Su 13:00-19:00"
+      ],
+      "priceRange": "€€",
+      "category_slugs": [
+        "espacio-gastronomico"
+      ],
+      "description": "Espacio gastronómico y de ocio que combina cuatro cocinas (arroces, sushi, tapeo gallego y cachopos) con zona de tardeo y eventos. Nico Clouston lo presentó como un descubrimiento para disfrutar de comida, fiesta y planes diferentes. En la sección de preguntas frecuentes de su web indican la dirección Rúa Panaderas 26 y los horarios del restaurante: jueves de 19:00 a 01:00, viernes de 19:00 a 03:30, sábado de 13:00 a 03:30 y domingo de 13:00 a 19:00【57794702063034†L200-L205】. La misma sección confirma que se ubica en la Calle Panaderas, 26, en A Coruña【57794702063034†L230-L233】, mientras que el aviso legal de CoverManager facilita el teléfono de contacto 611 781 435【13862525885668†L4-L6】.",
+      "social": {
+        "instagram": "https://www.instagram.com/descubreoculto_",
+        "facebook": "",
+        "twitter": ""
+      },
+      "images": []
+    }
+  ]
+}

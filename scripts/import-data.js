@@ -13,11 +13,37 @@ async function importData(jsonFilePath) {
     // PASO 1: Borrar todos los datos existentes
     console.log('🗑️  Eliminando datos existentes...');
     
-    // Eliminar venues (primero por las referencias)
+    // Primero eliminar reviews que referencian venues
+    const existingReviews = await adminSanityClient.fetch('*[_type == "review"]._id');
+    console.log(`   - Eliminando ${existingReviews.length} reseñas existentes`);
+    for (const id of existingReviews) {
+      try {
+        await adminSanityWriteClient.delete(id);
+      } catch (error) {
+        console.log(`     ⚠️  No se pudo eliminar reseña ${id}: ${error.message}`);
+      }
+    }
+
+    // Eliminar otros documentos que puedan referenciar venues
+    const existingQRCodes = await adminSanityClient.fetch('*[_type == "qrCode"]._id');
+    console.log(`   - Eliminando ${existingQRCodes.length} códigos QR existentes`);
+    for (const id of existingQRCodes) {
+      try {
+        await adminSanityWriteClient.delete(id);
+      } catch (error) {
+        console.log(`     ⚠️  No se pudo eliminar QR ${id}: ${error.message}`);
+      }
+    }
+    
+    // Ahora eliminar venues
     const existingVenues = await adminSanityClient.fetch('*[_type == "venue"]._id');
     console.log(`   - Eliminando ${existingVenues.length} venues existentes`);
     for (const id of existingVenues) {
-      await adminSanityWriteClient.delete(id);
+      try {
+        await adminSanityWriteClient.delete(id);
+      } catch (error) {
+        console.log(`     ⚠️  No se pudo eliminar venue ${id}: ${error.message}`);
+      }
     }
     
     // Eliminar cities
