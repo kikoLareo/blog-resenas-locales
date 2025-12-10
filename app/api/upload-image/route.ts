@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminSanityClient } from '@/lib/admin-sanity';
+import { adminSanityWriteClient } from '@/lib/admin-sanity';
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     // Subir a Sanity
-    const result = await adminSanityClient.assets.upload('image', buffer, {
+    const result = await adminSanityWriteClient.assets.upload('image', buffer, {
       filename: file.name,
       contentType: file.type,
     });

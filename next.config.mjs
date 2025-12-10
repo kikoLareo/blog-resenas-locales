@@ -120,6 +120,15 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/contact',
+        destination: '/contacto',
+        permanent: true,
+      },
+    ];
+  },
   // Optimizaciones de rendimiento
   poweredByHeader: false,
   compress: true,

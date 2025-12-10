@@ -23,25 +23,61 @@ export async function PATCH(
       slug: {
         current: body.slug
       },
-      content: body.content,
-      excerpt: body.excerpt || '',
+      // Convertir string simple a Portable Text si es necesario
+      body: typeof body.content === 'string' 
+        ? [
+            {
+              _type: 'block',
+              style: 'normal',
+              markDefs: [],
+              children: [
+                {
+                  _type: 'span',
+                  marks: [],
+                  text: body.content
+                }
+              ]
+            }
+          ]
+        : body.content,
+      tldr: body.tldr || '',
       published: body.published || false,
       venue: {
         _type: 'reference',
         _ref: body.venueId
       },
       ratings: {
-        overall: Number(body.ratings.overall),
         food: Number(body.ratings.food),
         service: Number(body.ratings.service),
-        atmosphere: Number(body.ratings.atmosphere),
-        value: Number(body.ratings.value)
+        ambience: Number(body.ratings.ambience), // Frontend sends ambience, Schema expects ambience
+        value: Number(body.ratings.value),
+        // Calcular overall si no viene
+        overall: (
+          Number(body.ratings.food) + 
+          Number(body.ratings.service) + 
+          Number(body.ratings.ambience) + 
+          Number(body.ratings.value)
+        ) / 4
       },
       tags: body.tags || [],
-      seoTitle: body.seoTitle || '',
-      metaDescription: body.metaDescription || '',
+      author: body.author || 'Foodie Galicia',
+      visitDate: body.visitDate || new Date().toISOString().split('T')[0],
       _updatedAt: new Date().toISOString()
     };
+
+    // Si hay imágenes, procesarlas
+    if (body.images && Array.isArray(body.images)) {
+       updateDoc.gallery = body.images.map((img: any) => ({
+         _type: 'image',
+         _key: img._id || Math.random().toString(36).substring(7),
+         asset: {
+           _type: 'reference',
+           _ref: img._id // Asumimos que _id es el ID del asset de Sanity
+         },
+         alt: img.alt || '',
+         caption: img.caption || ''
+       }));
+    }
 
     // Si se está publicando, agregar publishedAt
     if (body.published && !body.publishedAt) {

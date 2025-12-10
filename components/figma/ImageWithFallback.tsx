@@ -34,8 +34,18 @@ export function ImageWithFallback({
   blurDataURL,
   ...rest
 }: ImageWithFallbackProps) {
-  const [currentSrc, setCurrentSrc] = useState<string>(src);
-  const [hasError, setHasError] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState<string>(src || ERROR_IMG_SRC);
+  const [hasError, setHasError] = useState(!src);
+
+  React.useEffect(() => {
+    if (!src) {
+      setHasError(true);
+      setCurrentSrc(ERROR_IMG_SRC);
+    } else {
+      setHasError(false);
+      setCurrentSrc(src);
+    }
+  }, [src]);
 
   const handleError = () => {
     if (!hasError) {

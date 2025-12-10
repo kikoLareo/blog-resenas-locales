@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Star, MapPin, Clock } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { cleanContent } from "@/lib/utils";
 
 interface ReviewCardProps {
   id: string;
@@ -48,7 +49,7 @@ export function ReviewCard({ title, image, rating, location, readTime, tags, des
             <div className="flex items-center space-x-1"><MapPin className="h-3 w-3" /><span>{location}</span></div>
             <div className="flex items-center space-x-1"><Clock className="h-3 w-3" /><span>{readTime}</span></div>
           </div>
-          <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-relaxed">{description}</p>
+          <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 leading-relaxed">{cleanContent(description)}</p>
           <div className="flex flex-wrap gap-1.5">
             {tags.slice(0, 3).map((tag, index) => (
               <span key={index} className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded hover:bg-gray-200 transition-colors">{tag}</span>

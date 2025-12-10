@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
+import { cleanContent } from '@/lib/utils';
 
 
 interface VenueDetailProps {
@@ -400,7 +401,7 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
                     </div>
                   </div>
 
-                  <p className="text-gray-700 mb-4 line-clamp-3">{review.tldr}</p>
+                  <p className="text-gray-700 mb-4 line-clamp-3">{cleanContent(review.tldr)}</p>
 
                   {/* Tags */}
                   {review.tags && review.tags.length > 0 && (

@@ -30,6 +30,8 @@ type SearchResult = {
   };
   venue?: string;
   city?: string;
+  venueSlug?: string;
+  citySlug?: string;
 };
 
 type SearchPageProps = {
@@ -123,9 +125,11 @@ function SearchResultCard({ result }: { result: SearchResult }) {
   const getResultUrl = () => {
     switch (result._type) {
       case 'venue':
-        return `/venues/${result.slug.current}`;
+        return result.citySlug ? `/${result.citySlug}/${result.slug.current}` : '#';
       case 'review':
-        return `/reviews/${result.slug.current}`;
+        return result.citySlug && result.venueSlug 
+          ? `/${result.citySlug}/${result.venueSlug}/review/${result.slug.current}` 
+          : '#';
       case 'post':
         return `/blog/${result.slug.current}`;
       default:

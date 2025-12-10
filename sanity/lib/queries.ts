@@ -240,7 +240,10 @@ export const topReviewsQuery = `
     "venue": venue-> {
       title,
       slug,
-      "city": city->title
+      "city": city-> {
+        title,
+        slug
+      }
     }
   }
 `;
@@ -332,6 +335,14 @@ export const searchQuery = `
     "city": select(
       _type == "venue" => city->title,
       _type == "review" => venue->city->title
+    ),
+    "venueSlug": select(
+      _type == "review" => venue->slug.current,
+      _type == "venue" => slug.current
+    ),
+    "citySlug": select(
+      _type == "venue" => city->slug.current,
+      _type == "review" => venue->city->slug.current
     )
   }
 `;
