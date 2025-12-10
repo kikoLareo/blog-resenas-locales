@@ -38,7 +38,7 @@ export default async function TopResenasPage() {
                 title={review.title}
                 image={review.gallery?.asset?.url || review.venue?.images?.[0]?.asset?.url || ''}
                 rating={review.ratings?.food || review.ratings?.overall || 0}
-                location={review.venue?.city || 'Ciudad'}
+                location={review.venue?.city?.title || 'Ciudad'}
                 readTime="5 min"
                 tags={review.tags || []}
                 description={review.tldr}

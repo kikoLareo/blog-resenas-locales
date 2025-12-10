@@ -13,6 +13,7 @@ import { cityPageJsonLd } from '@/lib/schema';
 import { sanityFetch } from '@/lib/sanity.client';
 import { cityQuery, venuesByCityQuery } from '@/sanity/lib/queries';
 import VenueCard from '@/components/VenueCard';
+import { cleanContent } from '@/lib/utils';
 
 type CityPageProps = {
   params: Promise<{
@@ -158,7 +159,7 @@ function ReviewCard({ review }: { review: Review }) {
 
         {/* TLDR */}
         <p className="text-gray-600 mb-4 line-clamp-2">
-          {review.tldr}
+          {cleanContent(review.tldr)}
         </p>
 
         {/* Meta */}

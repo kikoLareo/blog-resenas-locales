@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Star } from 'lucide-react';
 import type { Venue } from '@/lib/types';
+import { cleanContent } from '@/lib/utils';
 
 interface VenueCardProps {
   venue: Venue;
@@ -64,7 +65,7 @@ export default function VenueCard({ venue }: VenueCardProps) {
         {/* Description */}
         {venue.description && (
           <p className="text-gray-600 mb-4 line-clamp-2 text-sm">
-            {venue.description}
+            {cleanContent(venue.description)}
           </p>
         )}
 
