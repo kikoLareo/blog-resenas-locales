@@ -177,14 +177,7 @@ export default defineType({
       type: 'array',
       of: [{ type: 'string' }],
       validation: (Rule) => Rule.max(8),
-      description: ({ parent }) => {
-        switch (parent?.reviewType) {
-          case 'gastronomy': return 'Platos estrella, especialidades';
-          case 'leisure': return 'Actividades, espectáculos destacados';  
-          case 'sports': return 'Programas, clases, equipamiento destacado';
-          default: return 'Aspectos más destacados';
-        }
-      },
+      description: 'Platos estrella, actividades, programas o aspectos más destacados según el tipo.',
     }),
 
     // Resto de campos comunes...
@@ -215,11 +208,12 @@ export default defineType({
       media: 'gallery.0'
     },
     prepare({ title, reviewType, venue, media }) {
-      const typeIcon = {
+      const icons: Record<string, string> = {
         gastronomy: '🍽️',
         leisure: '🎭', 
         sports: '⚽'
-      }[reviewType] || '📝';
+      };
+      const typeIcon = icons[reviewType as string] || '📝';
       
       return {
         title: `${typeIcon} ${title}`,

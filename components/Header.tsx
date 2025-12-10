@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Input } from "./ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { DarkModeToggle } from "./DarkModeToggle";
+import { NotificationCenter } from "./NotificationCenter";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -117,12 +118,18 @@ export function Header() {
               <span>Contacto</span>
             </Link>
             
+            {/* Notification Center */}
+            <div className="ml-2">
+              <NotificationCenter />
+            </div>
+
             {/* Dark Mode Toggle */}
             <DarkModeToggle className="ml-2" />
           </nav>
           
           {/* Mobile Menu */}
           <div className="md:hidden flex items-center gap-2">
+            <NotificationCenter />
             <DarkModeToggle />
             <Sheet>
               <SheetTrigger asChild>
