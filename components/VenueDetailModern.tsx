@@ -1,5 +1,6 @@
 'use client';
 
+import { calculateOverallRating } from '@/lib/rating';
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -96,7 +97,7 @@ export const VenueDetailModern: React.FC<VenueDetailModernProps> = ({ venue }) =
   const averageRating = venue.avgRating || 
     (venue.reviews?.length ? 
       venue.reviews.reduce((acc, review) => acc + (
-        (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4
+calculateOverallRating(review.ratings)
       ), 0) / venue.reviews.length : 0);
 
   const reviewCount = venue.reviewCount || venue.reviews?.length || 0;
@@ -268,12 +269,7 @@ export const VenueDetailModern: React.FC<VenueDetailModernProps> = ({ venue }) =
 
               <div className="space-y-6">
                 {venue.reviews.slice(0, 3).map((review) => {
-                  const reviewAvgRating = (
-                    review.ratings.food + 
-                    review.ratings.service + 
-                    review.ratings.ambience + 
-                    review.ratings.value
-                  ) / 4;
+                  const reviewAvgRating = calculateOverallRating(review.ratings);
 
                   return (
                     <ReviewCard

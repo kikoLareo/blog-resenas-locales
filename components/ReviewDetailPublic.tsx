@@ -1,5 +1,7 @@
 "use client";
 
+import { calculateOverallRating } from '@/lib/rating';
+import { cleanContent } from '@/lib/utils';
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -103,11 +105,7 @@ export default function ReviewDetailPublic({ review }: ReviewDetailPublicProps) 
   };
 
   const averageRating = (
-    review.ratings.food + 
-    review.ratings.service + 
-    review.ratings.ambience + 
-    review.ratings.value
-  ) / 4;
+calculateOverallRating(review.ratings));
 
   const heroImage = review.gallery?.[selectedImageIndex] || review.venue.images?.[0];
 
@@ -233,7 +231,7 @@ export default function ReviewDetailPublic({ review }: ReviewDetailPublicProps) 
       </div>
 
       {/* Imagen principal y galería */}
-      {heroImage && (
+      {heroImage?.asset?.url && (
         <div className="mb-8">
           <div className="relative aspect-[16/10] mb-4 rounded-lg overflow-hidden">
             <Image
@@ -319,7 +317,7 @@ export default function ReviewDetailPublic({ review }: ReviewDetailPublicProps) 
           </CardHeader>
           <CardContent>
             <div className="prose prose-gray max-w-none">
-              <p className="whitespace-pre-wrap leading-relaxed">{review.content}</p>
+              <p className="whitespace-pre-wrap leading-relaxed">{cleanContent(review.content)}</p>
             </div>
           </CardContent>
         </Card>

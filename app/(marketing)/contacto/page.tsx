@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_CONFIG } from '@/lib/constants';
+import { ContactForm } from '@/components/ContactForm';
 
 export const metadata: Metadata = {
   title: 'Contacto',
@@ -48,91 +49,7 @@ export default function ContactoPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
-            <div className="bg-white rounded-lg border border-gray-200 p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Envíanos un mensaje</h2>
-              
-              <form role="form" className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                      Nombre
-                    </label>
-                    <input
-                      type="text"
-                      id="firstName"
-                      name="firstName"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                      Apellidos
-                    </label>
-                    <input
-                      type="text"
-                      id="lastName"
-                      name="lastName"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                    Asunto
-                  </label>
-                  <select
-                    id="subject"
-                    name="subject"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    required
-                  >
-                    <option value="">Selecciona un asunto</option>
-                    <option value="suggestion">Sugerencia de local</option>
-                    <option value="collaboration">Propuesta de colaboración</option>
-                    <option value="feedback">Comentario sobre reseña</option>
-                    <option value="technical">Problema técnico</option>
-                    <option value="other">Otro</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                    Mensaje
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="Cuéntanos más detalles..."
-                    required
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-primary-600 text-white py-3 px-6 rounded-md hover:bg-primary-700 transition-colors font-medium"
-                >
-                  Enviar mensaje
-                </button>
-              </form>
-            </div>
+            <ContactForm />
 
             {/* Contact Info */}
             <div className="space-y-8">

@@ -2,6 +2,7 @@
 
 import { Coffee, Instagram, Twitter, Facebook, Mail, MapPin, Phone } from "lucide-react";
 import { Separator } from "./ui/separator";
+import Link from "next/link";
 
 export function Footer() {
   return (
@@ -26,21 +27,20 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Enlaces rápidos</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-muted-foreground hover:text-accent transition-colors">Categorías</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-accent transition-colors">Top Reseñas</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-accent transition-colors">Nuevos Locales</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-accent transition-colors">Cerca de ti</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-accent transition-colors">Blog</a></li>
+              <li><Link href="/categorias" className="text-muted-foreground hover:text-accent transition-colors">Categorías</Link></li>
+              <li><Link href="/top-resenas" className="text-muted-foreground hover:text-accent transition-colors">Top Reseñas</Link></li>
+              <li><Link href="/ciudades" className="text-muted-foreground hover:text-accent transition-colors">Ciudades</Link></li>
+              <li><Link href="/blog" className="text-muted-foreground hover:text-accent transition-colors">Blog</Link></li>
             </ul>
           </div>
           <div>
             <h3 className="font-semibold mb-4">Ciudades</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-muted-foreground hover:text-accent transition-colors">Madrid</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-accent transition-colors">Barcelona</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-accent transition-colors">Valencia</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-accent transition-colors">Sevilla</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-accent transition-colors">Bilbao</a></li>
+              <li><Link href="/madrid" className="text-muted-foreground hover:text-accent transition-colors">Madrid</Link></li>
+              <li><Link href="/barcelona" className="text-muted-foreground hover:text-accent transition-colors">Barcelona</Link></li>
+              <li><Link href="/valencia" className="text-muted-foreground hover:text-accent transition-colors">Valencia</Link></li>
+              <li><Link href="/sevilla" className="text-muted-foreground hover:text-accent transition-colors">Sevilla</Link></li>
+              <li><Link href="/bilbao" className="text-muted-foreground hover:text-accent transition-colors">Bilbao</Link></li>
             </ul>
           </div>
           <div>

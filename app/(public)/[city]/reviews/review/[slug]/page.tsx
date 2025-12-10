@@ -1,3 +1,4 @@
+import { calculateOverallRating } from '@/lib/rating';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -84,7 +85,8 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
   const jsonLd = reviewPageJsonLd(review, venueData);
 
   // Calculate overall rating
-  const overallRating = (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4;
+
+  const overallRating = calculateOverallRating(review.ratings);
 
   return (
     <>

@@ -395,7 +395,8 @@ export const homepageQuery = `{
       "city": city->{
         title,
         slug
-      }
+      },
+      "citySlug": city->slug.current
     },
     author
   },

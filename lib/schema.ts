@@ -1,3 +1,4 @@
+import { calculateOverallRating } from '@/lib/rating';
 import { 
   Venue, 
   Review, 
@@ -102,12 +103,7 @@ export function localBusinessJsonLd(venue: Venue): LocalBusinessJsonLd {
  */
 export function reviewJsonLd(review: Review, venue: Venue): ReviewJsonLd {
   // Calcular rating promedio (normalizado a 1-5)
-  const avgRating = (
-    review.ratings.food + 
-    review.ratings.service + 
-    review.ratings.ambience + 
-    review.ratings.value
-  ) / 4;
+  const avgRating = calculateOverallRating(review.ratings);
   const rating5 = Math.round(((avgRating / 10) * 5) * 10) / 10; // un decimal
   const baseUrl = SITE_CONFIG.url;
   const reviewUrl = `${baseUrl}/${venue.city.slug.current}/${venue.slug.current}/review/${review.slug.current}`;

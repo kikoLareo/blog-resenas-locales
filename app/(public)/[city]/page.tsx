@@ -1,3 +1,4 @@
+import { calculateOverallRating } from '@/lib/rating';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -101,7 +102,8 @@ function VenueCardSkeleton() {
 
 // Review Card Component
 function ReviewCard({ review }: { review: Review }) {
-  const overallRating = (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4;
+
+  const overallRating = calculateOverallRating(review.ratings);
 
   return (
     <article className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">

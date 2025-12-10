@@ -1,3 +1,4 @@
+import { calculateOverallRating } from '@/lib/rating';
 import { Venue, Review, City, Category, FAQ, Post } from './types';
 
 /**
@@ -95,12 +96,7 @@ export function generateVoiceSearchDescription(venue: Venue): string {
  * Generate conversational review summary
  */
 export function generateConversationalReviewSummary(review: Review, venue: Venue): string {
-  const avgRating = (
-    review.ratings.food + 
-    review.ratings.service + 
-    review.ratings.ambience + 
-    review.ratings.value
-  ) / 4;
+  const avgRating = calculateOverallRating(review.ratings);
   
   const ratingText = avgRating >= 8 ? 'excelente' : avgRating >= 6 ? 'muy bueno' : avgRating >= 4 ? 'bueno' : 'regular';
   

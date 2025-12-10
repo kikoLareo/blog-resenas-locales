@@ -1,5 +1,6 @@
 'use client';
 
+import { calculateOverallRating } from '@/lib/rating';
 import Link from 'next/link';
 import { 
   MapPinIcon, 
@@ -30,13 +31,9 @@ export default function InfoSummaryBox({
   voiceOptimized = true,
 }: InfoSummaryBoxProps) {
   
+
   // Calculate average rating from review if available
-  const avgRating = review ? (
-    review.ratings.food + 
-    review.ratings.service + 
-    review.ratings.ambience + 
-    review.ratings.value
-  ) / 4 : venue.avgRating;
+  const avgRating = review ? calculateOverallRating(review.ratings) : venue.avgRating;
 
   const ratingText = avgRating 
     ? avgRating >= 8 ? 'Excelente' : avgRating >= 6 ? 'Muy bueno' : avgRating >= 4 ? 'Bueno' : 'Regular'

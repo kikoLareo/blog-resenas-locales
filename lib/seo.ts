@@ -1,3 +1,4 @@
+import { calculateOverallRating } from '@/lib/rating';
 import { NextSeoProps } from 'next-seo';
 import { Venue, Review, City, Category, SEOData, SanityImage } from './types';
 import { SITE_CONFIG } from './constants';
@@ -69,12 +70,7 @@ export function generateVenueSEO(venue: Venue): NextSeoProps {
  * Generate SEO configuration for review pages
  */
 export function generateReviewSEO(review: Review, venue: Venue): NextSeoProps {
-  const avgRating = (
-    review.ratings.food + 
-    review.ratings.service + 
-    review.ratings.ambience + 
-    review.ratings.value
-  ) / 4;
+  const avgRating = calculateOverallRating(review.ratings);
   
   const ratingText = avgRating >= 8 ? 'Excelente' : avgRating >= 6 ? 'Muy bueno' : avgRating >= 4 ? 'Bueno' : 'Regular';
   

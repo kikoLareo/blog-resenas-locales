@@ -1,3 +1,4 @@
+import { calculateOverallRating } from '@/lib/rating';
 import { FeaturedItem, ReviewFeaturedItem, VenueFeaturedItem, CategoryFeaturedItem, CollectionFeaturedItem, GuideFeaturedItem } from '@/components/FeaturedCarousel';
 import { slugify } from './slug';
 
@@ -173,8 +174,7 @@ function getItemHref(item: SanityFeaturedItem): string {
 // Transformadores específicos por tipo
 function transformReviewItem(item: SanityFeaturedItem, baseItem: any): ReviewFeaturedItem {
   const review = item.reviewRef;
-  const avgRating = review?.ratings ? 
-    (review.ratings.food + review.ratings.service + review.ratings.atmosphere + review.ratings.value) / 4 : 5;
+  const avgRating = review?.ratings ? calculateOverallRating(review.ratings) : 5;
   
   return {
     ...baseItem,

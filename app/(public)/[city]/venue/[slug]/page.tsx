@@ -1,3 +1,4 @@
+import { calculateOverallRating } from '@/lib/rating';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -182,7 +183,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
                           </h3>
                           <p className="text-gray-600">{review.tldr}</p>
                         </div>
-                        <CompactScore score={(review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4} />
+                        <CompactScore score={calculateOverallRating(review.ratings)} />
                       </div>
                       
                       <div className="flex items-center justify-between text-sm text-gray-500">
@@ -215,7 +216,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
                     <span className="text-gray-600">Puntuación media:</span>
                     <span className="font-semibold">
                       {venueData.reviews && venueData.reviews.length > 0 
-                        ? (venueData.reviews.reduce((sum, r) => sum + (r.ratings.food + r.ratings.service + r.ratings.ambience + r.ratings.value) / 4, 0) / venueData.reviews.length).toFixed(1)
+                        ? (venueData.reviews.reduce((sum, r) => sum + calculateOverallRating(r.ratings), 0) / venueData.reviews.length).toFixed(1)
                         : 'N/A'
                       }
                     </span>

@@ -1,5 +1,6 @@
 'use client';
 
+import { calculateOverallRating } from '@/lib/rating';
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -95,12 +96,7 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
   relatedReviews = [],
 }) => {
   // Use overall rating if available, otherwise calculate average
-  const averageRating = review.ratings.overall || (
-    (review.ratings.food || 0) + 
-    (review.ratings.service || 0) + 
-    (review.ratings.ambience || 0) + 
-    (review.ratings.value || review.ratings.valueForMoney || 0)
-  ) / 4;
+  const averageRating = review.ratings.overall || calculateOverallRating(review.ratings);
 
   const heroImage = review.gallery?.[0]?.asset.url || review.venue.images?.[0]?.asset.url || '';
   

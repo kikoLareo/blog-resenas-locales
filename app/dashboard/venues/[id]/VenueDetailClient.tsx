@@ -1,4 +1,5 @@
 "use client";
+import { calculateOverallRating } from '@/lib/rating';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,7 +86,8 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
             typeof review.ratings.value !== 'number') {
           return acc;
         }
-        return acc + (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4;
+
+        return acc + calculateOverallRating(review.ratings);
       }, 0) / venue.reviews.length
     : 0;
 
@@ -98,7 +100,7 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
         setCities(cities || []);
       }
     } catch (error) {
-      console.error('Error cargando ciudades:', error);
+      // console.error('Error cargando ciudades:', error);
     }
   };
 
@@ -140,8 +142,8 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
         images: images
       };
 
-      console.log('Guardando venue con ID:', venue._id);
-      console.log('Datos a enviar:', apiData);
+      // console.log('Guardando venue con ID:', venue._id);
+      // console.log('Datos a enviar:', apiData);
 
       // Call API to update venue
       const res = await fetch(`/api/admin/venues/${venue._id}`, {
@@ -153,11 +155,11 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
       });
 
       const data = await res.json();
-      console.log('Respuesta del servidor:', data);
+      // console.log('Respuesta del servidor:', data);
 
       if (!res.ok) {
         const errorMsg = data?.details || data?.error || 'Error al actualizar';
-        console.error('Error al guardar:', errorMsg);
+        // console.error('Error al guardar:', errorMsg);
         window.alert(`Error: ${errorMsg}`);
         return;
       }
@@ -167,7 +169,7 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
       setIsEditModalOpen(false);
       window.location.reload();
     } catch (error) {
-      console.error('Error en handleSave:', error);
+      // console.error('Error en handleSave:', error);
       window.alert((error as any)?.message || 'Error al actualizar');
     } finally {
       setIsLoading(false);
@@ -320,7 +322,7 @@ export default function VenueDetailClient({ venue }: { venue: VenueWithDetails }
                     typeof review.ratings.value === 'number';
                   
                   const averageRating = hasValidRatings
-                    ? (review.ratings.food + review.ratings.service + review.ratings.ambience + review.ratings.value) / 4
+                    ? calculateOverallRating(review.ratings)
                     : 0;
 
                   return (

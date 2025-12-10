@@ -1,17 +1,27 @@
 "use client";
 
-import { Search, Menu, MapPin, Star, Coffee } from "lucide-react";
+import { Search, Menu, MapPin, Star, Coffee, Mail } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { Input } from "./ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { DarkModeToggle } from "./DarkModeToggle";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      router.push(`/buscar?q=${encodeURIComponent(searchTerm.trim())}`);
+    }
+  };
 
   useEffect(() => {
     // Inicializar el estado basado en la posición inicial de scroll
@@ -55,7 +65,7 @@ export function Header() {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, [scrolled, lastScrollY]);
+  }, [scrolled, lastScrollY, visible]);
 
   return (
     <header className={`fixed top-0 z-50 w-full transition-all duration-300 ${
@@ -77,14 +87,16 @@ export function Header() {
           
           {/* Search Bar - Desktop */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full group">
+            <form onSubmit={handleSearch} className="relative w-full group">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 transition-colors group-focus-within:text-primary" />
               <Input 
                 type="search" 
                 placeholder="Buscar restaurantes, comida, ubicación..." 
-                className="pl-10 pr-4 w-full bg-background/70 border border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 rounded-lg" 
+                className="pl-10 pr-4 w-full bg-background/70 border border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 rounded-lg"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
-            </div>
+            </form>
           </div>
           
           {/* Navigation - Desktop */}
@@ -99,6 +111,10 @@ export function Header() {
             <Link href="/top-resenas" className="nav-link group">
               <Star className="h-4 w-4 transition-transform group-hover:scale-110" />
               <span>Top Reseñas</span>
+            </Link>
+            <Link href="/contacto" className="nav-link group">
+              <Mail className="h-4 w-4 transition-transform group-hover:scale-110" />
+              <span>Contacto</span>
             </Link>
             
             {/* Dark Mode Toggle */}
@@ -123,14 +139,16 @@ export function Header() {
                   </div>
                   
                   {/* Mobile Search */}
-                  <div className="relative group">
+                  <form onSubmit={handleSearch} className="relative group">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 transition-colors group-focus-within:text-primary" />
                     <Input 
                       type="search" 
                       placeholder="Buscar restaurantes..." 
-                      className="pl-10 pr-4 bg-muted border-border focus:border-primary/50 focus:ring-2 focus:ring-primary/20" 
+                      className="pl-10 pr-4 bg-muted border-border focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                  </div>
+                  </form>
                   
                   {/* Mobile Navigation */}
                   <nav className="flex flex-col space-y-2">
@@ -144,6 +162,10 @@ export function Header() {
                     <Link href="/top-resenas" className="mobile-nav-link">
                       <Star className="h-4 w-4" />
                       <span>Top Reseñas</span>
+                    </Link>
+                    <Link href="/contacto" className="mobile-nav-link">
+                      <Mail className="h-4 w-4" />
+                      <span>Contacto</span>
                     </Link>
                   </nav>
                 </div>

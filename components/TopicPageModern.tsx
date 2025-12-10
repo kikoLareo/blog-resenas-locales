@@ -1,5 +1,6 @@
 'use client';
 
+import { calculateOverallRating } from '@/lib/rating';
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Search, SlidersHorizontal, Star, MapPin } from 'lucide-react';
@@ -282,7 +283,7 @@ export const TopicPageModern: React.FC<TopicPageModernProps> = ({
                         id={review._id}
                         title={review.title}
                         image={review.gallery?.asset.url || ''}
-                        rating={review.ratings.food / 2}
+                        rating={calculateOverallRating(review.ratings) / 2}
                         location={review.venue.city}
                         readTime={review.readTime || '5 min'}
                         tags={review.tags || []}

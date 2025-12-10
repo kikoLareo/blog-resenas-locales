@@ -1,5 +1,6 @@
 "use client";
 
+import { calculateOverallRating } from '@/lib/rating';
 import { Star, MapPin, Clock, Calendar, Share2, Bookmark, Heart } from "lucide-react";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
@@ -77,8 +78,9 @@ type ReviewDetailProps = {
 export function ReviewDetail({ slug, onBack, review: reviewFromSanity }: ReviewDetailProps) {
   // Adaptar datos si vienen de Sanity
   if (reviewFromSanity) {
+
     const avg10 = reviewFromSanity.ratings
-      ? (reviewFromSanity.ratings.food + reviewFromSanity.ratings.service + reviewFromSanity.ratings.ambience + reviewFromSanity.ratings.value) / 4
+      ? calculateOverallRating(reviewFromSanity.ratings)
       : 0;
     const rating5 = Math.round(((avg10 / 10) * 5) * 10) / 10;
     const heroImage = reviewFromSanity.gallery?.[0]?.asset?.url;
