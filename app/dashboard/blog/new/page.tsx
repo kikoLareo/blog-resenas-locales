@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import PortableTextEditor, { PortableTextBlock } from "@/components/PortableTextEditor";
+import TiptapEditor from "@/components/TiptapEditor";
+import { PortableTextBlock } from "@portabletext/types";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -321,10 +322,9 @@ export default function NewBlogPostPage() {
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="content">Contenido del Post</Label>
-                <PortableTextEditor
+                <TiptapEditor
                   value={formData.body}
                   onChange={(body) => setFormData({ ...formData, body })}
-                  placeholder="Escribe el contenido del post aquí..."
                 />
                 <p className="text-xs text-gray-500 mt-1">
                   Editor visual para contenido enriquecido con formato, listas e imágenes
