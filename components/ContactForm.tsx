@@ -15,14 +15,20 @@ export function ContactForm() {
     setStatus('submitting');
 
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // For now, just show success message
-    setStatus('success');
-    
-    // Reset form
-    const form = e.target as HTMLFormElement;
-    form.reset();
+    try {
+      // In a real app, this would be a fetch call to an API route
+      // const response = await fetch('/api/contact', { method: 'POST', body: new FormData(e.currentTarget) });
+      // if (!response.ok) throw new Error('Failed to submit');
+      
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setStatus('success');
+      
+      // Reset form
+      const form = e.target as HTMLFormElement;
+      form.reset();
+    } catch (error) {
+      setStatus('error');
+    }
   };
 
   if (status === 'success') {

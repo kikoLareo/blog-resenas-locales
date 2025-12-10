@@ -51,7 +51,8 @@ function SquareCard({ item }: { item: SelectedItem }) {
       case 'venue':
         return `/${item.city}/${item.slug}`;
       case 'review':
-        return `/${item.city}/reviews/review/${item.slug}`;
+        // Fix: Use correct review URL structure
+        return `/${item.city}/${item.venueSlug || 'local'}/review/${item.slug}`;
       case 'category':
         return `/categorias/${item.slug}`;
       case 'city':

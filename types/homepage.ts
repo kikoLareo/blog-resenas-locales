@@ -41,6 +41,7 @@ export interface SelectedItem {
   imageUrl?: string;             // URL de imagen para preview
   city?: string;                 // Ciudad (solo para venues)
   venue?: string;                // Venue (solo para reviews)
+  venueSlug?: string;            // Slug del venue (para reviews)
 }
 
 /**

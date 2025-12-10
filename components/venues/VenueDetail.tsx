@@ -271,6 +271,16 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
               <CardTitle>Información</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Empty State for Info */}
+              {!venue.phone && !venue.website && !venue.openingHours && (!venue.social || Object.keys(venue.social).length === 0) && !venue.geo && (
+                <div className="text-center py-4 text-gray-500 text-sm">
+                  <p>No hay información de contacto disponible.</p>
+                  <Link href="/contacto?subject=suggestion" className="text-blue-600 hover:underline mt-2 block">
+                    ¿Conoces este local? Ayúdanos a completar la información.
+                  </Link>
+                </div>
+              )}
+
               {/* Teléfono */}
               {venue.phone && (
                 <div className="flex items-center gap-3">
@@ -371,6 +381,9 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
                 <Button variant="outline">Ver todas las reseñas</Button>
               </Link>
             )}
+            <Link href="/contacto?subject=suggestion">
+              <Button>Escribir reseña</Button>
+            </Link>
           </div>
 
           <div className="grid gap-6">
@@ -454,9 +467,14 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
           <h3 className="text-lg font-medium text-gray-900 mb-2">
             Aún no hay reseñas
           </h3>
-          <p className="text-gray-500">
+          <p className="text-gray-500 mb-6">
             Sé el primero en escribir una reseña sobre {venue.title}
           </p>
+          <Link href="/contacto?subject=suggestion">
+            <Button>
+              Escribir una reseña
+            </Button>
+          </Link>
         </div>
       )}
       </main>
