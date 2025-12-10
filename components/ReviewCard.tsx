@@ -37,7 +37,7 @@ export function ReviewCard({ title, image, rating, location, readTime, tags, des
         )}
         <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-full flex items-center space-x-1">
           <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-          <span className="text-xs font-semibold text-gray-900">{rating}</span>
+          <span className="text-xs font-semibold text-gray-900">{typeof rating === 'number' && !isNaN(rating) ? rating.toFixed(1) : '0.0'}</span>
         </div>
       </div>
       <CardContent className="p-4 sm:p-5">
