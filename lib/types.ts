@@ -59,6 +59,7 @@ export interface Category {
   icon?: string;
   color?: string;
   heroImage?: SanityImage;
+  group?: 'gastro' | 'ocio' | 'deportes';
   // Campos calculados
   venueCount?: number;
   reviewCount?: number;

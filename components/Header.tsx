@@ -81,10 +81,10 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center space-x-2 hover-lift">
+          <Link href="/" className="flex items-center space-x-2 hover-lift">
             <Coffee className="h-8 w-8 text-primary" />
             <span className="text-xl font-serif font-bold text-primary">SaborLocal</span>
-          </div>
+          </Link>
           
           {/* Search Bar - Desktop */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">

@@ -39,6 +39,22 @@ const category = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'group',
+      title: 'Grupo Principal',
+      type: 'string',
+      group: 'basic',
+      options: {
+        list: [
+          { title: 'Gastronomía', value: 'gastro' },
+          { title: 'Ocio', value: 'ocio' },
+          { title: 'Deportes', value: 'deportes' },
+        ],
+        layout: 'radio'
+      },
+      initialValue: 'gastro',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
       name: 'description',
       title: 'Descripción',
       type: 'text',

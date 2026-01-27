@@ -14,7 +14,7 @@ export default async function DashboardLayout({
 
   // El middleware ya maneja la autenticación, solo renderizar el layout
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-background">
       <div className="flex">
         <AdminNav />
         <main className="flex-1 p-6">

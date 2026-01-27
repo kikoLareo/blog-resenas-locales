@@ -24,14 +24,14 @@ export function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="w-64 bg-white border-r border-gray-200 min-h-screen">
+    <nav className="w-64 bg-white dark:bg-card border-r border-gray-200 dark:border-border min-h-screen">
       <div className="p-4">
         <div className="space-y-1">
           {navigation.map((item) => {
             const isActive = pathname === item.href;
             const baseClasses = "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors";
-            const activeClasses = "bg-blue-50 text-blue-700 border-r-2 border-blue-700";
-            const inactiveClasses = "text-gray-600 hover:bg-gray-50 hover:text-gray-900";
+            const activeClasses = "bg-blue-50 text-blue-700 border-r-2 border-blue-700 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-500";
+            const inactiveClasses = "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100";
             
             return (
               <Link
