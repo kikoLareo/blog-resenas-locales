@@ -124,12 +124,14 @@ export async function generateMetadata({ params }: ReviewPageProps): Promise<Met
   }
 
   const { ratings } = review;
-  const avgRating = ratings ? (
-    (Number(ratings.food) || 0) + 
-    (Number(ratings.service) || 0) + 
-    (Number(ratings.ambience) || 0) + 
-    (Number(ratings.value) || 0)
-  ) / 4 : (Number(ratings?.overall) || 0);
+  const avgRating = ratings 
+    ? (
+        (Number((ratings as any).food) || 0) + 
+        (Number((ratings as any).service) || 0) + 
+        (Number((ratings as any).ambience) || 0) + 
+        (Number((ratings as any).value) || 0)
+      ) / 4 || (Number((ratings as any).overall) || 0)
+    : 0;
   
   const ratingText = avgRating >= 8 ? 'Excelente' : avgRating >= 6 ? 'Muy bueno' : avgRating >= 4 ? 'Bueno' : 'Regular';
   
@@ -176,12 +178,14 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
   }
 
   const { ratings } = review;
-  const avgRating = ratings ? (
-    (Number(ratings.food) || 0) + 
-    (Number(ratings.service) || 0) + 
-    (Number(ratings.ambience) || 0) + 
-    (Number(ratings.value) || 0)
-  ) / 4 : (Number(ratings?.overall) || 0);
+  const avgRating = ratings 
+    ? (
+        (Number((ratings as any).food) || 0) + 
+        (Number((ratings as any).service) || 0) + 
+        (Number((ratings as any).ambience) || 0) + 
+        (Number((ratings as any).value) || 0)
+      ) / 4 || (Number((ratings as any).overall) || 0)
+    : 0;
 
   // Generar JSON-LD para SEO
   const jsonLd = {
