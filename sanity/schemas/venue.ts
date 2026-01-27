@@ -116,8 +116,6 @@ export default defineType({
       initialValue: 'gastro',
       validation: (Rule) => Rule.required(),
     }),
-      validation: (Rule) => Rule.required().min(1),
-    }),
     defineField({
       name: 'images',
       title: 'Imágenes',

@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { SITE_CONFIG } from '@/lib/constants';
 import HomeSaborLocalServer from '@/components/HomeSaborLocalServer';
 import { sanityFetch } from '@/lib/sanity.client';
 import { homepageQuery, homepageConfigQuery } from '@/sanity/lib/queries';
+import { venuesByMasterCategoryQuery } from '@/lib/public-queries';
 import { getAllFeaturedItems } from '@/lib/featured-admin';
 import { defaultHomepageConfig } from '@/lib/homepage-admin';
-import { FeaturedSectionsModern, HeroModern } from '@/components';
+import { FeaturedSectionsModern, HeroModern, VenueCard } from '@/components';
 import { getVenueUrl, getReviewUrl } from '@/lib/utils';
 // Using featuredItems from Sanity for hero carousel
 
@@ -184,164 +186,130 @@ function renderSection(
 }
 
 export default async function HomePage() {
-  // Fetch paralelo para optimizar rendimiento
-  const [data, homepageConfig, allFeaturedItems] = await Promise.all([
-    sanityFetch<{
-      heroItems: any[];
-      featuredReviews: any[];
-      trendingReviews: any[];
-      topReviews: any[];
-      featuredPosts: any[];
-      featuredCities: any[];
-      featuredCategories: any[];
-      featuredVenues: any[];
-    }>({
+  const [homepageData, masterCategoryData] = await Promise.all([
+    sanityFetch<any>({
       query: homepageQuery,
-      revalidate: 3600, // Cache por 1 hora
-      tags: ['homepage', 'reviews'],
-    }).catch((error) => {
-      console.warn('Failed to fetch Sanity homepage data:', error.message);
-      return {
-        heroItems: [],
-        featuredReviews: [],
-        trendingReviews: [],
-        topReviews: [],
-        featuredPosts: [],
-        featuredCities: [],
-        featuredCategories: [],
-        featuredVenues: []
-      };
+      tags: ['homepage'],
     }),
-    
-    sanityFetch<HomepageConfig>({
-      query: homepageConfigQuery,
-      revalidate: 3600, // Cache por 1 hora
-      tags: ['homepage-config'],
-    }).catch((error) => {
-      console.warn('Failed to fetch homepage config:', error.message);
-      return null;
-    }),
-
-    // Obtener featuredItems del dashboard
-    getAllFeaturedItems().catch((error) => {
-      console.warn('Failed to fetch featured items:', error.message);
-      return [];
+    sanityFetch<any>({
+      query: venuesByMasterCategoryQuery,
+      tags: ['venues'],
     })
   ]);
 
-  // Filtrar solo los featuredItems activos y transformarlos para el hero
-  const heroFeaturedItems = allFeaturedItems
-    .filter((item: any) => item.isActive === true)
-    .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
-    .map((item: any) => {
-      // Si es tipo review y tiene reviewRef, usar datos de la review
-      if (item.type === 'review' && item.reviewRef) {
-        const review = item.reviewRef;
-        
-        // Asegurar datos de ciudad/venue para URL correcta
-        const citySlug = review.venue?.city?.slug?.current;
-        const venueSlug = review.venue?.slug?.current;
-        const reviewSlug = review.slug?.current;
-        
-        return {
-          id: item._id,
-          type: 'review' as const,
-          title: item.customTitle || review.title,
-          description: item.customDescription || review.summary || review.tldr || '',
-          image: review.gallery?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&q=85',
-          href: item.customUrl || `/${citySlug || 'a-coruna'}/${venueSlug || 'local'}/review/${reviewSlug || 'review'}`,
-          rating: review.ratings?.overall || review.ratings?.food || 4.5,
-          location: `${review.venue?.city?.title || 'Madrid'}, España`,
-          readTime: review.readTime ? `${review.readTime} min lectura` : '5 min lectura',
-          tags: review.tags || [],
-          isActive: true,
-          order: item.order || 0,
-          cuisine: review.venue?.cuisine || 'Gastronomía',
-          neighborhood: review.venue?.address?.split(',')[0] || review.venue?.city?.title || '',
-          priceRange: review.venue?.priceRange || '$$',
-          author: review.author || 'Equipo SaborLocal',
-          publishedDate: review.publishedAt ? new Date(review.publishedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-          ctaText: item.customCTA || 'Leer reseña completa',
-        };
-      }
-      
-      // Si es tipo venue y tiene venueRef, usar datos del venue
-      if (item.type === 'venue' && item.venueRef) {
-        const venue = item.venueRef;
-        
-        // Asegurar que el venue tiene ciudad antes de generar URL
-        const citySlug = venue.city?.slug?.current;
-        const venueSlug = venue.slug?.current;
-        
-        // Si no tiene ciudad asignada, usar A Coruña como default (90% de reseñas)
-        
-        return {
-          id: item._id,
-          type: 'venue' as const,
-          title: item.customTitle || venue.title,
-          description: item.customDescription || venue.description || `Descubre ${venue.title} en ${venue.city?.title || 'A Coruña'}`,
-          image: venue.images?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&q=85',
-          href: item.customUrl || `/${citySlug || 'a-coruna'}/${venueSlug || 'local'}`,
-          rating: venue.averageRating || 4.5,
-          location: `${venue.city?.title || 'Madrid'}, España`,
-          readTime: `${venue.reviewCount || 0} reseñas`,
-          tags: venue.categories?.map((c: any) => c.title) || [],
-          isActive: true,
-          order: item.order || 0,
-          cuisine: venue.cuisine || venue.categories?.[0]?.title || 'Local',
-          neighborhood: venue.address?.split(',')[0] || venue.city?.title || '',
-          priceRange: venue.priceRange || '$$',
-          ctaText: item.customCTA || 'Ver local',
-          reviewCount: venue.reviewCount || 0,
-        };
-      }
-      
-      // Si no tiene reviewRef o venueRef, usar los datos custom del featuredItem
-      return {
-        id: item._id,
-        type: item.type,
-        title: item.customTitle || item.title,
-        description: item.customDescription || '',
-        image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&q=85',
-        href: item.customUrl || '/',
-        isActive: true,
-        order: item.order || 0,
-        ctaText: item.customCTA || 'Ver más',
-      };
-    });
+  const {
+    featuredReviews = [],
+    recentReviews = [],
+    trendingReviews = [],
+    topRatedVenues = [],
+    categories = [],
+    cities = [],
+  } = homepageData;
 
-  // Si no hay featuredItems activos, usar heroItems de reviews como fallback
-  const finalHeroItems = heroFeaturedItems.length > 0 
-    ? heroFeaturedItems 
-    : data.heroItems.map((review: any) => ({
-        id: review._id,
-        type: 'review' as const,
-        title: review.title,
-        description: review.summary || review.tldr || '',
-        image: review.gallery?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&q=85',
-        href: `/${review.venue?.city?.slug?.current || 'madrid'}/${review.venue?.slug?.current || 'local'}/review/${review.slug?.current || 'review'}`,
-        rating: review.ratings?.overall || review.ratings?.food || 4.5,
-        location: `${review.venue?.city?.title || 'Madrid'}, España`,
-        readTime: review.readTime ? `${review.readTime} min lectura` : '5 min lectura',
-        tags: review.tags || [],
-        isActive: true,
-        order: 0,
-        cuisine: review.venue?.cuisine || 'Gastronomía',
-        neighborhood: review.venue?.address?.split(',')[0] || review.venue?.city?.title || '',
-        priceRange: review.venue?.priceRange || '$$',
-        author: review.author || 'Equipo SaborLocal',
-        publishedDate: review.publishedAt ? new Date(review.publishedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-      }));
-
-  // Preparar datos de Sanity transformados
-  const sanityData = {
-    trendingReviews: transformSanityReviews(data.trendingReviews || []),
-    topReviews: transformSanityReviews(data.topReviews || []),
-    venues: transformSanityVenues(data.featuredVenues || []),
-    categories: transformSanityCategories(data.featuredCategories || []),
-  };
+  // Transformar datos
+  const transformedFeatured = transformSanityReviews(featuredReviews);
+  const transformedTrending = transformSanityReviews(trendingReviews);
+  const transformedTopRated = transformSanityVenues(topRatedVenues);
+  const transformedCategories = transformSanityCategories(categories);
 
   return (
-    <HomeSaborLocalServer />
+    <div className="flex flex-col gap-12 pb-20">
+      <HeroModern featuredItems={transformedFeatured} />
+      
+      <div className="container mx-auto px-4 space-y-24">
+        {/* Gastronomía Section */}
+        {masterCategoryData.gastro?.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-serif font-bold text-foreground flex items-center gap-3">
+                <span className="bg-orange-100 dark:bg-orange-900/30 p-2 rounded-lg text-orange-600 dark:text-orange-400">🍽️</span>
+                Gastronomía
+              </h2>
+              <Link href="/categorias?grupo=gastro" className="text-primary hover:underline font-medium">Ver todo</Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {masterCategoryData.gastro.map((venue: any) => (
+                <VenueCard 
+                  key={venue._id} 
+                  id={venue._id}
+                  name={venue.title}
+                  image={venue.images?.asset?.url || ''}
+                  href={getVenueUrl(venue.citySlug, venue.slug)}
+                  cuisine="Restaurante"
+                  averageRating={venue.averageRating}
+                  reviewCount={venue.reviewCount}
+                  address={venue.address || ''}
+                  priceLevel={venue.priceRange?.length || 2}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Ocio Section */}
+        {masterCategoryData.ocio?.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-serif font-bold text-foreground flex items-center gap-3">
+                <span className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-lg text-purple-600 dark:text-purple-400">🎭</span>
+                Ocio y Entretenimiento
+              </h2>
+              <Link href="/categorias?grupo=ocio" className="text-primary hover:underline font-medium">Ver todo</Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {masterCategoryData.ocio.map((venue: any) => (
+                <VenueCard 
+                  key={venue._id} 
+                  id={venue._id}
+                  name={venue.title}
+                  image={venue.images?.asset?.url || ''}
+                  href={getVenueUrl(venue.citySlug, venue.slug)}
+                  cuisine="Ocio"
+                  averageRating={0}
+                  reviewCount={0}
+                  address={venue.address || ''}
+                  priceLevel={venue.priceRange?.length || 2}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Deportes Section */}
+        {masterCategoryData.deportes?.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-serif font-bold text-foreground flex items-center gap-3">
+                <span className="bg-green-100 dark:bg-green-900/30 p-2 rounded-lg text-green-600 dark:text-green-400">⚽</span>
+                Deportes y Bienestar
+              </h2>
+              <Link href="/categorias?grupo=deportes" className="text-primary hover:underline font-medium">Ver todo</Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {masterCategoryData.deportes.map((venue: any) => (
+                <VenueCard 
+                  key={venue._id} 
+                  id={venue._id}
+                  name={venue.title}
+                  image={venue.images?.asset?.url || ''}
+                  href={getVenueUrl(venue.citySlug, venue.slug)}
+                  cuisine="Deportes"
+                  averageRating={0}
+                  reviewCount={0}
+                  address={venue.address || ''}
+                  priceLevel={venue.priceRange?.length || 2}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        <FeaturedSectionsModern 
+          trending={transformedTrending}
+          topRated={transformedTopRated}
+          categories={transformedCategories}
+        />
+      </div>
+    </div>
   );
 }

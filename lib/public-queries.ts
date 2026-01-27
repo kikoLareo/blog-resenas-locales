@@ -230,3 +230,49 @@ export const venuesByCategoryQuery = groq`
     "reviewCount": count(*[_type == "review" && venue._ref == ^._id && published == true])
   }
 `;
+
+// Obtener locales destacados agrupados por categoría maestra
+export const venuesByMasterCategoryQuery = groq`{
+  "gastro": *[_type == "venue" && masterCategory == "gastro"] | order(title asc)[0...8] {
+    _id,
+    title,
+    "slug": slug.current,
+    "citySlug": city->slug.current,
+    address,
+    priceRange,
+    images[0] {
+      asset-> { url }
+    },
+    "averageRating": count(*[_type == "review" && venue._ref == ^._id && published == true]) > 0 ? 
+      math::avg(*[_type == "review" && venue._ref == ^._id && published == true]{
+        "rating": coalesce(ratings.food, ratings.entertainment, ratings.facilities, 0)
+      }.rating) : 0,
+    "reviewCount": count(*[_type == "review" && venue._ref == ^._id && published == true])
+  },
+  "ocio": *[_type == "venue" && masterCategory == "ocio"] | order(title asc)[0...8] {
+    _id,
+    title,
+    "slug": slug.current,
+    "citySlug": city->slug.current,
+    address,
+    priceRange,
+    images[0] {
+      asset-> { url }
+    },
+    "averageRating": 0,
+    "reviewCount": 0
+  },
+  "deportes": *[_type == "venue" && masterCategory == "deportes"] | order(title asc)[0...8] {
+    _id,
+    title,
+    "slug": slug.current,
+    "citySlug": city->slug.current,
+    address,
+    priceRange,
+    images[0] {
+      asset-> { url }
+    },
+    "averageRating": 0,
+    "reviewCount": 0
+  }
+}`;

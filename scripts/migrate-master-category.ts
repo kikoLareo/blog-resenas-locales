@@ -4,20 +4,21 @@ import * as path from 'path';
 
 // Cargar variables de entorno
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
   apiVersion: '2023-01-01',
-  token: process.env.SANITY_WRITE_TOKEN || process.env.SANITY_API_TOKEN,
+  token: process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_WRITE_TOKEN || process.env.SANITY_API_TOKEN,
   useCdn: false,
 });
 
 async function migrate() {
   console.log('🚀 Iniciando migración de Categoría Maestra...');
 
-  if (!process.env.SANITY_WRITE_TOKEN && !process.env.SANITY_API_TOKEN) {
-    console.error('❌ Error: SANITY_WRITE_TOKEN o SANITY_API_TOKEN no encontrado en .env.local');
+  if (!process.env.SANITY_API_WRITE_TOKEN && !process.env.SANITY_WRITE_TOKEN && !process.env.SANITY_API_TOKEN) {
+    console.error('❌ Error: SANITY_API_WRITE_TOKEN no encontrado en .env o .env.local');
     return;
   }
 
