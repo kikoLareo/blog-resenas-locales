@@ -6,7 +6,7 @@ import { Category } from '@/lib/types';
 
 // Query para obtener todas las categorías con estadísticas
 const categoriesQuery = `
-  *[_type == "category"] | order(title asc) {
+  *[_type == "category"] {
     _id,
     title,
     slug,
@@ -16,7 +16,7 @@ const categoriesQuery = `
     group,
     "venueCount": count(*[_type == "venue" && ^._id in categories[]._ref]),
     "reviewCount": count(*[_type == "review" && ^._id in venue->categories[]._ref])
-  }
+  } | [venueCount > 0 || reviewCount > 0] | order(title asc)
 `;
 
 export const metadata: Metadata = {
