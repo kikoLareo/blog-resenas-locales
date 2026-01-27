@@ -1,40 +1,46 @@
 import { adminSanityClient } from "@/lib/admin-sanity";
 import { HomepageSection } from "@/types/homepage";
 import HomepageSectionRenderer from "./sections/HomepageSectionRenderer";
+import { getReviewUrl } from "@/lib/utils";
 
 // Función para obtener reseñas destacadas desde Sanity
 async function getFeaturedReviews() {
   try {
     const reviews = await adminSanityClient.fetch(`
-      *[_type == "review" && published == true] | order(publishedAt desc)[0...3] {
+      *[_type == "review" && published == true] | order(publishedAt desc)[0...6] {
         _id,
         title,
-        slug,
+        "slug": slug.current,
         venue->{
           title,
-          slug,
+          "slug": slug.current,
           city->{
             title,
-            slug
+            "slug": slug.current
           }
         },
         ratings,
         publishedAt,
         summary,
-        tags
+        tags,
+        "image": gallery[0].asset->url
       }
     `);
     
     return reviews.map((review: any) => ({
       id: review._id,
       title: review.title,
-      image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&h=600&fit=crop&q=85", // Imagen por defecto
+      image: review.image || "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&h=600&fit=crop&q=85",
       rating: review.ratings?.overall || 4.5,
       location: `${review.venue?.city?.title || 'Madrid'}`,
       readTime: "5 min lectura",
       tags: review.tags || ["Gastronomía"],
       description: review.summary || "Reseña gastronómica detallada",
-      href: `/${review.venue?.city?.slug?.current || 'madrid'}/${review.venue?.slug?.current || 'local'}/review/${review.slug?.current || 'review'}`,
+      href: getReviewUrl(
+        review.venue?.city?.slug,
+        review.venue?.slug,
+        review.slug
+      ),
       isNew: true,
       isTrending: true,
       isPopular: true,

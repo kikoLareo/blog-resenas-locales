@@ -116,19 +116,20 @@ export async function generateMetadata({ params }: ReviewPageProps): Promise<Met
   const { city, venue: venueSlug, reviewSlug } = await params;
   const review = await getReview(city, venueSlug, reviewSlug);
 
-  if (!review) {
+  if (!review || !review.venue) {
     return {
       title: 'Reseña no encontrada',
       description: 'La reseña que buscas no existe o ha sido eliminada.',
     };
   }
 
-  const avgRating = review.ratings ? (
-    review.ratings.food + 
-    review.ratings.service + 
-    review.ratings.ambience + 
-    review.ratings.value
-  ) / 4 : 0;
+  const { ratings } = review;
+  const avgRating = ratings ? (
+    (Number(ratings.food) || 0) + 
+    (Number(ratings.service) || 0) + 
+    (Number(ratings.ambience) || 0) + 
+    (Number(ratings.value) || 0)
+  ) / 4 : (Number(ratings?.overall) || 0);
   
   const ratingText = avgRating >= 8 ? 'Excelente' : avgRating >= 6 ? 'Muy bueno' : avgRating >= 4 ? 'Bueno' : 'Regular';
   
@@ -170,16 +171,17 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
   const { city, venue: venueSlug, reviewSlug } = await params;
   const review = await getReview(city, venueSlug, reviewSlug);
 
-  if (!review) {
+  if (!review || !review.venue) {
     notFound();
   }
 
-  const avgRating = review.ratings ? (
-    review.ratings.food + 
-    review.ratings.service + 
-    review.ratings.ambience + 
-    review.ratings.value
-  ) / 4 : 0;
+  const { ratings } = review;
+  const avgRating = ratings ? (
+    (Number(ratings.food) || 0) + 
+    (Number(ratings.service) || 0) + 
+    (Number(ratings.ambience) || 0) + 
+    (Number(ratings.value) || 0)
+  ) / 4 : (Number(ratings?.overall) || 0);
 
   // Generar JSON-LD para SEO
   const jsonLd = {
@@ -193,21 +195,21 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
     },
     author: {
       '@type': 'Person',
-      name: review.author,
+      name: review.author || 'Anónimo',
     },
     itemReviewed: {
       '@type': 'LocalBusiness',
       name: review.venue.title,
       address: {
         '@type': 'PostalAddress',
-        streetAddress: review.venue.address,
-        addressLocality: review.venue.city.title,
-        addressRegion: review.venue.city.region,
+        streetAddress: review.venue.address || '',
+        addressLocality: review.venue.city?.title || '',
+        addressRegion: review.venue.city?.region || '',
         addressCountry: 'ES',
       },
       telephone: review.venue.phone,
       url: review.venue.website,
-      image: review.venue.images?.map(img => img.asset.url) || [],
+      image: review.venue.images?.map(img => img.asset?.url).filter(Boolean) || [],
       priceRange: review.venue.priceRange,
       geo: review.venue.geo ? {
         '@type': 'GeoCoordinates',
@@ -215,10 +217,10 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
         longitude: review.venue.geo.lng,
       } : undefined,
     },
-    reviewBody: review.tldr,
+    reviewBody: review.tldr || '',
     datePublished: review.publishedAt,
     headline: review.title,
-    image: review.gallery?.map(img => img.asset.url) || [],
+    image: review.gallery?.map(img => img.asset?.url).filter(Boolean) || [],
   };
 
   return (

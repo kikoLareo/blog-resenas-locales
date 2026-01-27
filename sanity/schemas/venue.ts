@@ -98,6 +98,24 @@ export default defineType({
           to: [{ type: 'category' }],
         },
       ],
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'masterCategory',
+      title: 'Categoría Maestra',
+      type: 'string',
+      description: 'Categorización principal para el ordenamiento del sitio',
+      options: {
+        list: [
+          { title: 'Gastronomía', value: 'gastro' },
+          { title: 'Ocio', value: 'ocio' },
+          { title: 'Deportes', value: 'deportes' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'gastro',
+      validation: (Rule) => Rule.required(),
+    }),
       validation: (Rule) => Rule.required().min(1),
     }),
     defineField({

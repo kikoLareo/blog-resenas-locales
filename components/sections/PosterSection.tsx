@@ -3,6 +3,7 @@
 import { HomepageSection, SelectedItem } from '@/types/homepage';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getVenueUrl, getReviewUrl } from '@/lib/utils';
 
 interface PosterSectionProps {
   section: HomepageSection;
@@ -49,9 +50,9 @@ function PosterCard({ item }: { item: SelectedItem }) {
   const getHref = () => {
     switch (item.type) {
       case 'venue':
-        return `/${item.city}/${item.slug}`;
+        return getVenueUrl(item.city, item.slug);
       case 'review':
-        return `/${item.city}/reviews/review/${item.slug}`;
+        return getReviewUrl(item.city, item.venueSlug, item.slug);
       case 'category':
         return `/categorias/${item.slug}`;
       case 'city':

@@ -10,6 +10,7 @@ import { sanityFetch } from '@/lib/sanity.client';
 import { searchQuery } from '@/sanity/lib/queries';
 import { websiteJsonLd } from '@/lib/schema';
 import { SITE_CONFIG } from '@/lib/constants';
+import { getVenueUrl, getReviewUrl } from '@/lib/utils';
 
 // Tipos para los resultados de búsqueda
 type SearchResult = {
@@ -125,11 +126,9 @@ function SearchResultCard({ result }: { result: SearchResult }) {
   const getResultUrl = () => {
     switch (result._type) {
       case 'venue':
-        return result.citySlug ? `/${result.citySlug}/${result.slug.current}` : '#';
+        return getVenueUrl(result.citySlug || '', result.slug.current);
       case 'review':
-        return result.citySlug && result.venueSlug 
-          ? `/${result.citySlug}/${result.venueSlug}/review/${result.slug.current}` 
-          : '#';
+        return getReviewUrl(result.citySlug || '', result.venueSlug || '', result.slug.current);
       case 'post':
         return `/blog/${result.slug.current}`;
       default:
@@ -153,10 +152,10 @@ function SearchResultCard({ result }: { result: SearchResult }) {
   const resultType = getResultType();
 
   return (
-    <article className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md p-6">
+    <article className="bg-card rounded-lg border border-border hover:border-primary/50 transition-all duration-200 hover:shadow-md p-6">
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Imagen */}
-        <div className="sm:w-32 sm:h-32 w-full h-48 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+        <div className="sm:w-32 sm:h-32 w-full h-48 bg-muted rounded-lg flex-shrink-0 overflow-hidden">
           {result.image?.asset?.url ? (
             <Image
               src={result.image.asset.url}
@@ -166,7 +165,7 @@ function SearchResultCard({ result }: { result: SearchResult }) {
               loading="lazy"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400">
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -181,10 +180,10 @@ function SearchResultCard({ result }: { result: SearchResult }) {
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${resultType.color} mb-2`}>
                 {resultType.label}
               </span>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 <Link 
                   href={getResultUrl()}
-                  className="hover:text-primary-600 transition-colors"
+                  className="hover:text-primary transition-colors"
                 >
                   {result.title}
                 </Link>
@@ -194,13 +193,13 @@ function SearchResultCard({ result }: { result: SearchResult }) {
 
           {/* Descripción */}
           {(result.description || result.excerpt) && (
-            <p className="text-gray-600 mb-3 line-clamp-2">
+            <p className="text-muted-foreground mb-3 line-clamp-2">
               {result.description || result.excerpt}
             </p>
           )}
 
           {/* Metadata adicional */}
-          <div className="flex items-center gap-4 text-sm text-gray-500">
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
             {result.venue && (
               <span className="flex items-center">
                 <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

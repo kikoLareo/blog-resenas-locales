@@ -60,7 +60,18 @@ export const venueWithReviewsQuery = groq`
       },
       tags
     },
-    "averageRating": math::avg(*[_type == "review" && venue._ref == ^._id && published == true].ratings.overall),
+    "averageRating": count(*[_type == "review" && venue._ref == ^._id && published == true]) > 0 ? 
+      math::avg(*[_type == "review" && venue._ref == ^._id && published == true]{
+        "rating": coalesce(
+          ratings.food,
+          ratings.entertainment,
+          ratings.facilities,
+          0
+        ) * 0.4 + 
+        coalesce(ratings.service, 0) * 0.2 + 
+        coalesce(ratings.ambience, 0) * 0.2 + 
+        coalesce(ratings.value, 0) * 0.2
+      }.rating) : 0,
     "reviewCount": count(*[_type == "review" && venue._ref == ^._id && published == true])
   }
 `;
@@ -159,7 +170,18 @@ export const venuesByCityQuery = groq`
       icon,
       color
     },
-    "averageRating": math::avg(*[_type == "review" && venue._ref == ^._id && published == true].ratings.overall),
+    "averageRating": count(*[_type == "review" && venue._ref == ^._id && published == true]) > 0 ? 
+      math::avg(*[_type == "review" && venue._ref == ^._id && published == true]{
+        "rating": coalesce(
+          ratings.food,
+          ratings.entertainment,
+          ratings.facilities,
+          0
+        ) * 0.4 + 
+        coalesce(ratings.service, 0) * 0.2 + 
+        coalesce(ratings.ambience, 0) * 0.2 + 
+        coalesce(ratings.value, 0) * 0.2
+      }.rating) : 0,
     "reviewCount": count(*[_type == "review" && venue._ref == ^._id && published == true])
   }
 `;
@@ -193,7 +215,18 @@ export const venuesByCategoryQuery = groq`
       icon,
       color
     },
-    "averageRating": math::avg(*[_type == "review" && venue._ref == ^._id && published == true].ratings.overall),
+    "averageRating": count(*[_type == "review" && venue._ref == ^._id && published == true]) > 0 ? 
+      math::avg(*[_type == "review" && venue._ref == ^._id && published == true]{
+        "rating": coalesce(
+          ratings.food,
+          ratings.entertainment,
+          ratings.facilities,
+          0
+        ) * 0.4 + 
+        coalesce(ratings.service, 0) * 0.2 + 
+        coalesce(ratings.ambience, 0) * 0.2 + 
+        coalesce(ratings.value, 0) * 0.2
+      }.rating) : 0,
     "reviewCount": count(*[_type == "review" && venue._ref == ^._id && published == true])
   }
 `;

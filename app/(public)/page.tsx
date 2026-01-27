@@ -6,6 +6,7 @@ import { homepageQuery, homepageConfigQuery } from '@/sanity/lib/queries';
 import { getAllFeaturedItems } from '@/lib/featured-admin';
 import { defaultHomepageConfig } from '@/lib/homepage-admin';
 import { FeaturedSectionsModern, HeroModern } from '@/components';
+import { getVenueUrl, getReviewUrl } from '@/lib/utils';
 // Using featuredItems from Sanity for hero carousel
 
 // Force dynamic rendering in build environments to avoid timeout issues
@@ -37,13 +38,17 @@ const transformSanityReviews = (reviews: any[]) => {
   return reviews.map((review) => ({
     id: review._id,
     title: review.title,
-    image: review.gallery?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop&q=85',
+    image: review.gallery?.asset?.url || review.gallery?.[0]?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop&q=85',
     rating: review.ratings?.food || review.ratings?.overall || 4.5,
     location: review.venue?.city || 'Madrid',
     readTime: '5 min',
     tags: review.tags || ['Gastronomía'],
     description: review.tldr || review.title,
-    href: `/${review.venue?.citySlug}/${review.venue?.slug?.current}/review/${review.slug?.current}`,
+    href: getReviewUrl(
+      review.venue?.citySlug || 'madrid',
+      review.venue?.slug?.current || '',
+      review.slug?.current || ''
+    ),
     isNew: false,
     isTrending: true,
     isPopular: review.ratings?.food >= 8.0,
@@ -72,7 +77,7 @@ const transformSanityVenues = (venues: any[]) => {
     neighborhood: venue.address?.split(',')[0] || '',
     priceLevel: venue.priceRange?.length || 2,
     cuisine: venue.categories?.[0]?.title || '',
-    href: `/${venue.city?.slug?.current}/${venue.slug?.current}`,
+    href: getVenueUrl(venue.city?.slug?.current || 'madrid', venue.slug?.current || ''),
     isOpen: true, // Default to open
     openingHours: venue.openingHours?.[0] || 'Consultar horarios',
   }));
