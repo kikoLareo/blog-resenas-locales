@@ -78,7 +78,7 @@ export const venueWithReviewsQuery = groq`
 
 // Query para obtener reseña específica
 export const reviewDetailQuery = groq`
-  *[_type == "review" && slug.current == $reviewSlug && venue->slug.current == $venueSlug && venue->city->slug.current == $citySlug][0] {
+  *[_type == "review" && slug.current == $reviewSlug && venue->slug.current == $venueSlug && venue->city->slug.current == $citySlug && published == true][0] {
     _id,
     title,
     "slug": slug.current,

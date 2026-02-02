@@ -165,7 +165,7 @@ export const venueQuery = `
 
 // Obtener reseñas recientes
 export const recentReviewsQuery = `
-  *[_type == "review"] | order(publishedAt desc)[0...6] {
+  *[_type == "review" && published == true] | order(publishedAt desc)[0...6] {
     _id,
     title,
     slug,
@@ -186,7 +186,7 @@ export const recentReviewsQuery = `
 
 // Obtener reseña individual completa
 export const reviewQuery = `
-  *[_type == "review" && slug.current == $slug][0] {
+  *[_type == "review" && slug.current == $slug && published == true][0] {
     _id,
     title,
     slug,
@@ -229,7 +229,7 @@ export const reviewQuery = `
 
 // Obtener mejores reseñas (por puntuación de comida)
 export const topReviewsQuery = `
-  *[_type == "review" && ratings.food >= 8] | order(ratings.food desc)[0...10] {
+  *[_type == "review" && ratings.food >= 8 && published == true] | order(ratings.food desc)[0...10] {
     _id,
     title,
     slug,
@@ -411,7 +411,7 @@ export const homepageQuery = `{
     },
     author
   },
-  "featuredReviews": *[_type == "review" && featured == true] | order(publishedAt desc)[0...3] {
+  "featuredReviews": *[_type == "review" && featured == true && published == true] | order(publishedAt desc)[0...3] {
     _id,
     title,
     slug,
@@ -432,7 +432,7 @@ export const homepageQuery = `{
       "citySlug": city->slug.current
     }
   },
-  "trendingReviews": *[_type == "review"] | order(ratings.food desc, publishedAt desc)[0...6] {
+  "trendingReviews": *[_type == "review" && published == true] | order(ratings.food desc, publishedAt desc)[0...6] {
     _id,
     title,
     slug,
@@ -453,7 +453,7 @@ export const homepageQuery = `{
       "citySlug": city->slug.current
     }
   },
-  "topReviews": *[_type == "review" && ratings.food >= 8.0] | order(ratings.food desc, publishedAt desc)[0...6] {
+  "topReviews": *[_type == "review" && ratings.food >= 8.0 && published == true] | order(ratings.food desc, publishedAt desc)[0...6] {
     _id,
     title,
     slug,

@@ -37,35 +37,45 @@ interface HomepageConfig {
 
 // Transform Sanity data to match expected format for components
 const transformSanityReviews = (reviews: any[]) => {
-  return reviews.map((review) => ({
-    id: review._id,
-    title: review.title,
-    image: review.gallery?.asset?.url || review.gallery?.[0]?.asset?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop&q=85',
-    rating: review.ratings?.food || review.ratings?.overall || 4.5,
-    location: review.venue?.city || 'Madrid',
-    readTime: '5 min',
-    tags: review.tags || ['Gastronomía'],
-    description: review.tldr || review.title,
-    href: getReviewUrl(
-      review.venue?.citySlug || 'madrid',
-      review.venue?.slug?.current || '',
-      review.slug?.current || ''
-    ),
-    isNew: false,
-    isTrending: true,
-    isPopular: review.ratings?.food >= 8.0,
-    author: 'Equipo SaborLocal',
-    publishedDate: review.publishedAt || new Date().toISOString(),
-    viewCount: Math.floor(Math.random() * 2000) + 500,
-    shareCount: Math.floor(Math.random() * 100) + 20,
-    commentCount: Math.floor(Math.random() * 30) + 5,
-    cuisine: review.venue?.title || 'Local',
-    priceRange: '$$' as const,
-    neighborhood: review.venue?.city || 'Madrid',
-    openNow: true,
-    deliveryAvailable: false,
-    reservationRequired: false,
-  }));
+  return reviews.map((review) => {
+    const venueSlug = typeof review.venue?.slug === 'string' 
+      ? review.venue.slug 
+      : review.venue?.slug?.current || '';
+    
+    const reviewSlug = typeof review.slug === 'string'
+      ? review.slug
+      : review.slug?.current || '';
+
+    return {
+      id: review._id,
+      title: review.title,
+      image: review.gallery?.asset?.url || review.gallery?.[0]?.asset?.url || review.gallery?.[0]?.url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop&q=85',
+      rating: review.ratings?.food || review.ratings?.overall || 4.5,
+      location: review.venue?.city || 'Madrid',
+      readTime: '5 min',
+      tags: review.tags || ['Gastronomía'],
+      description: review.tldr || review.title,
+      href: getReviewUrl(
+        review.venue?.citySlug || 'madrid',
+        venueSlug,
+        reviewSlug
+      ),
+      isNew: false,
+      isTrending: true,
+      isPopular: (review.ratings?.food || 0) >= 8.0,
+      author: review.author || 'Equipo SaborLocal',
+      publishedDate: review.publishedAt || new Date().toISOString(),
+      viewCount: Math.floor(Math.random() * 2000) + 500,
+      shareCount: Math.floor(Math.random() * 100) + 20,
+      commentCount: Math.floor(Math.random() * 30) + 5,
+      cuisine: review.venue?.title || 'Local',
+      priceRange: '$$' as const,
+      neighborhood: review.venue?.city || 'Madrid',
+      openNow: true,
+      deliveryAvailable: false,
+      reservationRequired: false,
+    };
+  });
 };
 
 const transformSanityVenues = (venues: any[]) => {
@@ -186,7 +196,7 @@ function renderSection(
 }
 
 export default async function HomePage() {
-  const [homepageData, masterCategoryData] = await Promise.all([
+  const [homepageData, masterCategoryData, homepageConfig] = await Promise.all([
     sanityFetch<any>({
       query: homepageQuery,
       tags: ['homepage'],
@@ -199,6 +209,13 @@ export default async function HomePage() {
       tags: ['venues'],
     }).catch(err => {
       console.error('Error fetching master category data:', err);
+      return null;
+    }),
+    sanityFetch<any>({
+      query: homepageConfigQuery,
+      tags: ['homepageConfig'],
+    }).catch(err => {
+      console.error('Error fetching homepage config:', err);
       return null;
     })
   ]);
@@ -219,7 +236,7 @@ export default async function HomePage() {
     featuredReviews = [],
     recentReviews = [],
     trendingReviews = [],
-    topRatedVenues = [],
+    topReviews = [],
     categories = [],
     cities = [],
   } = homepageData;
@@ -227,7 +244,7 @@ export default async function HomePage() {
   // Transformar datos
   const transformedFeatured = transformSanityReviews(featuredReviews || []);
   const transformedTrending = transformSanityReviews(trendingReviews || []);
-  const transformedTopRated = transformSanityVenues(topRatedVenues || []);
+  const transformedTopRated = transformSanityReviews(topReviews || []);
   const transformedCategories = transformSanityCategories(categories || []);
 
   const hasMasterCategories = masterCategoryData && (
@@ -236,104 +253,113 @@ export default async function HomePage() {
     (masterCategoryData.deportes?.length > 0)
   );
 
+  // Si no hay configuración en Sanity, usar el orden por defecto
+  const sections = homepageConfig?.sections || [
+    { id: 'hero', type: 'hero', enabled: true },
+    { id: 'master-gastro', type: 'master-categories', enabled: true, config: { masterCategory: 'gastro' } },
+    { id: 'master-ocio', type: 'master-categories', enabled: true, config: { masterCategory: 'ocio' } },
+    { id: 'master-deportes', type: 'master-categories', enabled: true, config: { masterCategory: 'deportes' } },
+    { id: 'featured-sections', type: 'featured', enabled: true }
+  ];
+
   return (
-    <div className="flex flex-col gap-12 pb-20">
-      <HeroModern featuredItems={transformedFeatured} />
-      
-      <div className="container mx-auto px-4 space-y-24">
-        {/* Gastronomía Section */}
-        {masterCategoryData?.gastro?.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-serif font-bold text-foreground flex items-center gap-3">
-                <span className="bg-orange-100 dark:bg-orange-900/30 p-2 rounded-lg text-orange-600 dark:text-orange-400">🍽️</span>
-                Gastronomía
-              </h2>
-              <Link href="/categorias?grupo=gastro" className="text-primary hover:underline font-medium">Ver todo</Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {masterCategoryData.gastro.map((venue: any) => (
-                <VenueCard 
-                  key={venue._id} 
-                  id={venue._id}
-                  name={venue.title}
-                  image={venue.images?.asset?.url || ''}
-                  href={getVenueUrl(venue.citySlug, venue.slug)}
-                  cuisine="Restaurante"
-                  averageRating={venue.averageRating}
-                  reviewCount={venue.reviewCount}
-                  address={venue.address || ''}
-                  priceLevel={venue.priceRange?.length || 2}
-                />
-              ))}
-            </div>
-          </section>
-        )}
+    <div className="flex flex-col gap-16 pb-20">
+      {sections.map((section: any) => {
+        if (!section.enabled) return null;
 
-        {/* Ocio Section */}
-        {masterCategoryData?.ocio?.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-serif font-bold text-foreground flex items-center gap-3">
-                <span className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-lg text-purple-600 dark:text-purple-400">🎭</span>
-                Ocio y Entretenimiento
-              </h2>
-              <Link href="/categorias?grupo=ocio" className="text-primary hover:underline font-medium">Ver todo</Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {masterCategoryData.ocio.map((venue: any) => (
-                <VenueCard 
-                  key={venue._id} 
-                  id={venue._id}
-                  name={venue.title}
-                  image={venue.images?.asset?.url || ''}
-                  href={getVenueUrl(venue.citySlug, venue.slug)}
-                  cuisine="Ocio"
-                  averageRating={0}
-                  reviewCount={0}
-                  address={venue.address || ''}
-                  priceLevel={venue.priceRange?.length || 2}
+        switch (section.type) {
+          case 'hero':
+            return <HeroModern key={section.id} featuredItems={transformedFeatured} />;
+          
+          case 'featured':
+          case 'trending':
+          case 'topRated':
+            return (
+              <div key={section.id} className="container mx-auto px-4">
+                <FeaturedSectionsModern 
+                  trending={transformedTrending}
+                  topRated={transformedTopRated}
+                  categories={transformedCategories}
+                  venues={[]} 
                 />
-              ))}
-            </div>
-          </section>
-        )}
+              </div>
+            );
 
-        {/* Deportes Section */}
-        {masterCategoryData?.deportes?.length > 0 && (
-          <section>
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-serif font-bold text-foreground flex items-center gap-3">
-                <span className="bg-green-100 dark:bg-green-900/30 p-2 rounded-lg text-green-600 dark:text-green-400">⚽</span>
-                Deportes y Bienestar
-              </h2>
-              <Link href="/categorias?grupo=deportes" className="text-primary hover:underline font-medium">Ver todo</Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {masterCategoryData.deportes.map((venue: any) => (
-                <VenueCard 
-                  key={venue._id} 
-                  id={venue._id}
-                  name={venue.title}
-                  image={venue.images?.asset?.url || ''}
-                  href={getVenueUrl(venue.citySlug, venue.slug)}
-                  cuisine="Deportes"
-                  averageRating={0}
-                  reviewCount={0}
-                  address={venue.address || ''}
-                  priceLevel={venue.priceRange?.length || 2}
-                />
-              ))}
-            </div>
-          </section>
-        )}
+          case 'categories':
+            return (
+              <div key={section.id} className="container mx-auto px-4">
+                <h2 className="text-3xl font-serif font-bold text-foreground mb-8">
+                  {section.title || section.config?.title || 'Explora por Categorías'}
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                  {transformedCategories.map((cat: any) => (
+                    <Link 
+                      key={cat.id} 
+                      href={`/categorias/${cat.slug}`}
+                      className="group flex flex-col items-center p-6 rounded-2xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                    >
+                      <span className="text-4xl mb-4 group-hover:scale-110 transition-transform">
+                        {cat.emoji || '🍴'}
+                      </span>
+                      <span className="font-semibold text-gray-900 dark:text-gray-100 text-center">
+                        {cat.name}
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        {cat.count} locales
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
 
-        <FeaturedSectionsModern 
-          trending={transformedTrending}
-          topRated={transformedTopRated}
-          categories={transformedCategories}
-        />
-      </div>
+          case 'master-categories':
+            const mCat = section.config?.masterCategory;
+            const data = masterCategoryData?.[mCat];
+            if (!data || data.length === 0) return null;
+
+            const config = {
+              gastro: { title: 'Gastronomía', icon: '🍽️', color: 'orange', link: '/categorias?grupo=gastro' },
+              ocio: { title: 'Ocio y Entretenimiento', icon: '🎭', color: 'purple', link: '/categorias?grupo=ocio' },
+              deportes: { title: 'Deportes y Bienestar', icon: '⚽', color: 'green', link: '/categorias?grupo=deportes' },
+            }[mCat as 'gastro' | 'ocio' | 'deportes'];
+
+            if (!config) return null;
+
+            return (
+              <section key={section.id} className="container mx-auto px-4">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-3xl font-serif font-bold text-foreground flex items-center gap-3">
+                    <span className={`bg-${config.color}-100 dark:bg-${config.color}-900/30 p-2 rounded-lg text-${config.color}-600 dark:text-${config.color}-400`}>
+                      {config.icon}
+                    </span>
+                    {config.title}
+                  </h2>
+                  <Link href={config.link} className="text-primary hover:underline font-medium">Ver todo</Link>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {data.map((venue: any) => (
+                    <VenueCard 
+                      key={venue._id} 
+                      id={venue._id}
+                      name={venue.title}
+                      image={venue.images?.asset?.url || venue.images?.[0]?.asset?.url || ''}
+                      href={getVenueUrl(venue.citySlug, venue.slug)}
+                      cuisine={config.title}
+                      averageRating={venue.averageRating}
+                      reviewCount={venue.reviewCount}
+                      address={venue.address || ''}
+                      priceLevel={venue.priceRange?.length || 2}
+                    />
+                  ))}
+                </div>
+              </section>
+            );
+          
+          default:
+            return null;
+        }
+      })}
     </div>
   );
 }
