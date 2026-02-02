@@ -98,7 +98,7 @@ export const reviewDetailQuery = groq`
     pros,
     cons,
     tldr,
-    content,
+    "content": body,
     gallery[] {
       asset-> {
         _id,

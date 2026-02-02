@@ -13,7 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/components/ui/utils';
-import { getVenueUrl, getReviewUrl } from '@/lib/utils';
+import { getVenueUrl, getReviewUrl, cleanContent } from '@/lib/utils';
+import { PortableText } from '@portabletext/react';
 
 interface ReviewDetailModernProps {
   review: {
@@ -109,11 +110,13 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
   }, []);
 
   // Use the canonical URL as fallback during SSR to avoid hydration mismatch
-  const displayUrl = currentUrl || getReviewUrl(review.venue.city.slug, review.venue.slug, review.slug);
+  const citySlug = review.venue.city?.slug || 'ciudad';
+  const displayUrl = currentUrl || getReviewUrl(citySlug, review.venue.slug, review.slug);
 
-  const calculateReadTime = (content: string) => {
+  const calculateReadTime = (content: any) => {
+    const text = cleanContent(content);
     const wordsPerMinute = 200;
-    const words = content.split(' ').length;
+    const words = text.split(/\s+/).length;
     const minutes = Math.ceil(words / wordsPerMinute);
     return `${minutes} min`;
   };
@@ -130,19 +133,21 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
               Inicio
             </Link>
           </li>
+          {review.venue.city && (
+            <li>
+              <span className="mx-2 text-gray-300 dark:text-gray-600">/</span>
+              <Link 
+                href={`/${review.venue.city.slug}`} 
+                className="hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+              >
+                {review.venue.city.title}
+              </Link>
+            </li>
+          )}
           <li>
             <span className="mx-2 text-gray-300 dark:text-gray-600">/</span>
             <Link 
-              href={`/${review.venue.city.slug}`} 
-              className="hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-            >
-              {review.venue.city.title}
-            </Link>
-          </li>
-          <li>
-            <span className="mx-2 text-gray-300 dark:text-gray-600">/</span>
-            <Link 
-              href={getVenueUrl(review.venue.city.slug, review.venue.slug)} 
+              href={getVenueUrl(review.venue.city?.slug || '', review.venue.slug)} 
               className="hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
             >
               {review.venue.title}
@@ -159,7 +164,7 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
 
       {/* Back button */}
       <div className="mb-8">
-        <Link href={getVenueUrl(review.venue.city.slug, review.venue.slug)}>
+        <Link href={getVenueUrl(review.venue.city?.slug || '', review.venue.slug)}>
           <Button variant="outline" size="sm" className="group dark:border-gray-700 dark:text-gray-200">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             Volver al local
@@ -177,7 +182,7 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
         }}
         publishedAt={review.publishedAt}
         readTime={readTime}
-        location={`${review.venue.title}, ${review.venue.city.title}`}
+        location={`${review.venue.title}${review.venue.city ? `, ${review.venue.city.title}` : ''}`}
         rating={averageRating}
         url={displayUrl}
         description={review.tldr}
@@ -208,30 +213,30 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="font-medium dark:text-gray-300">Comida</span>
-                  <RatingStars rating={(review.ratings.food || 0) / 2} size="sm" showValue={false} />
+                  <RatingStars rating={(review.ratings?.food || 0) / 2} size="sm" showValue={false} />
                   <span className="ml-2 font-semibold text-primary dark:text-primary-400">
-                    {(review.ratings.food || 0).toFixed(1)}
+                    {(review.ratings?.food || 0).toFixed(1)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-medium dark:text-gray-300">Servicio</span>
-                  <RatingStars rating={(review.ratings.service || 0) / 2} size="sm" showValue={false} />
+                  <RatingStars rating={(review.ratings?.service || 0) / 2} size="sm" showValue={false} />
                   <span className="ml-2 font-semibold text-primary dark:text-primary-400">
-                    {(review.ratings.service || 0).toFixed(1)}
+                    {(review.ratings?.service || 0).toFixed(1)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-medium dark:text-gray-300">Ambiente</span>
-                  <RatingStars rating={(review.ratings.ambience || 0) / 2} size="sm" showValue={false} />
+                  <RatingStars rating={(review.ratings?.ambience || 0) / 2} size="sm" showValue={false} />
                   <span className="ml-2 font-semibold text-primary dark:text-primary-400">
-                    {(review.ratings.ambience || 0).toFixed(1)}
+                    {(review.ratings?.ambience || 0).toFixed(1)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-medium dark:text-gray-300">Precio</span>
-                  <RatingStars rating={(review.ratings.value || review.ratings.valueForMoney || 0) / 2} size="sm" showValue={false} />
+                  <RatingStars rating={(review.ratings?.value || review.ratings?.valueForMoney || 0) / 2} size="sm" showValue={false} />
                   <span className="ml-2 font-semibold text-primary dark:text-primary-400">
-                    {(review.ratings.value || review.ratings.valueForMoney || 0).toFixed(1)}
+                    {(review.ratings?.value || review.ratings?.valueForMoney || 0).toFixed(1)}
                   </span>
                 </div>
               </div>
@@ -317,7 +322,11 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
               </CardHeader>
               <CardContent>
                 <div className="prose prose-gray dark:prose-invert max-w-none">
-                  <div dangerouslySetInnerHTML={{ __html: review.content }} />
+                  {typeof review.content === 'string' ? (
+                    <div dangerouslySetInnerHTML={{ __html: review.content }} />
+                  ) : (
+                    <PortableText value={review.content as any} />
+                  )}
                 </div>
               </CardContent>
             </Card>

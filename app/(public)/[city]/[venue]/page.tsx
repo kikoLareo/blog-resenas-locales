@@ -143,9 +143,10 @@ export async function generateMetadata({ params }: VenuePageProps): Promise<Meta
   const averageRating = venue.averageRating || 0;
   const ratingText = averageRating >= 8 ? 'Excelente' : averageRating >= 6 ? 'Muy bueno' : averageRating >= 4 ? 'Bueno' : 'Regular';
   
+  const cityName = venue.city?.title || 'España';
   const title = venue.reviewCount > 0 
-    ? `${venue.title} - ${ratingText} (${averageRating.toFixed(1)}/10) | ${venue.city.title}`
-    : `${venue.title} | ${venue.city.title}`;
+    ? `${venue.title} - ${ratingText} (${averageRating.toFixed(1)}/10) | ${cityName}`
+    : `${venue.title} | ${cityName}`;
   
   const categoryList = venue.categories && venue.categories.length > 0 
     ? venue.categories.map(c => c.title).join(', ')
@@ -153,14 +154,14 @@ export async function generateMetadata({ params }: VenuePageProps): Promise<Meta
     
   const description = venue.description 
     ? venue.description.slice(0, 160)
-    : `Descubre ${venue.title} en ${venue.city.title}. ${venue.priceRange ? `${venue.priceRange} • ` : ''}${categoryList}`;
+    : `Descubre ${venue.title} en ${cityName}. ${venue.priceRange ? `${venue.priceRange} • ` : ''}${categoryList}`;
 
-  const images = venue.images?.map(img => ({
+  const images = venue.images?.map(img => img?.asset?.url ? {
     url: img.asset.url,
     alt: img.alt || venue.title,
     width: 1200,
     height: 800,
-  })) || [];
+  } : null).filter((img): img is any => img !== null) || [];
 
   return {
     title,
@@ -206,14 +207,14 @@ export default async function VenuePage({ params }: VenuePageProps) {
     address: {
       '@type': 'PostalAddress',
       streetAddress: venue.address,
-      addressLocality: venue.city.title,
-      addressRegion: venue.city.region,
+      addressLocality: venue.city?.title || '',
+      addressRegion: venue.city?.region || '',
       postalCode: venue.postalCode,
       addressCountry: 'ES',
     },
     telephone: venue.phone,
     url: venue.website,
-    image: venue.images?.map(img => img.asset.url) || [],
+    image: venue.images?.map(img => img?.asset?.url).filter(Boolean) || [],
     priceRange: venue.priceRange,
     geo: venue.geo ? {
       '@type': 'GeoCoordinates',
@@ -236,7 +237,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
       datePublished: review.publishedAt,
       reviewRating: {
         '@type': 'Rating',
-        ratingValue: review.ratings.overall,
+        ratingValue: review.ratings?.overall || 0,
         bestRating: 10,
         worstRating: 0,
       },

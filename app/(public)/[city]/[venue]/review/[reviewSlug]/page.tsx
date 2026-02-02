@@ -135,7 +135,8 @@ export async function generateMetadata({ params }: ReviewPageProps): Promise<Met
   
   const ratingText = avgRating >= 8 ? 'Excelente' : avgRating >= 6 ? 'Muy bueno' : avgRating >= 4 ? 'Bueno' : 'Regular';
   
-  const title = `${review.venue.title} - Reseña ${ratingText} (${avgRating.toFixed(1)}/10) | ${review.venue.city.title}`;
+  const cityName = review.venue.city?.title || 'España';
+  const title = `${review.venue.title} - Reseña ${ratingText} (${avgRating.toFixed(1)}/10) | ${cityName}`;
   const description = review.tldr.slice(0, 160);
   
   const images = review.gallery
