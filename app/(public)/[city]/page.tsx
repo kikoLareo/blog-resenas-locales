@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
       description,
       type: 'website',
       url: `${SITE_CONFIG.url}/${citySlug}`,
-      images: (city as any).heroImage ? [
+      images: (city as any).heroImage?.asset?.url ? [
         {
           url: (city as any).heroImage.asset.url,
           width: 1200,
@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
       card: 'summary_large_image',
       title: `${title} | ${SITE_CONFIG.name}`,
       description,
-      images: (city as any).heroImage ? [(city as any).heroImage.asset.url] : [],
+      images: (city as any).heroImage?.asset?.url ? [(city as any).heroImage.asset.url] : [],
     },
     alternates: {
       canonical: `${SITE_CONFIG.url}/${citySlug}`,

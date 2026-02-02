@@ -151,7 +151,7 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
         {/* Columna izquierda - Imágenes */}
         <div className="lg:col-span-2">
           {/* Imagen principal */}
-          {heroImage && (
+          {heroImage?.asset?.url && (
             <div className="relative aspect-[4/3] mb-4 rounded-lg overflow-hidden ring-1 ring-gray-200 dark:ring-gray-800">
               <ImageWithFallback
                 src={heroImage.asset.url}
@@ -171,23 +171,25 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
               aria-label={`Galería de imágenes de ${venue.title}`}
             >
               {venue.images.slice(0, 8).map((image, index) => (
-                <button
-                  key={image.asset._id}
-                  className={`relative aspect-square rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
-                    selectedImageIndex === index ? 'border-blue-500' : 'border-transparent'
-                  }`}
-                  onClick={() => setSelectedImageIndex(index)}
-                  aria-label={`Ver imagen ${index + 1} de ${venue.title}`}
-                  aria-pressed={selectedImageIndex === index}
-                  type="button"
-                >
-                  <ImageWithFallback
-                    src={image.asset.url}
-                    alt={image.alt || `${venue.title} - Imagen ${index + 1}`}
-                    fill
-                    className="object-cover hover:scale-105 transition-transform"
-                  />
-                </button>
+                image?.asset?.url && (
+                  <button
+                    key={image.asset._id || index}
+                    className={`relative aspect-square rounded-md overflow-hidden cursor-pointer border-2 transition-all ${
+                      selectedImageIndex === index ? 'border-blue-500' : 'border-transparent'
+                    }`}
+                    onClick={() => setSelectedImageIndex(index)}
+                    aria-label={`Ver imagen ${index + 1} de ${venue.title}`}
+                    aria-pressed={selectedImageIndex === index}
+                    type="button"
+                  >
+                    <ImageWithFallback
+                      src={image.asset.url}
+                      alt={image.alt || `${venue.title} - Imagen ${index + 1}`}
+                      fill
+                      className="object-cover hover:scale-105 transition-transform"
+                    />
+                  </button>
+                )
               ))}
             </div>
           )}
@@ -403,7 +405,7 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
                       <div className="flex items-center gap-4 mt-1 text-sm text-gray-500 dark:text-gray-400">
                         <span>Por {review.author}</span>
                         {review.visitDate && (
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1" suppressHydrationWarning>
                             <Calendar className="h-3 w-3" />
                             {new Intl.DateTimeFormat('es-ES').format(new Date(review.visitDate))}
                           </span>
@@ -411,8 +413,8 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
                       </div>
                     </div>
                     
-                    <div className={`text-2xl font-bold ${getRatingColor(review.ratings.overall)}`}>
-                      {formatRating(review.ratings.overall)}
+                    <div className={`text-2xl font-bold ${getRatingColor(review.ratings?.overall || 0)}`}>
+                      {formatRating(review.ratings?.overall || 0)}
                     </div>
                   </div>
 
@@ -434,19 +436,19 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                       <div>
                         <div className="text-gray-500 dark:text-gray-400">Comida</div>
-                        <div className="font-medium dark:text-gray-200">{formatRating(review.ratings.food)}</div>
+                        <div className="font-medium dark:text-gray-200">{formatRating(review.ratings?.food || 0)}</div>
                       </div>
                       <div>
                         <div className="text-gray-500 dark:text-gray-400">Servicio</div>
-                        <div className="font-medium dark:text-gray-200">{formatRating(review.ratings.service)}</div>
+                        <div className="font-medium dark:text-gray-200">{formatRating(review.ratings?.service || 0)}</div>
                       </div>
                       <div>
                         <div className="text-gray-500 dark:text-gray-400">Ambiente</div>
-                        <div className="font-medium dark:text-gray-200">{formatRating(review.ratings.ambience)}</div>
+                        <div className="font-medium dark:text-gray-200">{formatRating(review.ratings?.ambience || 0)}</div>
                       </div>
                       <div>
                         <div className="text-gray-500 dark:text-gray-400">R.C.P.</div>
-                        <div className="font-medium dark:text-gray-200">{formatRating(review.ratings.value)}</div>
+                        <div className="font-medium dark:text-gray-200">{formatRating(review.ratings?.value || 0)}</div>
                       </div>
                     </div>
 

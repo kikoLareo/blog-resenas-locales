@@ -120,7 +120,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           {/* Published date */}
           <div className="flex items-center gap-1">
             <Calendar className="h-4 w-4" />
-            <span>{formatDate(publishedAt)}</span>
+            <span suppressHydrationWarning>{formatDate(publishedAt)}</span>
           </div>
 
           {/* Separator */}

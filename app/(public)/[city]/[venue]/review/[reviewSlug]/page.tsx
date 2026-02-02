@@ -138,12 +138,14 @@ export async function generateMetadata({ params }: ReviewPageProps): Promise<Met
   const title = `${review.venue.title} - Reseña ${ratingText} (${avgRating.toFixed(1)}/10) | ${review.venue.city.title}`;
   const description = review.tldr.slice(0, 160);
   
-  const images = review.gallery?.map(img => ({
-    url: img.asset.url,
-    alt: img.alt || `${review.venue.title} - ${review.title}`,
-    width: 1200,
-    height: 800,
-  })) || [];
+  const images = review.gallery
+    ?.map(img => img?.asset?.url ? {
+      url: img.asset.url,
+      alt: img.alt || `${review.venue.title} - ${review.title}`,
+      width: 1200,
+      height: 800,
+    } : null)
+    .filter((img): img is { url: string; alt: string; width: number; height: number } => img !== null) || [];
 
   return {
     title,
@@ -213,7 +215,7 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
       },
       telephone: review.venue.phone,
       url: review.venue.website,
-      image: review.venue.images?.map(img => img.asset?.url).filter(Boolean) || [],
+      image: review.venue.images?.map(img => img?.asset?.url).filter(Boolean) || [],
       priceRange: review.venue.priceRange,
       geo: review.venue.geo ? {
         '@type': 'GeoCoordinates',
@@ -224,7 +226,7 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
     reviewBody: review.tldr || '',
     datePublished: review.publishedAt,
     headline: review.title,
-    image: review.gallery?.map(img => img.asset?.url).filter(Boolean) || [],
+    image: review.gallery?.map(img => img?.asset?.url).filter(Boolean) || [],
   };
 
   return (

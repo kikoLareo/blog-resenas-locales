@@ -97,13 +97,19 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
   relatedReviews = [],
 }) => {
   // Use overall rating if available, otherwise calculate average
-  const averageRating = review.ratings.overall || calculateOverallRating(review.ratings);
+  const averageRating = review.ratings?.overall || calculateOverallRating(review.ratings || {} as any);
 
-  const heroImage = review.gallery?.[0]?.asset.url || review.venue.images?.[0]?.asset.url || '';
+  const fallbackVenueImage = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200'
+  const heroImage = review.gallery?.[0]?.asset?.url || review.venue.images?.[0]?.asset?.url || fallbackVenueImage;
   
-  const currentUrl = typeof window !== 'undefined' 
-    ? window.location.href 
-    : getReviewUrl(review.venue.city.slug, review.venue.slug, review.slug);
+  const [currentUrl, setCurrentUrl] = React.useState('');
+
+  React.useEffect(() => {
+    setCurrentUrl(window.location.href);
+  }, []);
+
+  // Use the canonical URL as fallback during SSR to avoid hydration mismatch
+  const displayUrl = currentUrl || getReviewUrl(review.venue.city.slug, review.venue.slug, review.slug);
 
   const calculateReadTime = (content: string) => {
     const wordsPerMinute = 200;
@@ -167,13 +173,13 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
         coverImage={heroImage}
         author={{
           name: review.author,
-          avatar: review.authorAvatar?.asset.url,
+          avatar: review.authorAvatar?.asset?.url,
         }}
         publishedAt={review.publishedAt}
         readTime={readTime}
         location={`${review.venue.title}, ${review.venue.city.title}`}
         rating={averageRating}
-        url={currentUrl}
+        url={displayUrl}
         description={review.tldr}
         className="mb-12"
       />
@@ -319,21 +325,23 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
 
           {/* Gallery */}
           {review.gallery && review.gallery.length > 1 && (
-            <Card>
+            <Card className="dark:bg-gray-900 dark:border-gray-800">
               <CardHeader>
-                <CardTitle>Galería de fotos</CardTitle>
+                <CardTitle className="dark:text-white">Galería de fotos</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {review.gallery.slice(1).map((image, index) => (
-                    <div key={index} className="relative aspect-video overflow-hidden rounded-lg">
-                      <Image
-                        src={image.asset.url}
-                        alt={image.alt || `Foto ${index + 1} de ${review.venue.title}`}
-                        fill
-                        className="object-cover hover:scale-105 transition-transform cursor-pointer"
-                        sizes="(max-width: 768px) 50vw, 33vw"
-                      />
+                    <div key={index} className="relative aspect-video overflow-hidden rounded-lg bg-gray-100 dark:bg-white/5">
+                      {image?.asset?.url && (
+                        <Image
+                          src={image.asset.url}
+                          alt={image.alt || `Foto ${index + 1} de ${review.venue.title}`}
+                          fill
+                          className="object-cover hover:scale-105 transition-transform cursor-pointer"
+                          sizes="(max-width: 768px) 50vw, 33vw"
+                        />
+                      )}
                     </div>
                   ))}
                 </div>
