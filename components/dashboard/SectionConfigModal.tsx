@@ -243,7 +243,7 @@ export default function SectionConfigModal({
                 ))}
               </div>
             ) : (
-              <div className="text-center text-gray-500 py-8">
+              <div className="text-center text-gray-500 dark:text-gray-400 py-8">
                 <p>Primero selecciona los tipos de contenido en la pestaña Configuración</p>
               </div>
             )}

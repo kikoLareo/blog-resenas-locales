@@ -58,10 +58,10 @@ export const FeaturedSectionsModern: React.FC<FeaturedSectionsModernProps> = ({
                   Tendencia
                 </Badge>
               </div>
-              <h2 className="font-serif text-3xl font-semibold text-gray-900 mb-2">
+              <h2 className="font-serif text-3xl font-semibold text-gray-900 dark:text-white mb-2">
                 Lo más popular esta semana
               </h2>
-              <p className="text-gray-600 max-w-2xl">
+              <p className="text-gray-600 dark:text-gray-400 max-w-2xl">
                 Las reseñas que más están disfrutando nuestros lectores y las experiencias gastronómicas del momento
               </p>
             </div>
@@ -113,10 +113,10 @@ export const FeaturedSectionsModern: React.FC<FeaturedSectionsModernProps> = ({
                   Mejor puntuados
                 </Badge>
               </div>
-              <h2 className="font-serif text-3xl font-semibold text-gray-900 mb-2">
+              <h2 className="font-serif text-3xl font-semibold text-gray-900 dark:text-white mb-2">
                 Experiencias excepcionales
               </h2>
-              <p className="text-gray-600 max-w-2xl">
+              <p className="text-gray-600 dark:text-gray-400 max-w-2xl">
                 Los restaurantes y experiencias gastronómicas con las mejores valoraciones de nuestros críticos
               </p>
             </div>
@@ -160,10 +160,10 @@ export const FeaturedSectionsModern: React.FC<FeaturedSectionsModernProps> = ({
       {/* Categories Section */}
       <section>
         <div className="text-center mb-8">
-          <h2 className="font-serif text-3xl font-semibold text-gray-900 mb-4">
+          <h2 className="font-serif text-3xl font-semibold text-gray-900 dark:text-white mb-4">
             Explora por categorías
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto mb-8">
+          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8">
             Descubre nuevos sabores navegando por tipos de cocina, estilos gastronómicos y especialidades culinarias
           </p>
         </div>
@@ -194,7 +194,7 @@ export const FeaturedSectionsModern: React.FC<FeaturedSectionsModernProps> = ({
 
       {/* Featured Venues Section */}
       {venues.length > 0 && (
-        <section className="bg-gray-50 rounded-3xl p-8 lg:p-12">
+        <section className="bg-gray-50 dark:bg-gray-900/40 rounded-3xl p-8 lg:p-12 border dark:border-gray-800">
           <div className="flex items-center justify-between mb-8">
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -203,10 +203,10 @@ export const FeaturedSectionsModern: React.FC<FeaturedSectionsModernProps> = ({
                   Locales destacados
                 </Badge>
               </div>
-              <h2 className="font-serif text-3xl font-semibold text-gray-900 mb-2">
+              <h2 className="font-serif text-3xl font-semibold text-gray-900 dark:text-white mb-2">
                 Descubre lugares únicos
               </h2>
-              <p className="text-gray-600 max-w-2xl">
+              <p className="text-gray-600 dark:text-gray-400 max-w-2xl">
                 Una selección especial de restaurantes, bares y locales gastronómicos que no te puedes perder
               </p>
             </div>

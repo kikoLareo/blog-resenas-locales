@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { SITE_CONFIG } from '@/lib/constants';
 import HomeSaborLocalServer from '@/components/HomeSaborLocalServer';
 import { sanityFetch } from '@/lib/sanity.client';
-import { homepageQuery, homepageConfigQuery } from '@/sanity/lib/queries';
+import { homepageQuery, homepageConfigQuery, homepageSectionsQuery } from '@/sanity/lib/queries';
 import { venuesByMasterCategoryQuery } from '@/lib/public-queries';
 import { getAllFeaturedItems } from '@/lib/featured-admin';
 import { defaultHomepageConfig } from '@/lib/homepage-admin';
@@ -13,26 +13,16 @@ import { getVenueUrl, getReviewUrl } from '@/lib/utils';
 
 // Force dynamic rendering in build environments to avoid timeout issues
 export const dynamic = 'force-dynamic';
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 0; // Don't cache for now to see real dashboard changes
 
 // Tipos para las secciones configurables
 interface SectionConfig {
-  id: string;
-  type: 'hero' | 'featured' | 'trending' | 'topRated' | 'categories' | 'newsletter';
+  _id: string;
+  sectionType: string;
   enabled: boolean;
   title?: string;
   order?: number;
-  config: {
-    title?: string;
-    subtitle?: string;
-    itemCount?: number;
-    layout?: 'grid' | 'carousel' | 'list';
-    showImages?: boolean;
-  };
-}
-
-interface HomepageConfig {
-  sections: SectionConfig[];
+  config: any;
 }
 
 // Transform Sanity data to match expected format for components
@@ -196,26 +186,29 @@ function renderSection(
 }
 
 export default async function HomePage() {
-  const [homepageData, masterCategoryData, homepageConfig] = await Promise.all([
+  const [homepageData, masterCategoryData, homepageConfig, homepageSections] = await Promise.all([
     sanityFetch<any>({
       query: homepageQuery,
       tags: ['homepage'],
     }).catch(err => {
-      console.error('Error fetching homepage data:', err);
       return null;
     }),
     sanityFetch<any>({
       query: venuesByMasterCategoryQuery,
       tags: ['venues'],
     }).catch(err => {
-      console.error('Error fetching master category data:', err);
       return null;
     }),
     sanityFetch<any>({
       query: homepageConfigQuery,
       tags: ['homepageConfig'],
     }).catch(err => {
-      console.error('Error fetching homepage config:', err);
+      return null;
+    }),
+    sanityFetch<any>({
+      query: homepageSectionsQuery,
+      tags: ['homepageSection'],
+    }).catch(err => {
       return null;
     })
   ]);
@@ -254,28 +247,47 @@ export default async function HomePage() {
   );
 
   // Si no hay configuración en Sanity, usar el orden por defecto
-  const sections = homepageConfig?.sections || [
-    { id: 'hero', type: 'hero', enabled: true },
-    { id: 'master-gastro', type: 'master-categories', enabled: true, config: { masterCategory: 'gastro' } },
-    { id: 'master-ocio', type: 'master-categories', enabled: true, config: { masterCategory: 'ocio' } },
-    { id: 'master-deportes', type: 'master-categories', enabled: true, config: { masterCategory: 'deportes' } },
-    { id: 'featured-sections', type: 'featured', enabled: true }
-  ];
+  let sections: SectionConfig[] = [];
+  
+  if (homepageSections && homepageSections.length > 0) {
+    sections = homepageSections;
+  } else if (homepageConfig?.sections && homepageConfig.sections.length > 0) {
+    // Adapter for singleton format if needed
+    sections = homepageConfig.sections.map((s: any) => ({
+      _id: s.id || s._id,
+      sectionType: s.type || s.sectionType,
+      enabled: s.enabled,
+      title: s.title,
+      config: s.config
+    }));
+  } else {
+    sections = [
+      { _id: 'hero', sectionType: 'hero', enabled: true, title: 'Hero Principal', config: {} },
+      { _id: 'master-gastro', sectionType: 'master-categories', enabled: true, config: { masterCategory: 'gastro' }, title: 'Gastronomía' },
+      { _id: 'master-ocio', sectionType: 'master-categories', enabled: true, config: { masterCategory: 'ocio' }, title: 'Ocio' },
+      { _id: 'master-deportes', sectionType: 'master-categories', enabled: true, config: { masterCategory: 'deportes' }, title: 'Deportes' },
+      { _id: 'featured-sections', sectionType: 'featured', enabled: true, title: 'Destacados', config: {} }
+    ];
+  }
 
   return (
     <div className="flex flex-col gap-16 pb-20">
-      {sections.map((section: any) => {
-        if (!section.enabled) return null;
+      {sections.filter(s => s.enabled).map((section) => {
+        const type = section.sectionType;
 
-        switch (section.type) {
+        switch (type) {
           case 'hero':
-            return <HeroModern key={section.id} featuredItems={transformedFeatured} />;
+            return <HeroModern key={section._id} featuredItems={transformedFeatured} />;
           
           case 'featured':
           case 'trending':
           case 'topRated':
+          case 'poster':
+          case 'poster-v2':
+          case 'banner':
+          case 'card-square':
             return (
-              <div key={section.id} className="container mx-auto px-4">
+              <div key={section._id} className="container mx-auto px-4">
                 <FeaturedSectionsModern 
                   trending={transformedTrending}
                   topRated={transformedTopRated}
@@ -287,8 +299,8 @@ export default async function HomePage() {
 
           case 'categories':
             return (
-              <div key={section.id} className="container mx-auto px-4">
-                <h2 className="text-3xl font-serif font-bold text-foreground mb-8">
+              <div key={section._id} className="container mx-auto px-4">
+                <h2 className="text-3xl font-serif font-bold text-gray-900 dark:text-white mb-8">
                   {section.title || section.config?.title || 'Explora por Categorías'}
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -318,24 +330,24 @@ export default async function HomePage() {
             const data = masterCategoryData?.[mCat];
             if (!data || data.length === 0) return null;
 
-            const config = {
+            const mConfig = {
               gastro: { title: 'Gastronomía', icon: '🍽️', color: 'orange', link: '/categorias?grupo=gastro' },
               ocio: { title: 'Ocio y Entretenimiento', icon: '🎭', color: 'purple', link: '/categorias?grupo=ocio' },
               deportes: { title: 'Deportes y Bienestar', icon: '⚽', color: 'green', link: '/categorias?grupo=deportes' },
             }[mCat as 'gastro' | 'ocio' | 'deportes'];
 
-            if (!config) return null;
+            if (!mConfig) return null;
 
             return (
-              <section key={section.id} className="container mx-auto px-4">
+              <section key={section._id} className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-3xl font-serif font-bold text-foreground flex items-center gap-3">
-                    <span className={`bg-${config.color}-100 dark:bg-${config.color}-900/30 p-2 rounded-lg text-${config.color}-600 dark:text-${config.color}-400`}>
-                      {config.icon}
+                  <h2 className="text-3xl font-serif font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                    <span className={`bg-${mConfig.color}-100 dark:bg-${mConfig.color}-900/30 p-2 rounded-lg text-${mConfig.color}-600 dark:text-${mConfig.color}-400`}>
+                      {mConfig.icon}
                     </span>
-                    {config.title}
+                    {mConfig.title}
                   </h2>
-                  <Link href={config.link} className="text-primary hover:underline font-medium">Ver todo</Link>
+                  <Link href={mConfig.link} className="text-primary hover:underline font-medium">Ver todo</Link>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {data.map((venue: any) => (
@@ -345,7 +357,7 @@ export default async function HomePage() {
                       name={venue.title}
                       image={venue.images?.asset?.url || venue.images?.[0]?.asset?.url || ''}
                       href={getVenueUrl(venue.citySlug, venue.slug)}
-                      cuisine={config.title}
+                      cuisine={mConfig.title}
                       averageRating={venue.averageRating}
                       reviewCount={venue.reviewCount}
                       address={venue.address || ''}

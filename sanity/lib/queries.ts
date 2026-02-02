@@ -872,3 +872,16 @@ export const homepageConfigQuery = `
     lastModified
   }
 `;
+
+// Obtener todas las secciones individuales de la homepage
+export const homepageSectionsQuery = `
+  *[_type == "homepageSection"] | order(order asc) {
+    _id,
+    _type,
+    title,
+    sectionType,
+    enabled,
+    order,
+    config
+  }
+`;

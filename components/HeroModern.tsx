@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, TrendingUp, MapPin } from 'lucide-react';
+import { ArrowRight, TrendingUp, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel } from '@/components/Carousel';
@@ -105,15 +105,15 @@ export const HeroModern: React.FC<HeroModernProps> = ({
       </CarouselFullScreen>
 
       {/* After the fullscreen hero, keep the featured carousel section (unchanged) */}
-      <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 py-16 lg:py-24 bg-white dark:bg-gray-950">
         {/* Featured Carousel */}
         {heroItems.length > 0 && (
           <div className="mb-16">
             <div className="text-center mb-8">
-              <h2 className="font-serif text-2xl lg:text-3xl font-semibold text-gray-900 mb-4">
+              <h2 className="font-serif text-2xl lg:text-3xl font-semibold text-gray-900 dark:text-gray-50 mb-4">
                 Destacados de la semana
               </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
+              <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                 Una selección especial de nuestras mejores reseñas y descubrimientos gastronómicos más recientes
               </p>
             </div>
@@ -136,7 +136,7 @@ export const HeroModern: React.FC<HeroModernProps> = ({
               {heroItems.map((item) => (
                 <div key={item.id} className="h-full">
                   <Link href={item.href} className="block group h-full">
-                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg border border-gray-100 h-full transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+                    <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-lg border border-gray-100 dark:border-gray-800 h-full transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
                       <div className="relative aspect-video overflow-hidden">
                         <div className="w-full h-full relative">
                           <Image
@@ -150,14 +150,14 @@ export const HeroModern: React.FC<HeroModernProps> = ({
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                         {item.rating && (
                           <div className="absolute top-4 left-4">
-                            <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
+                            <div className="flex items-center gap-1 bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full px-2 py-1">
                               <RatingStars rating={item.rating} size="sm" showValue />
                             </div>
                           </div>
                         )}
                         {item.location && (
                           <div className="absolute top-4 right-4">
-                            <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium">
+                            <div className="flex items-center gap-1 bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium dark:text-white">
                               {item.location}
                             </div>
                           </div>
@@ -165,10 +165,10 @@ export const HeroModern: React.FC<HeroModernProps> = ({
                       </div>
 
                       <div className="p-6">
-                        <h3 className="font-serif text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
+                        <h3 className="font-serif text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
                           {item.title}
                         </h3>
-                        <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
+                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed line-clamp-3 mb-4">
                           {item.description}
                         </p>
                       </div>
@@ -199,12 +199,12 @@ export const HeroModern: React.FC<HeroModernProps> = ({
         )}
 
         {/* CTA Section */}
-        <div className="text-center bg-white rounded-3xl p-8 lg:p-12 shadow-lg border border-gray-100">
+        <div className="text-center bg-white dark:bg-gray-900 rounded-3xl p-8 lg:p-12 shadow-lg border border-gray-100 dark:border-gray-800">
           <div className="max-w-2xl mx-auto">
-            <h3 className="font-serif text-2xl lg:text-3xl font-semibold text-gray-900 mb-4">
+            <h3 className="font-serif text-2xl lg:text-3xl font-semibold text-gray-900 dark:text-white mb-4">
               ¿Eres propietario de un restaurante?
             </h3>
-            <p className="text-gray-600 mb-6 leading-relaxed">
+            <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
               Únete a nuestra comunidad gastronómica y comparte tu pasión por la buena cocina.
               Conecta con foodielovers que buscan experiencias auténticas.
             </p>
@@ -239,7 +239,7 @@ export const HeroModern: React.FC<HeroModernProps> = ({
 const HeroCard: React.FC<{ item: any }> = ({ item }) => {
   return (
     <Link href={item.href} className="block group h-full">
-      <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg border border-gray-100 h-full transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+      <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-lg border border-gray-100 dark:border-gray-800 h-full transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
         {/* Image */}
         <div className="relative aspect-video overflow-hidden">
           <div className="w-full h-full relative">
@@ -258,7 +258,7 @@ const HeroCard: React.FC<{ item: any }> = ({ item }) => {
           {/* Rating badge */}
           {item.rating && (
             <div className="absolute top-4 left-4">
-              <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
+              <div className="flex items-center gap-1 bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full px-2 py-1">
                 <RatingStars rating={item.rating} size="sm" showValue />
               </div>
             </div>
@@ -267,7 +267,7 @@ const HeroCard: React.FC<{ item: any }> = ({ item }) => {
           {/* Location badge */}
           {item.location && (
             <div className="absolute top-4 right-4">
-              <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium">
+              <div className="flex items-center gap-1 bg-white/90 dark:bg-black/70 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium dark:text-white">
                 <MapPin className="h-3 w-3" />
                 {item.location}
               </div>
@@ -277,48 +277,35 @@ const HeroCard: React.FC<{ item: any }> = ({ item }) => {
 
         {/* Content */}
         <div className="p-6">
-          <h3 className="font-serif text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
+          <h3 className="font-serif text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
             {item.title}
           </h3>
-          
-          <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-4">
+          <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-4">
             {item.description}
           </p>
-
-          {/* Tags */}
-          {item.tags && item.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {item.tags.slice(0, 2).map((tag: string, index: number) => (
-                <Badge key={index} variant="secondary" className="text-xs">
-                  {tag}
-                </Badge>
-              ))}
-              {item.tags.length > 2 && (
-                <Badge variant="secondary" className="text-xs">
-                  +{item.tags.length - 2}
-                </Badge>
-              )}
+          
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-xs">
+              <Clock className="h-3.5 w-3.5" />
+              <span>{item.readTime || '5 min'}</span>
             </div>
-          )}
-        </div>
-
-        {/* Type indicator */}
-        <div className="absolute bottom-4 right-4">
-          <Badge
-            variant="outline"
-            className={cn(
-              "text-xs font-medium",
-              item.type === 'review' && "bg-blue-50 text-blue-700 border-blue-200",
-              item.type === 'venue' && "bg-green-50 text-green-700 border-green-200",
-              item.type === 'guide' && "bg-purple-50 text-purple-700 border-purple-200",
-              item.type === 'collection' && "bg-orange-50 text-orange-700 border-orange-200",
-            )}
-          >
-            {item.type === 'review' && 'Reseña'}
-            {item.type === 'venue' && 'Local'}
-            {item.type === 'guide' && 'Guía'}
-            {item.type === 'collection' && 'Colección'}
-          </Badge>
+            
+            <Badge 
+              variant="outline" 
+              className={cn(
+                "text-xs font-medium",
+                item.type === 'review' && "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800",
+                item.type === 'venue' && "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800",
+                item.type === 'guide' && "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800",
+                item.type === 'collection' && "bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800",
+              )}
+            >
+              {item.type === 'review' && 'Reseña'}
+              {item.type === 'venue' && 'Local'}
+              {item.type === 'guide' && 'Guía'}
+              {item.type === 'collection' && 'Colección'}
+            </Badge>
+          </div>
         </div>
       </div>
     </Link>

@@ -71,14 +71,14 @@ function SortableItem({ section, onToggle, onEdit, onDelete }: SortableItemProps
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white border rounded-lg p-4"
+      className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
     >
       <div className="flex items-center gap-4">
         {/* Drag handle */}
         <div
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600"
+          className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
         >
           <GripVertical className="h-5 w-5" />
         </div>
@@ -88,8 +88,8 @@ function SortableItem({ section, onToggle, onEdit, onDelete }: SortableItemProps
           <div className="flex items-center gap-2">
             <div className="text-2xl">{getSectionIcon(section.sectionType)}</div>
             <div>
-              <h3 className="font-medium">{section.title}</h3>
-              <p className="text-sm text-gray-500">
+              <h3 className="font-medium text-gray-900 dark:text-gray-50">{section.title}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 {section.config.displayTitle || 'Sin título configurado'}
               </p>
             </div>
@@ -97,7 +97,7 @@ function SortableItem({ section, onToggle, onEdit, onDelete }: SortableItemProps
         </div>
 
         {/* Stats */}
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-gray-500 dark:text-gray-400">
           {section.config.selectedItems?.length || 0} elementos
         </div>
 
@@ -295,8 +295,8 @@ export default function HomepageSectionsPage() {
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Gestión de Secciones</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Gestión de Secciones</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
             Configura las secciones de la página principal
           </p>
         </div>
