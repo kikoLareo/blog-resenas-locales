@@ -1,4 +1,3 @@
-
 // Tipos base
 export interface SanityImage {
   _type: 'image';
@@ -147,6 +146,7 @@ export interface Post {
   };
   excerpt?: string;
   cover?: SanityImage;
+  heroImage?: SanityImage;
   faq?: Array<{
     question: string;
     answer: string;

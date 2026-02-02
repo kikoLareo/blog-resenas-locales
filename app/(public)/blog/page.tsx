@@ -63,29 +63,29 @@ export default async function BlogPage() {
         />
       )}
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a]">
         <div className="container-wide py-12">
         {/* Breadcrumbs */}
         <nav className="mb-8" aria-label="Breadcrumb">
-          <ol className="flex items-center space-x-2 text-sm text-gray-500">
+          <ol className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
             <li>
-              <Link href="/" className="hover:text-primary-600">Inicio</Link>
+              <Link href="/" className="hover:text-primary transition-colors">Inicio</Link>
             </li>
             <li>
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
             </li>
-            <li className="text-gray-900 font-medium">Blog</li>
+            <li className="text-gray-900 dark:text-white font-medium">Blog</li>
           </ol>
         </nav>
 
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Blog <span className="text-primary-600">Gastronómico</span>
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            Blog <span className="text-primary">Gastronómico</span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             Artículos, guías y consejos de expertos sobre gastronomía, restaurantes y cultura culinaria.
           </p>
         </div>
@@ -93,131 +93,90 @@ export default async function BlogPage() {
         {/* Featured Post */}
         {posts?.length > 0 && (
           <section className="mb-16">
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+            <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <div className="grid grid-cols-1 lg:grid-cols-2">
-                <div className="aspect-video lg:aspect-auto bg-gray-100">
-                  {posts[0].cover ? (
+                <div className="aspect-video lg:aspect-auto bg-gray-100 dark:bg-white/5 relative">
+                  {posts[0].heroImage?.asset?.url ? (
                     <Image
-                      src={posts[0].cover.asset.url}
-                      alt={posts[0].cover.alt || posts[0].title}
-                      className="w-full h-full object-cover"
+                      src={posts[0].heroImage.asset.url}
+                      alt={posts[0].heroImage.alt || posts[0].title}
+                      fill
+                      className="object-cover"
+                      priority
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
+                    <div className="flex items-center justify-center h-full text-gray-400">Sin imagen</div>
                   )}
                 </div>
-                <div className="p-8 lg:p-12">
-                  <div className="mb-4">
-                    <span className="inline-block px-3 py-1 text-xs font-semibold text-primary-700 bg-primary-100 rounded-full">
-                      Artículo destacado
-                    </span>
+                <div className="p-8 md:p-12 flex flex-col justify-center">
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className="text-primary text-sm font-bold tracking-wider uppercase">Destacado</span>
+                    <span className="text-gray-400 dark:text-gray-500 text-sm">{new Date(posts[0].publishedAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                   </div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                    <Link 
-                      href={`/blog/${posts[0].slug.current}`}
-                      className="hover:text-primary-600 transition-colors"
-                    >
+                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                    <Link href={`/blog/${posts[0].slug.current}`} className="hover:text-primary transition-colors">
                       {posts[0].title}
                     </Link>
                   </h2>
-                  {posts[0].excerpt && (
-                    <p className="text-gray-600 mb-6 text-lg leading-relaxed">
-                      {posts[0].excerpt}
-                    </p>
-                  )}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center text-sm text-gray-500">
-                      <span>{posts[0].author}</span>
-                      <span className="mx-2">•</span>
-                      <time dateTime={posts[0].publishedAt} suppressHydrationWarning>
-                        {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(posts[0].publishedAt))}
-                      </time>
-                    </div>
-                    <Link
-                      href={`/blog/${posts[0].slug.current}`}
-                      className="text-primary-600 hover:text-primary-700 font-medium"
-                    >
-                      Leer más →
-                    </Link>
-                  </div>
+                  <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 line-clamp-3">
+                    {posts[0].excerpt}
+                  </p>
+                  <Link
+                    href={`/blog/${posts[0].slug.current}`}
+                    className="inline-flex items-center text-primary font-bold gap-2 hover:gap-3 transition-all"
+                  >
+                    Leer artículo completo
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </Link>
                 </div>
               </div>
             </div>
           </section>
         )}
 
-        {/* Posts Grid */}
-        {posts?.length > 1 && (
-          <section>
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">Todos los Artículos</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {posts.slice(1).map((post) => (
-                <article key={post._id} className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
-                  {/* Image */}
-                  <div className="aspect-video bg-gray-100">
-                    {post.cover ? (
-                      <Image
-                        src={post.cover.asset.url}
-                        alt={post.cover.alt || post.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                      <Link 
-                        href={`/blog/${post.slug.current}`}
-                        className="hover:text-primary-600 transition-colors"
-                      >
-                        {post.title}
-                      </Link>
-                    </h3>
-                    
-                    {post.excerpt && (
-                      <p className="text-gray-600 mb-4 line-clamp-3">
-                        {post.excerpt}
-                      </p>
-                    )}
-
-                    {/* Tags */}
-                    {post.tags && post.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {post.tags.slice(0, 3).map((tag) => (
-                          <span
-                            key={tag}
-                            className="inline-block px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-md"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-100">
-                      <span>{post.author}</span>
-                      <time dateTime={post.publishedAt} suppressHydrationWarning>
-                        {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(post.publishedAt))}
-                      </time>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
+        {/* Regular Posts Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {posts?.slice(1).map((post) => (
+            <article key={post._id} className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col h-full group">
+              <Link href={`/blog/${post.slug.current}`} className="aspect-video relative overflow-hidden bg-gray-100 dark:bg-white/5 flex-shrink-0">
+                {post.heroImage?.asset?.url ? (
+                  <Image
+                    src={post.heroImage.asset.url}
+                    alt={post.heroImage.alt || post.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-400">Sin imagen</div>
+                )}
+              </Link>
+              <div className="p-6 flex flex-col flex-grow">
+                <div className="text-gray-400 dark:text-gray-500 text-sm mb-3">
+                  {new Date(post.publishedAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                  <Link href={`/blog/${post.slug.current}`}>
+                    {post.title}
+                  </Link>
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6 line-clamp-3 text-sm flex-grow">
+                  {post.excerpt}
+                </p>
+                <Link
+                  href={`/blog/${post.slug.current}`}
+                  className="inline-flex items-center text-primary font-semibold text-sm gap-1 hover:gap-2 transition-all mt-auto"
+                >
+                  Continuar leyendo
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+              </div>
+            </article>
+          ))}
+        </div>
 
         {/* Empty State */}
         {(!posts || posts.length === 0) && (

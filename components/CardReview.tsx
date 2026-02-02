@@ -63,35 +63,35 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
 
   return (
     <Card className={cn(
-      "group overflow-hidden transition-all duration-200 hover:shadow-lg",
+      "group overflow-hidden transition-all duration-300 hover:shadow-2xl dark:hover:shadow-primary/5 dark:bg-[#111111] dark:border-white/10",
       cardSizeClasses[size],
       className
     )}>
       <Link href={href} className="block">
         {/* Image */}
         <div className={cn(
-          "relative overflow-hidden bg-gray-100",
+          "relative overflow-hidden bg-gray-100 dark:bg-white/5",
           aspectRatioClasses[imageAspectRatio]
         )}>
           <Image
-            src={image}
+            src={image || '/placeholder-venue.jpg'}
             alt={title}
             fill
-            className="object-cover transition-transform duration-200 group-hover:scale-105"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
           {/* Rating overlay */}
           <div className="absolute top-3 left-3">
-            <div className="flex items-center gap-1 rounded-full bg-white/90 backdrop-blur-sm px-2 py-1 text-sm font-medium shadow-sm">
+            <div className="flex items-center gap-1 rounded-full bg-white/90 dark:bg-black/70 backdrop-blur-sm px-2.5 py-1 text-sm font-bold shadow-sm dark:text-white dark:border dark:border-white/10">
               <RatingStars rating={rating} size="sm" showValue />
             </div>
           </div>
         </div>
 
-        <CardContent className="p-4">
+        <CardContent className="p-5">
           {/* Title */}
           <h3 className={cn(
-            "font-serif text-gray-900 transition-colors group-hover:text-primary-600 line-clamp-2",
+            "font-serif text-gray-900 dark:text-white transition-colors group-hover:text-primary line-clamp-2",
             titleSizeClasses[size]
           )}>
             {title}
@@ -99,19 +99,19 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
 
           {/* Description */}
           {truncatedDescription && (
-            <p className="mt-2 text-sm text-gray-600 line-clamp-2">
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
               {truncatedDescription}
             </p>
           )}
 
           {/* Meta info */}
-          <div className="mt-3 flex items-center gap-4 text-sm text-gray-500">
-            <div className="flex items-center gap-1">
-              <MapPin className="h-4 w-4" />
-              <span>{location}</span>
+          <div className="mt-4 flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wider">
+            <div className="flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5 text-primary" />
+              <span className="truncate max-w-[100px]">{location}</span>
             </div>
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
+            <div className="flex items-center gap-1.5 ml-auto">
+              <Clock className="h-3.5 w-3.5 text-primary" />
               <span>{readTime}</span>
             </div>
           </div>

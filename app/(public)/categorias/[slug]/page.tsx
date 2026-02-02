@@ -6,7 +6,9 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { Venue, Category } from '@/lib/types';
 import { SITE_CONFIG } from '@/lib/constants';
 import { sanityFetch } from '@/lib/sanity.client';
-import { categoryQuery, venuesByCategoryQuery } from '@/sanity/lib/queries';
+import { categoryQuery } from '@/sanity/lib/queries';
+import { venuesByCategoryQuery } from '@/lib/public-queries';
+import { getVenueUrl } from '@/lib/utils';
 
 type CategoryPageProps = {
   params: Promise<{ slug: string }>;
@@ -81,10 +83,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       notFound();
     }
 
-    // Query de venues simplificada - solo si la categoría existe
-    let venues: Venue[] = [];
+    // Query de venues con la versión proyectada de public-queries que ya trae slugs como strings
+    let venues: any[] = [];
     try {
-      venues = await sanityFetch<Venue[]>({ 
+      venues = await sanityFetch<any[]>({ 
         query: venuesByCategoryQuery, 
         params: { categorySlug: slug, offset: 0, limit: 12 }, 
         tags: ['venues'], 
@@ -96,9 +98,9 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     }
 
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a]">
         {/* Breadcrumbs */}
-        <div className="bg-white border-b border-gray-200">
+        <div className="bg-white dark:bg-[#111111] border-b border-gray-200 dark:border-white/10">
           <div className="container mx-auto px-4 py-4">
             <Breadcrumbs 
               items={[
@@ -111,30 +113,30 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         </div>
 
         {/* Hero Section */}
-        <section className="bg-white">
-          <div className="container mx-auto px-4 py-12">
+        <section className="bg-white dark:bg-[#111111] dark:border-b dark:border-white/5">
+          <div className="container mx-auto px-4 py-12 md:py-16">
             <div className="text-center max-w-4xl mx-auto">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
                 {category.title}
               </h1>
               
               {category.description && (
-                <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
                   {category.description}
                 </p>
               )}
               
-              <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
-                <span>{venues.length} locales encontrados</span>
-                <span>•</span>
-                <span>Actualizado recientemente</span>
+              <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500 dark:text-gray-500">
+                <span className="bg-gray-100 dark:bg-white/5 px-3 py-1 rounded-full">{venues.length} locales encontrados</span>
+                <span className="flex items-center">•</span>
+                <span className="bg-gray-100 dark:bg-white/5 px-3 py-1 rounded-full">Actualizado recientemente</span>
               </div>
             </div>
           </div>
         </section>
 
         {/* Venues Grid */}
-        <section className="py-16">
+        <section className="py-12 md:py-16">
           <div className="container mx-auto px-4">
             {venues.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -143,16 +145,16 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-16">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+              <div className="text-center py-16 bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-white/5 shadow-sm">
+                <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
                   No hay locales disponibles aún
                 </h3>
-                <p className="text-gray-600 mb-8">
-                  Estamos trabajando en agregar más locales en esta categoría.
+                <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
+                  Estamos trabajando en agregar más locales en esta categoría para ofrecerte las mejores reseñas.
                 </p>
                 <Link
                   href="/categorias"
-                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90 transition-colors"
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-primary hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 active:scale-95"
                 >
                   Ver otras categorías
                 </Link>
@@ -187,26 +189,29 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 }
 
 // Componente para mostrar venues
-function VenueCard({ venue }: { venue: Venue }) {
+function VenueCard({ venue }: { venue: any }) {
+  // Usar la función centralizada para generar la URL correcta sin duplicar slugs
+  const venueUrl = getVenueUrl(venue.city?.slug, venue.slug);
+  
   return (
-    <Link href={`/${venue.city?.slug?.current || 'ciudad'}/${venue.slug?.current || venue._id}`}>
-      <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden group">
+    <Link href={venueUrl}>
+      <div className="bg-white dark:bg-[#111111] rounded-2xl shadow-sm hover:shadow-xl dark:shadow-none dark:hover:bg-white/5 border border-gray-200 dark:border-white/10 transition-all duration-300 overflow-hidden group h-full flex flex-col">
         {/* Image */}
         <div className="relative aspect-[16/10] overflow-hidden">
-          {venue.images?.[0] && (
-            <Image
-              src={venue.images[0].asset?.url || '/placeholder-venue.jpg'}
-              alt={venue.title}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover group-hover:scale-105 transition-transform duration-200"
-            />
-          )}
+          <Image
+            src={venue.images?.asset?.url || venue.images?.[0]?.asset?.url || '/placeholder-venue.jpg'}
+            alt={venue.title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           
           {/* Price badge */}
           {venue.priceRange && (
-            <div className="absolute top-3 right-3">
-              <span className="bg-black bg-opacity-70 text-white text-xs font-medium px-2 py-1 rounded-full">
+            <div className="absolute top-4 right-4">
+              <span className="bg-black/70 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full border border-white/20">
                 {venue.priceRange}
               </span>
             </div>
@@ -214,22 +219,28 @@ function VenueCard({ venue }: { venue: Venue }) {
         </div>
 
         {/* Content */}
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-primary transition-colors">
+        <div className="p-6 flex-grow flex flex-col">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary transition-colors line-clamp-1">
             {venue.title}
           </h3>
           
           {venue.description && (
-            <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2 md:line-clamp-3">
               {venue.description}
             </p>
           )}
           
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <span>{venue.city?.title || 'Ciudad'}</span>
-            {venue.categories?.[0] && (
-              <span className="text-primary">{venue.categories[0].title}</span>
-            )}
+          <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/5 text-sm">
+            <div className="flex items-center text-gray-500 dark:text-gray-400">
+              <span className="truncate max-w-[120px]">{venue.city?.title || 'Ciudad'}</span>
+            </div>
+            
+            <span className="text-primary font-semibold flex items-center gap-1">
+              Ver detalles
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
           </div>
         </div>
       </div>

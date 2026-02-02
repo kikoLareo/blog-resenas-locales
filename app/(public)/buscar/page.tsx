@@ -76,10 +76,10 @@ function SearchResults({ results, searchTerm }: { results: SearchResult[]; searc
     return (
       <div className="text-center py-12">
         <div className="text-gray-400 text-6xl mb-4">🔍</div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
           No se encontraron resultados
         </h3>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
           No encontramos contenido relacionado con &ldquo;{searchTerm}&rdquo;. 
           Intenta con otros términos o navega por nuestras categorías.
         </p>
@@ -92,7 +92,7 @@ function SearchResults({ results, searchTerm }: { results: SearchResult[]; searc
           </Link>
           <Link
             href="/"
-            className="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors"
+            className="border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
           >
             Ir al Inicio
           </Link>
@@ -104,10 +104,10 @@ function SearchResults({ results, searchTerm }: { results: SearchResult[]; searc
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           Resultados para &ldquo;{searchTerm}&rdquo;
         </h2>
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-gray-500 dark:text-gray-400">
           {results.length} resultado{results.length !== 1 ? 's' : ''} encontrado{results.length !== 1 ? 's' : ''}
         </span>
       </div>
@@ -139,13 +139,13 @@ function SearchResultCard({ result }: { result: SearchResult }) {
   const getResultType = () => {
     switch (result._type) {
       case 'venue':
-        return { label: 'Local', color: 'bg-blue-100 text-blue-800' };
+        return { label: 'Local', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' };
       case 'review':
-        return { label: 'Reseña', color: 'bg-green-100 text-green-800' };
+        return { label: 'Reseña', color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' };
       case 'post':
-        return { label: 'Artículo', color: 'bg-purple-100 text-purple-800' };
+        return { label: 'Artículo', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' };
       default:
-        return { label: 'Contenido', color: 'bg-gray-100 text-gray-800' };
+        return { label: 'Contenido', color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300' };
     }
   };
 
@@ -256,7 +256,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const jsonLd = websiteJsonLd();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* JSON-LD */}
       <script
         type="application/ld+json"
@@ -269,10 +269,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            <span className="text-primary-600">Buscar</span> Contenido
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <span className="text-primary-600 dark:text-primary-400">Buscar</span> Contenido
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
             Encuentra reseñas de restaurantes, locales y contenido gastronómico
           </p>
           
@@ -292,22 +292,22 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               ) : (
                 <div className="text-center py-12">
                   <div className="text-gray-400 text-6xl mb-4">🔍</div>
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
                     ¿Qué estás buscando?
                   </h2>
-                  <p className="text-gray-600 mb-8">
+                  <p className="text-gray-600 dark:text-gray-400 mb-8">
                     Utiliza el formulario de arriba para buscar reseñas, locales y contenido gastronómico.
                   </p>
                   
                   {/* Sugerencias de búsqueda */}
                   <div className="max-w-lg mx-auto">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Búsquedas populares:</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Búsquedas populares:</h3>
                     <div className="flex flex-wrap gap-2 justify-center">
                       {['Restaurantes', 'Cafeterías', 'Bares', 'Comida italiana', 'Tapas', 'Brunch'].map((term) => (
                         <Link
                           key={term}
                           href={`/buscar?q=${encodeURIComponent(term)}`}
-                          className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-full hover:bg-primary-50 hover:border-primary-300 hover:text-primary-700 transition-colors text-sm"
+                          className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-800 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-full hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:border-primary-300 dark:hover:border-primary-700 hover:text-primary-700 dark:hover:text-primary-300 transition-colors text-sm"
                         >
                           {term}
                         </Link>
@@ -331,26 +331,26 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <SidebarAd />
             
             {/* Enlaces relacionados */}
-            <div className="bg-white rounded-lg p-6 border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <div className="bg-white dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-800">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Explorar más
               </h3>
               <div className="space-y-3">
                 <Link
                   href="/categorias"
-                  className="block text-primary-600 hover:text-primary-700 transition-colors"
+                  className="block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
                 >
                   Ver todas las categorías →
                 </Link>
                 <Link
                   href="/ciudades"
-                  className="block text-primary-600 hover:text-primary-700 transition-colors"
+                  className="block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
                 >
                   Explorar por ciudades →
                 </Link>
                 <Link
                   href="/blog"
-                  className="block text-primary-600 hover:text-primary-700 transition-colors"
+                  className="block text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
                 >
                   Leer el blog →
                 </Link>

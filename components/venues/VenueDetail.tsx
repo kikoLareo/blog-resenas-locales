@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ImageWithFallback } from '@/components/figma/ImageWithFallback';
-import { cleanContent } from '@/lib/utils';
+import { cleanContent, getReviewUrl, getVenueUrl } from '@/lib/utils';
 
 
 interface VenueDetailProps {
@@ -95,10 +95,10 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
   };
 
   const getRatingColor = (rating: number) => {
-    if (rating >= 8) return 'text-green-600';
-    if (rating >= 6) return 'text-yellow-600';
-    if (rating >= 4) return 'text-orange-600';
-    return 'text-red-600';
+    if (rating >= 8) return 'text-green-600 dark:text-green-400';
+    if (rating >= 6) return 'text-yellow-600 dark:text-yellow-400';
+    if (rating >= 4) return 'text-orange-600 dark:text-orange-400';
+    return 'text-red-600 dark:text-red-400';
   };
 
   const formatOpeningHours = (hours?: string) => {
@@ -109,18 +109,18 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
   const averageRating = venue.averageRating || 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 bg-white dark:bg-gray-950">
       {/* Breadcrumbs with Schema.org markup */}
       <nav 
         aria-label="Navegación de ubicación"
-        className="mb-6 text-sm text-gray-500"
+        className="mb-6 text-sm text-gray-500 dark:text-gray-400"
         role="navigation"
       >
         <ol className="flex items-center" itemScope itemType="https://schema.org/BreadcrumbList">
           <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
             <Link 
               href="/" 
-              className="hover:text-gray-700"
+              className="hover:text-gray-700 dark:hover:text-gray-200"
               itemProp="item"
             >
               <span itemProp="name">Inicio</span>
@@ -131,7 +131,7 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
           <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
             <Link 
               href={`/${venue.city.slug}`} 
-              className="hover:text-gray-700"
+              className="hover:text-gray-700 dark:hover:text-gray-200"
               itemProp="item"
             >
               <span itemProp="name">{venue.city.title}</span>
@@ -140,7 +140,7 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
           </li>
           <span className="mx-2" aria-hidden="true">/</span>
           <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
-            <span className="text-gray-900" itemProp="name">{venue.title}</span>
+            <span className="text-gray-900 dark:text-gray-100" itemProp="name">{venue.title}</span>
             <meta itemProp="position" content="3" />
           </li>
         </ol>
@@ -152,7 +152,7 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
         <div className="lg:col-span-2">
           {/* Imagen principal */}
           {heroImage && (
-            <div className="relative aspect-[4/3] mb-4 rounded-lg overflow-hidden">
+            <div className="relative aspect-[4/3] mb-4 rounded-lg overflow-hidden ring-1 ring-gray-200 dark:ring-gray-800">
               <ImageWithFallback
                 src={heroImage.asset.url}
                 alt={heroImage.alt || venue.title}
@@ -193,12 +193,12 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
           )}
 
           {/* Información principal */}
-          <Card className="mb-8">
+          <Card className="mb-8 dark:bg-gray-900 dark:border-gray-800">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div>
-                  <CardTitle className="text-3xl mb-2">{venue.title}</CardTitle>
-                  <div className="flex items-center gap-4 text-gray-600 mb-4">
+                  <CardTitle className="text-3xl mb-2 dark:text-white">{venue.title}</CardTitle>
+                  <div className="flex items-center gap-4 text-gray-600 dark:text-gray-400 mb-4">
                     <div className="flex items-center gap-1">
                       <MapPin className="h-4 w-4" />
                       <span>{venue.address}</span>
@@ -215,7 +215,7 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
                   <div className="flex flex-wrap gap-2 mb-4">
                     {venue.categories.map((category) => (
                       <Link key={category._id} href={`/categorias/${category.slug}`}>
-                        <Badge variant="secondary" className="hover:bg-gray-300 transition-colors">
+                        <Badge variant="secondary" className="hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors">
                           {category.title}
                         </Badge>
                       </Link>
@@ -242,13 +242,13 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
                         <Star
                           key={i}
                           className={`h-4 w-4 ${
-                            i < Math.round(averageRating / 2) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                            i < Math.round(averageRating / 2) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300 dark:text-gray-600'
                           }`}
                           aria-hidden="true"
                         />
                       ))}
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
                       {venue.reviewCount} reseña{venue.reviewCount !== 1 ? 's' : ''}
                     </div>
                   </div>
@@ -258,7 +258,7 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
 
             {venue.description && (
               <CardContent>
-                <p className="text-gray-700 leading-relaxed">{venue.description}</p>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{venue.description}</p>
               </CardContent>
             )}
           </Card>
@@ -266,16 +266,16 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
 
         {/* Columna derecha - Información de contacto */}
         <div>
-          <Card className="sticky top-8">
+          <Card className="sticky top-8 dark:bg-gray-900 dark:border-gray-800">
             <CardHeader>
-              <CardTitle>Información</CardTitle>
+              <CardTitle className="dark:text-white">Información</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Empty State for Info */}
               {!venue.phone && !venue.website && !venue.openingHours && (!venue.social || Object.keys(venue.social).length === 0) && !venue.geo && (
-                <div className="text-center py-4 text-gray-500 text-sm">
+                <div className="text-center py-4 text-gray-500 dark:text-gray-400 text-sm">
                   <p>No hay información de contacto disponible.</p>
-                  <Link href="/contacto?subject=suggestion" className="text-blue-600 hover:underline mt-2 block">
+                  <Link href="/contacto?subject=suggestion" className="text-blue-600 dark:text-blue-400 hover:underline mt-2 block">
                     ¿Conoces este local? Ayúdanos a completar la información.
                   </Link>
                 </div>
@@ -284,8 +284,8 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
               {/* Teléfono */}
               {venue.phone && (
                 <div className="flex items-center gap-3">
-                  <Phone className="h-5 w-5 text-gray-500" />
-                  <a href={`tel:${venue.phone}`} className="text-blue-600 hover:underline">
+                  <Phone className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                  <a href={`tel:${venue.phone}`} className="text-blue-600 dark:text-blue-400 hover:underline">
                     {venue.phone}
                   </a>
                 </div>
@@ -294,12 +294,12 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
               {/* Website */}
               {venue.website && (
                 <div className="flex items-center gap-3">
-                  <Globe className="h-5 w-5 text-gray-500" />
+                  <Globe className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                   <a 
                     href={venue.website} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline flex items-center gap-1"
+                    className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
                   >
                     Sitio web
                     <ExternalLink className="h-3 w-3" />
@@ -310,10 +310,10 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
               {/* Horarios */}
               {venue.openingHours && (
                 <div className="flex items-start gap-3">
-                  <Clock className="h-5 w-5 text-gray-500 mt-0.5" />
+                  <Clock className="h-5 w-5 text-gray-500 dark:text-gray-400 mt-0.5" />
                   <div>
-                    <div className="font-medium text-sm">Horarios</div>
-                    <div className="text-sm text-gray-600 whitespace-pre-line">
+                    <div className="font-medium text-sm dark:text-gray-200">Horarios</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">
                       {formatOpeningHours(venue.openingHours)}
                     </div>
                   </div>
@@ -323,14 +323,14 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
               {/* Redes sociales */}
               {venue.social && Object.keys(venue.social).length > 0 && (
                 <div>
-                  <div className="font-medium text-sm mb-2">Redes sociales</div>
-                  <div className="flex gap-2">
+                  <div className="font-medium text-sm mb-2 dark:text-gray-200">Redes sociales</div>
+                  <div className="flex gap-2 text-sm">
                     {venue.social.instagram && (
                       <a
                         href={venue.social.instagram}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-pink-600 hover:text-pink-700"
+                        className="text-pink-600 dark:text-pink-400 hover:underline"
                       >
                         Instagram
                       </a>
@@ -340,7 +340,7 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
                         href={venue.social.facebook}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-700"
+                        className="text-blue-600 dark:text-blue-400 hover:underline"
                       >
                         Facebook
                       </a>
@@ -351,14 +351,14 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
 
               {/* Ubicación */}
               {venue.geo && (
-                <div>
-                  <Button variant="outline" className="w-full" asChild>
+                <div className="pt-2">
+                  <Button variant="outline" className="w-full flex items-center justify-center gap-2 dark:border-gray-700 dark:text-gray-200" asChild>
                     <a
                       href={`https://maps.google.com/?q=${venue.geo.lat},${venue.geo.lng}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <MapPin className="mr-2 h-4 w-4" />
+                      <MapPin className="h-4 w-4" />
                       Ver en Google Maps
                     </a>
                   </Button>
@@ -373,37 +373,39 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
       {venue.reviews && venue.reviews.length > 0 && (
         <div className="mt-12">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold">
+            <h2 className="text-2xl font-bold dark:text-white">
               Reseñas ({venue.reviewCount})
             </h2>
-            {venue.reviewCount > venue.reviews.length && (
-              <Link href={`/${venue.city.slug}/${venue.slug}/reviews`}>
-                <Button variant="outline">Ver todas las reseñas</Button>
+            <div className="flex gap-3">
+              {venue.reviewCount > venue.reviews.length && (
+                <Link href={`/${venue.city.slug}/${venue.slug}/reviews`}>
+                  <Button variant="outline" className="dark:border-gray-700 dark:text-gray-200">Ver todas</Button>
+                </Link>
+              )}
+              <Link href="/contacto?subject=suggestion">
+                <Button>Escribir reseña</Button>
               </Link>
-            )}
-            <Link href="/contacto?subject=suggestion">
-              <Button>Escribir reseña</Button>
-            </Link>
+            </div>
           </div>
 
           <div className="grid gap-6">
             {venue.reviews.map((review) => (
-              <Card key={review._id} className="hover:shadow-md transition-shadow">
+              <Card key={review._id} className="hover:shadow-md transition-shadow dark:bg-gray-900 dark:border-gray-800">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <Link 
-                        href={`/${venue.city.slug}/${venue.slug}/review/${review.slug}`}
-                        className="text-xl font-semibold hover:text-blue-600 transition-colors"
+                        href={getReviewUrl(venue.city.slug, venue.slug, review.slug)}
+                        className="text-xl font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                       >
                         {review.title}
                       </Link>
-                      <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                      <div className="flex items-center gap-4 mt-1 text-sm text-gray-500 dark:text-gray-400">
                         <span>Por {review.author}</span>
                         {review.visitDate && (
                           <span className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
-                            {new Date(review.visitDate).toLocaleDateString('es-ES')}
+                            {new Intl.DateTimeFormat('es-ES').format(new Date(review.visitDate))}
                           </span>
                         )}
                       </div>
@@ -414,13 +416,13 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
                     </div>
                   </div>
 
-                  <p className="text-gray-700 mb-4 line-clamp-3">{cleanContent(review.tldr)}</p>
+                  <p className="text-gray-700 dark:text-gray-300 mb-4 line-clamp-3 leading-relaxed">{cleanContent(review.tldr)}</p>
 
                   {/* Tags */}
                   {review.tags && review.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {review.tags.slice(0, 3).map((tag) => (
-                        <Badge key={tag} variant="outline" className="text-xs">
+                        <Badge key={tag} variant="outline" className="text-xs dark:border-gray-700 dark:text-gray-400">
                           <Tag className="h-3 w-3 mr-1" />
                           {tag}
                         </Badge>
@@ -429,27 +431,27 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
                   )}
 
                   <div className="flex items-center justify-between">
-                    <div className="grid grid-cols-4 gap-4 text-sm">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <div className="text-gray-500">Comida</div>
-                        <div className="font-medium">{formatRating(review.ratings.food)}</div>
+                        <div className="text-gray-500 dark:text-gray-400">Comida</div>
+                        <div className="font-medium dark:text-gray-200">{formatRating(review.ratings.food)}</div>
                       </div>
                       <div>
-                        <div className="text-gray-500">Servicio</div>
-                        <div className="font-medium">{formatRating(review.ratings.service)}</div>
+                        <div className="text-gray-500 dark:text-gray-400">Servicio</div>
+                        <div className="font-medium dark:text-gray-200">{formatRating(review.ratings.service)}</div>
                       </div>
                       <div>
-                        <div className="text-gray-500">Ambiente</div>
-                        <div className="font-medium">{formatRating(review.ratings.ambience)}</div>
+                        <div className="text-gray-500 dark:text-gray-400">Ambiente</div>
+                        <div className="font-medium dark:text-gray-200">{formatRating(review.ratings.ambience)}</div>
                       </div>
                       <div>
-                        <div className="text-gray-500">Relación C/P</div>
-                        <div className="font-medium">{formatRating(review.ratings.value)}</div>
+                        <div className="text-gray-500 dark:text-gray-400">R.C.P.</div>
+                        <div className="font-medium dark:text-gray-200">{formatRating(review.ratings.value)}</div>
                       </div>
                     </div>
 
-                    <Link href={`/${venue.city.slug}/${venue.slug}/review/${review.slug}`}>
-                      <Button variant="outline" size="sm">
+                    <Link href={getReviewUrl(venue.city.slug, venue.slug, review.slug)}>
+                      <Button variant="outline" size="sm" className="hidden sm:flex dark:border-gray-700 dark:text-gray-200">
                         Leer más
                       </Button>
                     </Link>
@@ -463,11 +465,11 @@ export default function VenueDetail({ venue }: VenueDetailProps) {
 
       {/* Sin reseñas */}
       {(!venue.reviews || venue.reviews.length === 0) && (
-        <div className="mt-12 text-center py-12 bg-gray-50 rounded-lg">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <div className="mt-12 text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-lg">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
             Aún no hay reseñas
           </h3>
-          <p className="text-gray-500 mb-6">
+          <p className="text-gray-500 dark:text-gray-400 mb-6">
             Sé el primero en escribir una reseña sobre {venue.title}
           </p>
           <Link href="/contacto?subject=suggestion">

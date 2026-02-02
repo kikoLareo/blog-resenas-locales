@@ -13,7 +13,7 @@ import { cityPageJsonLd } from '@/lib/schema';
 import { sanityFetch } from '@/lib/sanity.client';
 import { cityQuery, venuesByCityQuery } from '@/sanity/lib/queries';
 import VenueCard from '@/components/VenueCard';
-import { cleanContent } from '@/lib/utils';
+import { cleanContent, getReviewUrl, getVenueUrl } from '@/lib/utils';
 
 type CityPageProps = {
   params: Promise<{
@@ -105,31 +105,25 @@ function VenueCardSkeleton() {
 function ReviewCard({ review }: { review: Review }) {
 
   const overallRating = calculateOverallRating(review.ratings);
+  const fallbackImage = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800';
+  const displayImage = (review as any).gallery?.asset?.url || (review as any).gallery?.url || fallbackImage;
 
   return (
-    <article className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
+    <article className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 hover:shadow-md overflow-hidden">
       {/* Image */}
-      <div className="aspect-video bg-gray-100 relative">
-        {review.gallery?.[0] ? (
-          <Image
-            src={(review as any).gallery?.asset?.url || (review as any).gallery?.url}
-            alt={(review as any).gallery?.alt || review.title}
-            fill
-            className="object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
-            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-        )}
+      <div className="aspect-video bg-gray-100 dark:bg-gray-900 relative">
+        <Image
+          src={displayImage}
+          alt={(review as any).gallery?.alt || review.title}
+          fill
+          className="object-cover"
+          loading="lazy"
+        />
         
         {/* Rating Badge */}
         <div className="absolute top-4 right-4">
-          <div className="bg-white rounded-full px-3 py-1 shadow-sm">
-            <span className="text-sm font-semibold text-gray-900">
+          <div className="bg-white dark:bg-gray-900 rounded-full px-3 py-1 shadow-sm">
+            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               {overallRating.toFixed(1)}
             </span>
           </div>
@@ -139,7 +133,7 @@ function ReviewCard({ review }: { review: Review }) {
       {/* Content */}
       <div className="p-6">
         {/* Venue Info */}
-        <div className="flex items-center text-sm text-gray-600 mb-2">
+        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -148,9 +142,9 @@ function ReviewCard({ review }: { review: Review }) {
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
           <Link 
-            href={`/${review.venue.city.slug.current}/${review.venue.slug.current}/review/${review.slug.current}`}
+            href={getReviewUrl(review.venue.city.slug.current, review.venue.slug.current, review.slug.current)}
             className="hover:text-primary-600 transition-colors"
           >
             {review.title}
@@ -158,12 +152,12 @@ function ReviewCard({ review }: { review: Review }) {
         </h3>
 
         {/* TLDR */}
-        <p className="text-gray-600 mb-4 line-clamp-2">
+        <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
           {cleanContent(review.tldr)}
         </p>
 
         {/* Meta */}
-        <div className="flex items-center justify-between text-sm text-gray-500 pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-100 dark:border-gray-700">
           <span>{review.author}</span>
           <time dateTime={review.publishedAt} suppressHydrationWarning>
             {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(review.publishedAt))}
@@ -222,9 +216,9 @@ export default async function CityPage({ params }: CityPageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
           {/* Breadcrumbs */}
-          <div className="bg-white border-b border-gray-200">
+          <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
               <Breadcrumbs
                 items={[
@@ -238,15 +232,15 @@ export default async function CityPage({ params }: CityPageProps) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Header */}
             <div className="text-center mb-12">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
                 Restaurantes en {city.title}
               </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
                 {city.description || `Descubre los mejores restaurantes y locales en ${city.title}. Reseñas auténticas y recomendaciones locales.`}
               </p>
               
               {/* Stats */}
-              <div className="flex justify-center items-center gap-8 mt-6 text-sm text-gray-500">
+              <div className="flex justify-center items-center gap-8 mt-6 text-sm text-gray-500 dark:text-gray-400">
                 <span className="flex items-center gap-1">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -266,8 +260,8 @@ export default async function CityPage({ params }: CityPageProps) {
             {reviews.length > 0 && (
               <section className="mb-16">
                 <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900">Últimas reseñas</h2>
-                  <Link href={`/${citySlug}/reviews`} className="text-blue-600 hover:text-blue-800 font-medium">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Últimas reseñas</h2>
+                  <Link href={`/${citySlug}/reviews`} className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">
                     Ver todas →
                   </Link>
                 </div>
@@ -282,9 +276,9 @@ export default async function CityPage({ params }: CityPageProps) {
             {/* Venues Section */}
             <section>
               <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold text-gray-900">Todos los locales</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Todos los locales</h2>
                 {venues.length >= 12 && (
-                  <Link href={`/${citySlug}/locales`} className="text-blue-600 hover:text-blue-800 font-medium">
+                  <Link href={`/${citySlug}/locales`} className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">
                     Ver todos →
                   </Link>
                 )}
@@ -298,15 +292,15 @@ export default async function CityPage({ params }: CityPageProps) {
                 </div>
               ) : (
                 <div className="text-center py-16">
-                  <div className="text-gray-400 mb-4">
+                  <div className="text-gray-400 dark:text-gray-600 mb-4">
                     <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h4M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                     Aún no hay locales en {city.title}
                   </h3>
-                  <p className="text-gray-500 mb-6">
+                  <p className="text-gray-500 dark:text-gray-400 mb-6">
                     Estamos trabajando para incluir más locales en esta ciudad.
                   </p>
                   <Link 

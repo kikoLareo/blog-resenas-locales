@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/components/ui/utils';
+import { getVenueUrl, getReviewUrl } from '@/lib/utils';
 
 interface ReviewDetailModernProps {
   review: {
@@ -102,7 +103,7 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
   
   const currentUrl = typeof window !== 'undefined' 
     ? window.location.href 
-    : `/${review.venue.city.slug}/${review.venue.slug}/review/${review.slug}`;
+    : getReviewUrl(review.venue.city.slug, review.venue.slug, review.slug);
 
   const calculateReadTime = (content: string) => {
     const wordsPerMinute = 200;
@@ -114,36 +115,36 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
   const readTime = review.content ? calculateReadTime(review.content) : '5 min';
 
   return (
-    <article className="max-w-4xl mx-auto px-4 py-8">
+    <article className="max-w-4xl mx-auto px-4 py-8 bg-white dark:bg-gray-950">
       {/* Breadcrumbs */}
-      <nav className="mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
+      <nav className="mb-6 text-sm text-gray-500 dark:text-gray-400" aria-label="Breadcrumb">
         <ol className="flex items-center space-x-2">
           <li>
-            <Link href="/" className="hover:text-gray-700 transition-colors">
+            <Link href="/" className="hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
               Inicio
             </Link>
           </li>
           <li>
-            <span className="mx-2 text-gray-300">/</span>
+            <span className="mx-2 text-gray-300 dark:text-gray-600">/</span>
             <Link 
               href={`/${review.venue.city.slug}`} 
-              className="hover:text-gray-700 transition-colors"
+              className="hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
             >
               {review.venue.city.title}
             </Link>
           </li>
           <li>
-            <span className="mx-2 text-gray-300">/</span>
+            <span className="mx-2 text-gray-300 dark:text-gray-600">/</span>
             <Link 
-              href={`/${review.venue.city.slug}/${review.venue.slug}`} 
-              className="hover:text-gray-700 transition-colors"
+              href={getVenueUrl(review.venue.city.slug, review.venue.slug)} 
+              className="hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
             >
               {review.venue.title}
             </Link>
           </li>
           <li>
-            <span className="mx-2 text-gray-300">/</span>
-            <span className="text-gray-900" aria-current="page">
+            <span className="mx-2 text-gray-300 dark:text-gray-600">/</span>
+            <span className="text-gray-900 dark:text-gray-100" aria-current="page">
               {review.title}
             </span>
           </li>
@@ -152,8 +153,8 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
 
       {/* Back button */}
       <div className="mb-8">
-        <Link href={`/${review.venue.city.slug}/${review.venue.slug}`}>
-          <Button variant="outline" size="sm" className="group">
+        <Link href={getVenueUrl(review.venue.city.slug, review.venue.slug)}>
+          <Button variant="outline" size="sm" className="group dark:border-gray-700 dark:text-gray-200">
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             Volver al local
           </Button>
@@ -181,60 +182,60 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
         {/* Main content */}
         <div className="lg:col-span-2 space-y-8">
           {/* TLDR Summary */}
-          <Card className="border-l-4 border-l-primary-500 bg-primary-50/50">
+          <Card className="border-l-4 border-l-primary-500 bg-primary-50/50 dark:bg-primary-950/20 dark:border-gray-800">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-primary-800">
+              <CardTitle className="text-lg font-semibold text-primary-800 dark:text-primary-400">
                 Resumen rápido
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-700 leading-relaxed">{review.tldr}</p>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{review.tldr}</p>
             </CardContent>
           </Card>
 
           {/* Detailed ratings */}
-          <Card>
+          <Card className="dark:bg-gray-900 dark:border-gray-800">
             <CardHeader>
-              <CardTitle>Calificaciones detalladas</CardTitle>
+              <CardTitle className="dark:text-white">Calificaciones detalladas</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                            <div className="space-y-4">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Comida</span>
+                  <span className="font-medium dark:text-gray-300">Comida</span>
                   <RatingStars rating={(review.ratings.food || 0) / 2} size="sm" showValue={false} />
-                  <span className="ml-2 font-semibold text-primary">
+                  <span className="ml-2 font-semibold text-primary dark:text-primary-400">
                     {(review.ratings.food || 0).toFixed(1)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Servicio</span>
+                  <span className="font-medium dark:text-gray-300">Servicio</span>
                   <RatingStars rating={(review.ratings.service || 0) / 2} size="sm" showValue={false} />
-                  <span className="ml-2 font-semibold text-primary">
+                  <span className="ml-2 font-semibold text-primary dark:text-primary-400">
                     {(review.ratings.service || 0).toFixed(1)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Ambiente</span>
+                  <span className="font-medium dark:text-gray-300">Ambiente</span>
                   <RatingStars rating={(review.ratings.ambience || 0) / 2} size="sm" showValue={false} />
-                  <span className="ml-2 font-semibold text-primary">
+                  <span className="ml-2 font-semibold text-primary dark:text-primary-400">
                     {(review.ratings.ambience || 0).toFixed(1)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Precio</span>
+                  <span className="font-medium dark:text-gray-300">Precio</span>
                   <RatingStars rating={(review.ratings.value || review.ratings.valueForMoney || 0) / 2} size="sm" showValue={false} />
-                  <span className="ml-2 font-semibold text-primary">
+                  <span className="ml-2 font-semibold text-primary dark:text-primary-400">
                     {(review.ratings.value || review.ratings.valueForMoney || 0).toFixed(1)}
                   </span>
                 </div>
               </div>
               
-              <div className="pt-4 border-t">
+              <div className="pt-4 border-t dark:border-gray-800">
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-semibold text-gray-900">Calificación general</span>
+                  <span className="text-lg font-semibold text-gray-900 dark:text-white">Calificación general</span>
                   <div className="flex items-center gap-3">
                     <RatingStars rating={averageRating / 2} size="md" showValue={false} />
-                    <span className="text-xl font-bold text-primary-600">
+                    <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
                       {averageRating.toFixed(1)}
                     </span>
                   </div>
@@ -245,14 +246,14 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
 
           {/* Highlights */}
           {review.highlights && review.highlights.length > 0 && (
-            <Card>
+            <Card className="dark:bg-gray-900 dark:border-gray-800">
               <CardHeader>
-                <CardTitle>Platos recomendados</CardTitle>
+                <CardTitle className="dark:text-white">Platos recomendados</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {review.highlights.map((highlight, index) => (
-                    <Badge key={index} variant="secondary" className="bg-green-100 text-green-800">
+                    <Badge key={index} variant="secondary" className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
                       {highlight}
                     </Badge>
                   ))}
@@ -265,16 +266,16 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
           {((review.pros && review.pros.length > 0) || (review.cons && review.cons.length > 0)) && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {review.pros && review.pros.length > 0 && (
-                <Card className="border-green-200">
+                <Card className="border-green-200 dark:border-green-900/50 dark:bg-gray-900">
                   <CardHeader>
-                    <CardTitle className="text-green-800">Lo que nos gustó</CardTitle>
+                    <CardTitle className="text-green-800 dark:text-green-400">Lo que nos gustó</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
                       {review.pros.map((pro, index) => (
                         <li key={index} className="flex items-start gap-2">
-                          <span className="text-green-600 font-bold">+</span>
-                          <span className="text-gray-700">{pro}</span>
+                          <span className="text-green-600 dark:text-green-400 font-bold">+</span>
+                          <span className="text-gray-700 dark:text-gray-300">{pro}</span>
                         </li>
                       ))}
                     </ul>
@@ -283,16 +284,16 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
               )}
 
               {review.cons && review.cons.length > 0 && (
-                <Card className="border-red-200">
+                <Card className="border-red-200 dark:border-red-900/50 dark:bg-gray-900">
                   <CardHeader>
-                    <CardTitle className="text-red-800">A mejorar</CardTitle>
+                    <CardTitle className="text-red-800 dark:text-red-400">A mejorar</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
                       {review.cons.map((con, index) => (
                         <li key={index} className="flex items-start gap-2">
-                          <span className="text-red-600 font-bold">-</span>
-                          <span className="text-gray-700">{con}</span>
+                          <span className="text-red-600 dark:text-red-400 font-bold">-</span>
+                          <span className="text-gray-700 dark:text-gray-300">{con}</span>
                         </li>
                       ))}
                     </ul>
@@ -304,12 +305,12 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
 
           {/* Review Content */}
           {review.content && (
-            <Card>
+            <Card className="dark:bg-gray-900 dark:border-gray-800">
               <CardHeader>
-                <CardTitle>Reseña completa</CardTitle>
+                <CardTitle className="dark:text-white">Reseña completa</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="prose prose-gray max-w-none">
+                <div className="prose prose-gray dark:prose-invert max-w-none">
                   <div dangerouslySetInnerHTML={{ __html: review.content }} />
                 </div>
               </CardContent>
@@ -343,10 +344,10 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
           {/* Tags */}
           {review.tags && review.tags.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Etiquetas</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Etiquetas</h3>
               <div className="flex flex-wrap gap-2">
                 {review.tags.map((tag, index) => (
-                  <Badge key={index} variant="outline">
+                  <Badge key={index} variant="outline" className="dark:border-gray-700 dark:text-gray-400">
                     {tag}
                   </Badge>
                 ))}
@@ -358,16 +359,16 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Venue Info Card */}
-          <Card className="sticky top-8">
+          <Card className="sticky top-8 dark:bg-gray-900 dark:border-gray-800">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex items-center justify-between dark:text-white">
                 <span>Información del local</span>
                 {review.venue.website && (
                   <a
                     href={review.venue.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary-600 hover:text-primary-700"
+                    className="text-primary-600 hover:text-primary-700 dark:text-primary-400"
                   >
                     <ExternalLink className="h-4 w-4" />
                   </a>
@@ -377,34 +378,34 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
             <CardContent className="space-y-4">
               <div>
                 <Link 
-                  href={`/${review.venue.city.slug}/${review.venue.slug}`}
-                  className="text-lg font-semibold text-gray-900 hover:text-primary-600 transition-colors"
+                  href={getVenueUrl(review.venue.city.slug, review.venue.slug)}
+                  className="text-lg font-semibold text-gray-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                 >
                   {review.venue.title}
                 </Link>
-                <div className="flex items-start gap-2 text-gray-600 mt-1">
+                <div className="flex items-start gap-2 text-gray-600 dark:text-gray-400 mt-1">
                   <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
                   <span className="text-sm">{review.venue.address}</span>
                 </div>
               </div>
 
               {review.venue.phone && (
-                <div className="flex items-center gap-2 text-gray-600">
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                   <Phone className="h-4 w-4" />
-                  <a href={`tel:${review.venue.phone}`} className="hover:text-gray-900 text-sm">
+                  <a href={`tel:${review.venue.phone}`} className="hover:text-gray-900 dark:hover:text-gray-200 text-sm">
                     {review.venue.phone}
                   </a>
                 </div>
               )}
 
               {review.venue.website && (
-                <div className="flex items-center gap-2 text-gray-600">
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                   <Globe className="h-4 w-4" />
                   <a 
                     href={review.venue.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-gray-900 text-sm truncate"
+                    className="hover:text-gray-900 dark:hover:text-gray-200 text-sm truncate"
                   >
                     {review.venue.website.replace(/^https?:\/\//, '')}
                   </a>
@@ -413,17 +414,17 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
 
               {review.avgTicket && (
                 <div className="text-sm">
-                  <span className="font-medium text-gray-700">Ticket promedio: </span>
-                  <span className="font-semibold text-gray-900">{review.avgTicket}€</span>
+                  <span className="font-medium text-gray-700 dark:text-gray-400">Ticket promedio: </span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-200">{review.avgTicket}€</span>
                 </div>
               )}
 
               {review.venue.categories.length > 0 && (
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">Categorías:</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">Categorías:</p>
                   <div className="flex flex-wrap gap-1">
                     {review.venue.categories.map((category) => (
-                      <Badge key={category._id} variant="secondary" className="text-xs">
+                      <Badge key={category._id} variant="secondary" className="text-xs dark:bg-gray-800 dark:text-gray-300">
                         {category.title}
                       </Badge>
                     ))}
@@ -431,7 +432,7 @@ export const ReviewDetailModern: React.FC<ReviewDetailModernProps> = ({
                 </div>
               )}
 
-              <div className="pt-4 border-t">
+              <div className="pt-4 border-t dark:border-gray-800">
                 <ShareButtons
                   url={currentUrl}
                   title={review.title}

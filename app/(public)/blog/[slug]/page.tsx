@@ -125,13 +125,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         />
       )}
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a]">
         <div className="container-wide py-12">
         {/* Breadcrumbs */}
         <nav className="mb-8" aria-label="Breadcrumb">
-          <ol className="flex items-center space-x-2 text-sm text-gray-500">
+          <ol className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
             <li>
-              <Link href="/" className="hover:text-primary-600">Inicio</Link>
+              <Link href="/" className="hover:text-primary transition-colors">Inicio</Link>
             </li>
             <li>
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -139,14 +139,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </svg>
             </li>
             <li>
-              <Link href="/blog" className="hover:text-primary-600">Blog</Link>
+              <Link href="/blog" className="hover:text-primary transition-colors">Blog</Link>
             </li>
             <li>
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
             </li>
-            <li className="text-gray-900 font-medium line-clamp-1">{post.title}</li>
+            <li className="text-gray-900 dark:text-white font-medium line-clamp-1">{post.title}</li>
           </ol>
         </nav>
 
@@ -154,28 +154,28 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {/* Article Header */}
           <header className="mb-12">
             <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
                 {post.title}
               </h1>
               
               {post.excerpt && (
-                <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
                   {post.excerpt}
                 </p>
               )}
 
-              <div className="flex items-center justify-center space-x-4 text-gray-500 mb-8">
+              <div className="flex items-center justify-center space-x-6 text-gray-500 dark:text-gray-500 mb-8">
                 <div className="flex items-center">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                  {post.author}
+                  <span className="dark:text-gray-400">{post.author}</span>
                 </div>
                 <div className="flex items-center">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <time dateTime={post.publishedAt} suppressHydrationWarning>
+                  <time dateTime={post.publishedAt} suppressHydrationWarning className="dark:text-gray-400">
                     {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(post.publishedAt))}
                   </time>
                 </div>
@@ -187,7 +187,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   {post.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-block px-3 py-1 text-sm font-medium text-primary-700 bg-primary-100 rounded-full"
+                      className="inline-block px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 dark:bg-primary/20 rounded-full"
                     >
                       {tag}
                     </span>
@@ -198,8 +198,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </header>
 
           {/* Article Content */}
-          <article className="bg-white rounded-lg border border-gray-200 p-8 lg:p-12 mb-12">
-            <div className="prose prose-lg max-w-none">
+          <article className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-white/10 p-8 lg:p-12 mb-12 shadow-sm">
+            <div className="prose prose-lg dark:prose-invert max-w-none">
+              {/* Aquí se debería renderizar el contenido dinámico post.body si estuviera configurado PortableText */}
               <p className="lead">
                 Santiago de Compostela, además de ser destino de peregrinaje, es un paraíso gastronómico que combina tradición gallega con innovación culinaria. En esta guía, exploramos los restaurantes que mejor representan la esencia de la cocina gallega.
               </p>
@@ -235,27 +236,26 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {/* Related Posts */}
           {relatedPosts && relatedPosts.length > 0 && (
             <section className="mb-12">
-              <h3 className="text-2xl font-bold text-gray-900 mb-8">Artículos Relacionados</h3>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Artículos Relacionados</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {relatedPosts.slice(0, 2).map((relatedPost) => (
-                <article key={relatedPost._id} className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-md overflow-hidden">
-                  <div className="p-6">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                <article key={relatedPost._id} className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-white/10 hover:border-primary/30 transition-all duration-300 hover:shadow-xl overflow-hidden group">
+                  <div className="p-8">
+                    <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-primary transition-colors line-clamp-2">
                       <Link 
                         href={`/blog/${relatedPost.slug.current}`}
-                        className="hover:text-primary-600 transition-colors"
                       >
                         {relatedPost.title}
                       </Link>
                     </h4>
                     
                     {relatedPost.excerpt && (
-                      <p className="text-gray-600 mb-4 line-clamp-2">
+                      <p className="text-gray-600 dark:text-gray-400 mb-6 line-clamp-2 text-sm">
                         {relatedPost.excerpt}
                       </p>
                     )}
 
-                    <div className="flex items-center justify-between text-sm text-gray-500">
+                    <div className="flex items-center justify-between text-xs font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wider">
                       <span>{relatedPost.author}</span>
                       <time dateTime={relatedPost.publishedAt} suppressHydrationWarning>
                         {new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(relatedPost.publishedAt))}

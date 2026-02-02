@@ -75,7 +75,7 @@ export default function Breadcrumbs({
           <li>
             <Link
               href="/"
-              className="flex items-center text-gray-500 hover:text-gray-700 transition-colors duration-200"
+              className="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200"
               aria-label="Ir al inicio"
             >
               <HomeIcon className="w-4 h-4" aria-hidden="true" />
@@ -100,7 +100,7 @@ export default function Breadcrumbs({
               {/* Breadcrumb Link or Text */}
               {isLast ? (
                 <span
-                  className="font-medium text-gray-900 truncate max-w-xs"
+                  className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-xs md:max-w-md"
                   aria-current="page"
                   title={item.name}
                 >
@@ -109,8 +109,7 @@ export default function Breadcrumbs({
               ) : (
                 <Link
                   href={item.url}
-                  className="text-gray-500 hover:text-gray-700 transition-colors duration-200 truncate max-w-xs"
-                  title={item.name}
+                  className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200 truncate max-w-[120px] md:max-w-xs"
                 >
                   {item.name}
                 </Link>

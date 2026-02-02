@@ -190,12 +190,30 @@ export default async function HomePage() {
     sanityFetch<any>({
       query: homepageQuery,
       tags: ['homepage'],
+    }).catch(err => {
+      console.error('Error fetching homepage data:', err);
+      return null;
     }),
     sanityFetch<any>({
       query: venuesByMasterCategoryQuery,
       tags: ['venues'],
+    }).catch(err => {
+      console.error('Error fetching master category data:', err);
+      return null;
     })
   ]);
+
+  if (!homepageData) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <h1 className="text-2xl font-bold mb-4">¡Ups! Algo salió mal</h1>
+        <p className="text-muted-foreground mb-8">No hemos podido cargar los datos de la página principal. Por favor, inténtalo de nuevo más tarde.</p>
+        <Link href="/" className="bg-primary text-primary-foreground px-6 py-2 rounded-md hover:opacity-90 transition-opacity">
+          Reintentar
+        </Link>
+      </div>
+    );
+  }
 
   const {
     featuredReviews = [],
@@ -207,10 +225,16 @@ export default async function HomePage() {
   } = homepageData;
 
   // Transformar datos
-  const transformedFeatured = transformSanityReviews(featuredReviews);
-  const transformedTrending = transformSanityReviews(trendingReviews);
-  const transformedTopRated = transformSanityVenues(topRatedVenues);
-  const transformedCategories = transformSanityCategories(categories);
+  const transformedFeatured = transformSanityReviews(featuredReviews || []);
+  const transformedTrending = transformSanityReviews(trendingReviews || []);
+  const transformedTopRated = transformSanityVenues(topRatedVenues || []);
+  const transformedCategories = transformSanityCategories(categories || []);
+
+  const hasMasterCategories = masterCategoryData && (
+    (masterCategoryData.gastro?.length > 0) || 
+    (masterCategoryData.ocio?.length > 0) || 
+    (masterCategoryData.deportes?.length > 0)
+  );
 
   return (
     <div className="flex flex-col gap-12 pb-20">
@@ -218,7 +242,7 @@ export default async function HomePage() {
       
       <div className="container mx-auto px-4 space-y-24">
         {/* Gastronomía Section */}
-        {masterCategoryData.gastro?.length > 0 && (
+        {masterCategoryData?.gastro?.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-3xl font-serif font-bold text-foreground flex items-center gap-3">
@@ -247,7 +271,7 @@ export default async function HomePage() {
         )}
 
         {/* Ocio Section */}
-        {masterCategoryData.ocio?.length > 0 && (
+        {masterCategoryData?.ocio?.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-3xl font-serif font-bold text-foreground flex items-center gap-3">
@@ -276,7 +300,7 @@ export default async function HomePage() {
         )}
 
         {/* Deportes Section */}
-        {masterCategoryData.deportes?.length > 0 && (
+        {masterCategoryData?.deportes?.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-3xl font-serif font-bold text-foreground flex items-center gap-3">
